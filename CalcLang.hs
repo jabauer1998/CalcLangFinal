@@ -197,21 +197,21 @@ parseDol = do
            p <- (char '.')
            d1 <- digit
            d2 <- parseLexeme digit
-           return (Dol ((c : d) ++ [p, d1, d2]) startPosition)
+           return (Dol (d ++ [p, d1, d2]) startPosition)
 
 parsePerc :: CalcLangLexer Token
 parsePerc = do
             startPosition <- getPosition
-            p <- (char '%')
             d <- many1 digit
             p <- (char '.')
-            delse <- parseLexeme (many1 digit)
-            return (Perc ((p : d) ++ [p] ++ delse) startPosition)
+            delse <- (many1 digit)
+            parseLexeme (char '%')
+            return (Perc (d ++ [p] ++ delse) startPosition)
             
             
 
 parseToken :: CalcLangLexer Token
-parseToken = try parseDol <|> try parsePerc <|> try parsePeriod <|> try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseNum <|> try parseBool <|> try parseIdent
+parseToken = try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent
 
 parseTokens :: CalcLangLexer [Token]
 parseTokens = spaces *> many parseToken
@@ -295,7 +295,7 @@ parsePercentAst = do
                   start <- getPosition
                   x <- parsePerc
                   case x of
-                    Perc a p -> return (DollarAst start a)
+                    Perc a p -> return (PercentAst start a)
 
 
 parseIntNumber :: CalcLangParser AstNode
@@ -334,7 +334,14 @@ parseFunctionCall = do
                           IdentAst _ n -> return (FunctionCall start n l)
 
 parsePrimaryExpression :: CalcLangParser AstNode
-parsePrimaryExpression = try parseDollarAst <|> try parsePercentAst <|> try parseNumber <|> try parseTuple <|> try parseSet <|> try parseBoolean <|> try parseIfExpr <|> try parseFunctionCall <|> try parseIdentifier
+parsePrimaryExpression = try parseDollarAst <|> try parsePercentAst <|> try parseNumber <|> try parseParenExpression <|> try parseTuple <|> try parseSet <|> try parseBoolean <|> try parseIfExpr <|> try parseFunctionCall <|> try parseIdentifier
+
+parseParenExpression :: CalcLangParser AstNode
+parseParenExpression = do
+                       parseLPar
+                       x <- parseExpression
+                       parseRPar
+                       return x
 
 parseUnaryOperation :: CalcLangParser AstNode
 parseUnaryOperation = try parseNotOperation <|> try parseNegationOperation <|> parsePrimaryExpression
@@ -448,7 +455,7 @@ parseBinaryOperation = try parseLogicalOperation <|> try parseAddSubOp
 
 parseExpressionList :: CalcLangParser [AstNode]
 parseExpressionList = do
-                      x <- (sepBy parseExpression parseComma)
+                      x <- (sepBy1 parseExpression parseComma)
                       return (reverse x)
 
 
@@ -498,7 +505,7 @@ data CalcLangValue = BoolVal Bool
                    deriving (Show, Eq)
 
 data STable a b = SymbolTable [(a, b)] deriving (Show, Eq)
-type VariableTable = STable Char AstNode
+type VariableTable = STable Char CalcLangValue
 type FunctionTable = STable Char ([AstNode], AstNode)
 
 addEntry :: STable a b -> (a, b) -> STable a b
@@ -573,7 +580,7 @@ interpret node vT fT = case node of
                           DotProductOperation _ x y -> dotProductVals (interpret x vT fT) (interpret y vT fT)
                           PowerOperation _ x y -> powVals (interpret x vT fT) (interpret y vT fT)
                           DollarAst _ x -> DollarVal (read x :: Double)
-                          PercentAst _ x -> PercentVal (read x :: Double)
+                          PercentAst _ x -> PercentVal ((read x :: Double) / 100.0)
                           IntNumberAst _ x -> IntVal (read x :: Int) 
                           RealNumberAst _ x -> RealVal (read x :: Double)
                           BooleanAst _ x -> BoolVal (if x == "TRUE" then True else False)
@@ -582,21 +589,22 @@ interpret node vT fT = case node of
                           IdentAst _ x -> do
                                           let entry = (getEntry vT x)
                                           case entry of
-                                            Just y -> (interpret y vT fT)
+                                            Just y -> y
                                             Nothing -> ErrorVal [("Variable " ++ [x] ++ " not found")]
                           FunctionCall _ x y -> do
                                                 let entry = (getEntry fT x)
                                                 case entry of
                                                     Just (params, retExpr) -> do
                                                                               let zippedData = (zipWith generateParam params y)
-                                                                              let vTable = (foldl (\table tuple -> addEntry table tuple) vT zippedData)
+                                                                              let finalZippedData = (map (\(x, y) -> (x, interpret y vT fT)) zippedData)
+                                                                              let vTable = (foldl (\table tuple -> addEntry table tuple) vT finalZippedData)
                                                                               let retVal = (interpret retExpr vTable fT)
                                                                               (retVal)
                                                     Nothing -> ErrorVal ["Function " ++ [x] ++ " not found"]
                           NegateOperation _ x -> negVal (interpret x vT fT)
                           NotOperation _ x -> notVal (interpret x vT fT)
                           FunctionDef _ s l e -> VoidVal vT (addEntry fT (s, (l, e)))
-                          Assign _ s e -> VoidVal (addEntry vT (s,e)) fT
+                          Assign _ s e -> VoidVal (addEntry vT (s, interpret e vT fT)) fT
                           IfExpr _ cond ifTrue ifFalse -> if (asBool (interpret cond vT fT)) then (interpret ifTrue vT fT) else (interpret ifFalse vT fT)
 
 asBool :: CalcLangValue -> Bool
@@ -864,7 +872,9 @@ runCommandLine vT fT = do
                                     case interpreterResult of
                                       VoidVal vT fT -> runCommandLine vT fT
                                       ErrorVal x -> putStrLn (toErrorLog x)
-                                      n -> putStrLn (toString n)
+                                      n -> do
+                                           putStrLn (toString n)
+                                           runCommandLine vT fT
                                       
 
 
