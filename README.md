@@ -2,11 +2,8 @@
 CalcLang is an interpreted language designed to be used in a Math class. 
 Oroginally it was created as a reply with scala however i switched it over to haskell for performance reasons.
 
-# Scala
--- The parser and lexer is hand generated it comes with maven for the build and distribution. To get started just run maven and execute the jar file.
-
 #Haskell
--- The lexer was generated with alex and the parser was generated with alex. The Haskell design also provides better error detection and runs much quicker.
+-- In this version of CalcLang the lexer and the Parser are generated with Parsec
 
 --The main difference with this version is that defining function syntax is slightly different.
 --Scala -> it is f(x) = expr
