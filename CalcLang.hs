@@ -496,7 +496,7 @@ parseAstNode = spaces *> (try parseFunctionDefinition <|> try parseMacroAssignme
 data CalcLangValue = BoolVal Bool
                    | IntVal Int
                    | RealVal Double
-                   | VoidVal VariableTable FunctionTable
+                   | VoidVal
                    | TupleVal [CalcLangValue]
                    | SetVal [CalcLangValue]
                    | DollarVal Double
@@ -507,10 +507,31 @@ data CalcLangValue = BoolVal Bool
 data STable a b = SymbolTable [(a, b)] deriving (Show, Eq)
 type VariableTable = STable Char CalcLangValue
 type FunctionTable = STable Char ([AstNode], AstNode)
+data Env = Environment [VariableTable]
 
-addEntry :: STable a b -> (a, b) -> STable a b
-addEntry table entry = case table of
-                         SymbolTable x -> SymbolTable (entry : x)
+addScopeToEnv :: Env -> Env
+addScopeToEnv a = case a of
+                      Environment [] -> Environment [SymbolTable []]
+                      Environment [b] -> Environment [SymbolTable [], b]
+                      Environment (b:c) -> Environment ([SymbolTable []] ++ [b] ++ c)
+
+removeScopeFromEnv :: Env -> Env
+removeScopeFromEnv a = case a of
+                         Environment [] -> Environment []
+                         Environment [a] -> Environment []
+                         Environment (s : r) -> Environment r
+                  
+
+addEntryToEnv :: Env -> (Char, CalcLangValue) ->  Env
+addEntryToEnv e t = case e of
+                      Environment [] -> case (addScopeToEnv e) of
+                                          Environment [a] -> Environment [addEntryToTable a t]
+                      Environment [a] -> Environment [addEntryToTable a t]
+                      Environment (a : b) -> Environment ((addEntryToTable a t) : b)  
+
+addEntryToTable :: STable a b -> (a, b) -> STable a b
+addEntryToTable table entry = case table of
+                                SymbolTable x -> SymbolTable (entry : x)
 
 removeEntry :: (Eq a, Show a, Show b) => STable a b -> a -> STable a b
 removeEntry table key = case table of
@@ -521,13 +542,23 @@ removeKey :: (Eq key) => [(key, a)] -> key -> [(key, a)]
 removeKey list key = case list of
                        [] -> []
                        ((itemKey, _) : rest) -> case itemKey == key of
-                                                  True -> rest
-                                                  False -> removeKey rest key
-                             
-getEntry :: (Eq a) => STable a b -> a -> Maybe b
-getEntry table key = case table of
-                       SymbolTable [] -> Nothing
-                       SymbolTable list -> getKey list key
+                                                      True -> rest
+                                                      False -> removeKey rest key
+
+getEntryFromEnv :: Env -> Char -> Maybe CalcLangValue
+getEntryFromEnv e c = case e of
+                        Environment [] -> Nothing
+                        Environment [a] -> (getEntryFromTable a c)
+                        Environment (a : rest) -> do
+                                                  let x = (getEntryFromTable a c)
+                                                  case x of
+                                                    Nothing -> (getEntryFromEnv (Environment  rest) c)
+                                                    otherwise -> x
+
+getEntryFromTable :: (Eq a) => STable a b -> a -> Maybe b
+getEntryFromTable table key = case table of
+                                  SymbolTable [] -> Nothing
+                                  SymbolTable list -> getKey list key
 
 getKey :: (Eq key) => [(key,a)] -> key -> Maybe a
 getKey list key = case list of
@@ -566,46 +597,51 @@ generateParam :: AstNode -> AstNode -> (Char, AstNode)
 generateParam paramLexeme toExpr = case paramLexeme of
                                      IdentAst _ x -> (x, toExpr)
 
-interpret :: AstNode -> VariableTable -> FunctionTable -> CalcLangValue
+interpret :: AstNode -> Env -> FunctionTable -> (CalcLangValue, Env, FunctionTable)
 interpret node vT fT = case node of
-                          EqualOperation _ x y -> equalVals (interpret x vT fT) (interpret y vT fT)
-                          LessThenOrEqualsOperation _ x y -> lessOrEqualVals (interpret x vT fT) (interpret y vT fT)
-                          GreaterThenOrEqualsOperation _ x y -> greaterOrEqualVals (interpret x vT fT) (interpret y vT fT)
-                          LessThenOperation _ x y -> lessThanVals (interpret x vT fT) (interpret y vT fT)
-                          GreaterThenOperation _ x y -> greaterThanVals (interpret x vT fT) (interpret y vT fT)
-                          AdditionOperation _ x y -> addVals (interpret x vT fT) (interpret y vT fT)
-                          SubtractionOperation _ x y -> subtractVals (interpret x vT fT) (interpret y vT fT)
-                          MultiplicationOperation _ x y -> multVals (interpret x vT fT) (interpret y vT fT)
-                          DivisionOperation _ x y -> divVals (interpret x vT fT) (interpret y vT fT)
-                          DotProductOperation _ x y -> dotProductVals (interpret x vT fT) (interpret y vT fT)
-                          PowerOperation _ x y -> powVals (interpret x vT fT) (interpret y vT fT)
-                          DollarAst _ x -> DollarVal (read x :: Double)
-                          PercentAst _ x -> PercentVal ((read x :: Double) / 100.0)
-                          IntNumberAst _ x -> IntVal (read x :: Int) 
-                          RealNumberAst _ x -> RealVal (read x :: Double)
-                          BooleanAst _ x -> BoolVal (if x == "TRUE" then True else False)
-                          SetAst _ x -> SetVal (map (\s -> interpret s vT fT) x)
-                          TupleAst _ x -> TupleVal (map (\s -> interpret s vT fT) x)
+                          EqualOperation _ x y -> (equalVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                          LessThenOrEqualsOperation _ x y -> (lessOrEqualVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                          GreaterThenOrEqualsOperation _ x y -> (greaterOrEqualVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                          LessThenOperation _ x y -> (lessThanVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                          GreaterThenOperation _ x y -> (greaterThanVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                          AdditionOperation _ x y -> (addVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                          SubtractionOperation _ x y -> (subtractVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                          MultiplicationOperation _ x y -> (multVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                          DivisionOperation _ x y -> (divVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                          DotProductOperation _ x y -> (dotProductVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                          PowerOperation _ x y -> (powVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                          DollarAst _ x -> (DollarVal (read x :: Double), vT, fT)
+                          PercentAst _ x -> (PercentVal ((read x :: Double) / 100.0), vT, fT)
+                          IntNumberAst _ x -> (IntVal (read x :: Int), vT, fT) 
+                          RealNumberAst _ x -> (RealVal (read x :: Double), vT, fT)
+                          BooleanAst _ x -> (BoolVal (if x == "TRUE" then True else False), vT, fT)
+                          SetAst _ x -> (SetVal (map (\s -> (gV (interpret s vT fT))) x), vT, fT)
+                          TupleAst _ x -> (TupleVal (map (\s -> (gV (interpret s vT fT))) x), vT, fT)
                           IdentAst _ x -> do
-                                          let entry = (getEntry vT x)
+                                          let entry = (getEntryFromEnv vT x)
                                           case entry of
-                                            Just y -> y
-                                            Nothing -> ErrorVal [("Variable " ++ [x] ++ " not found")]
+                                            Just y -> (y, vT, fT)
+                                            Nothing -> (ErrorVal [("Variable " ++ [x] ++ " not found")], vT, fT)
                           FunctionCall _ x y -> do
-                                                let entry = (getEntry fT x)
+                                                let entry = (getEntryFromTable fT x)
                                                 case entry of
                                                     Just (params, retExpr) -> do
                                                                               let zippedData = (zipWith generateParam params y)
-                                                                              let finalZippedData = (map (\(x, y) -> (x, interpret y vT fT)) zippedData)
-                                                                              let vTable = (foldl (\table tuple -> addEntry table tuple) vT finalZippedData)
-                                                                              let retVal = (interpret retExpr vTable fT)
-                                                                              (retVal)
-                                                    Nothing -> ErrorVal ["Function " ++ [x] ++ " not found"]
-                          NegateOperation _ x -> negVal (interpret x vT fT)
-                          NotOperation _ x -> notVal (interpret x vT fT)
-                          FunctionDef _ s l e -> VoidVal vT (addEntry fT (s, (l, e)))
-                          Assign _ s e -> VoidVal (addEntry vT (s, interpret e vT fT)) fT
-                          IfExpr _ cond ifTrue ifFalse -> if (asBool (interpret cond vT fT)) then (interpret ifTrue vT fT) else (interpret ifFalse vT fT)
+                                                                              let finalZippedData = (map (\(x, y) -> (x, (gV (interpret y vT fT)))) zippedData)
+                                                                              let addedScopeEnv = addScopeToEnv vT
+                                                                              let vTable = (foldl (\table tuple -> addEntryToEnv table tuple) addedScopeEnv  finalZippedData)
+                                                                              let retVal = (gV (interpret retExpr vTable fT))
+                                                                              (retVal, removeScopeFromEnv vTable, fT)
+                                                    Nothing -> (ErrorVal ["Function " ++ [x] ++ " not found"], vT, fT)
+                          NegateOperation _ x -> (negVal (gV (interpret x vT fT)), vT, fT)
+                          NotOperation _ x -> (notVal (gV (interpret x vT fT)), vT, fT)
+                          FunctionDef _ s l e -> (VoidVal, vT, (addEntryToTable fT (s, (l, e)))) 
+                          Assign _ s e -> (VoidVal, (addEntryToEnv vT (s, (gV (interpret e vT fT)))),  fT)
+                          IfExpr _ cond ifTrue ifFalse -> if (asBool (gV (interpret cond vT fT))) then (interpret ifTrue vT fT) else (interpret ifFalse vT fT)
+
+gV :: (CalcLangValue, Env, FunctionTable) -> CalcLangValue
+gV t = case t of
+         (a, _, _) -> a
 
 asBool :: CalcLangValue -> Bool
 asBool val = case val of
@@ -624,7 +660,7 @@ asReal val = case val of
                _ -> -1.0
 
 powVals :: CalcLangValue -> CalcLangValue -> CalcLangValue
-powVals v1 v2 = case (v1,v2) of
+powVals v1 v2 = case (v1, v2) of
                  (ErrorVal v1, ErrorVal v2) -> ErrorVal (v1 ++ v2)
                  (ErrorVal v1, _) -> ErrorVal v1
                  (_, ErrorVal v2) -> ErrorVal v2
@@ -859,7 +895,7 @@ lessOrEqualVals v1 v2 = notVal (greaterThanVals v1 v2)
 greaterOrEqualVals :: CalcLangValue -> CalcLangValue -> CalcLangValue
 greaterOrEqualVals v1 v2 = notVal (lessThanVals v1 v2)
 
-runCommandLine :: VariableTable -> FunctionTable -> IO ()
+runCommandLine :: Env -> FunctionTable -> IO ()
 runCommandLine vT fT = do
                        putStr ">>CalcLang>> "
                        hFlush stdout
@@ -870,14 +906,12 @@ runCommandLine vT fT = do
                          Right t -> do
                                     let interpreterResult = (interpret t vT fT)
                                     case interpreterResult of
-                                      VoidVal vT fT -> runCommandLine vT fT
-                                      ErrorVal x -> putStrLn (toErrorLog x)
-                                      n -> do
+                                      (n, x, y) -> do
                                            putStrLn (toString n)
-                                           runCommandLine vT fT
+                                           runCommandLine x y
                                       
 
 
 main :: IO ()
-main = runCommandLine (SymbolTable []) (SymbolTable [])
+main = runCommandLine (Environment []) (SymbolTable [])
 
