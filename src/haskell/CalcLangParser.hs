@@ -1,4 +1,4 @@
-module CalcLangParser where
+module CalcLangParser(runCalcLangLexer, runCalcLangParser) where
 
 import Text.Parsec
 import Text.Parsec.String
@@ -6,42 +6,9 @@ import Text.Parsec.Char
 import Data.Text (Text)
 import System.IO
 import Numeric
-
-type Pos = SourcePos
-
-data Token = Ident Char Pos
-           | IntNum String Pos
-           | RealNum String Pos
-           | TF String Pos
-           | Func Pos
-           | Plus Pos
-           | Minus Pos
-           | Times Pos
-           | Div Pos
-           | Eq Pos
-           | Pow Pos
-           | Not Pos
-           | Comma Pos
-           | LPar Pos
-           | RPar Pos
-           | LBrack Pos
-           | RBrack Pos
-           | LessThen Pos
-           | GreaterThen Pos
-           | GtOrEq Pos
-           | LtOrEq Pos
-           | If Pos
-           | Then Pos
-           | Else Pos
-           | Let Pos
-           | Dol String Pos
-           | Perc String Pos
-           | Dot Pos
-           deriving (Show, Eq)
-
+import CalcLangAst
 
 type CalcLangLexer a = ParsecT String () IO a
-
 
 parseLexeme :: (CalcLangLexer a) -> (CalcLangLexer a)
 parseLexeme a = a <* spaces
@@ -217,34 +184,6 @@ parseTokens = spaces *> many parseToken
 
 --Next we need to design the Parser...
 type CalcLangParser a = ParsecT String () IO a
-
-data AstNode = EqualOperation Pos AstNode AstNode
-             | LessThenOrEqualsOperation Pos AstNode AstNode
-             | GreaterThenOrEqualsOperation Pos AstNode AstNode
-             | LessThenOperation Pos AstNode AstNode
-             | GreaterThenOperation Pos AstNode AstNode
-             | AdditionOperation Pos AstNode AstNode
-             | SubtractionOperation Pos AstNode AstNode
-             | MultiplicationOperation Pos AstNode AstNode
-             | DotProductOperation Pos AstNode AstNode
-             | DivisionOperation Pos AstNode AstNode
-             | PowerOperation Pos AstNode AstNode
-             | IntNumberAst Pos String
-             | RealNumberAst Pos String
-             | BooleanAst Pos String
-             | SetAst Pos [AstNode]
-             | TupleAst Pos [AstNode]
-             | IdentAst Pos Char
-             | DollarAst Pos String
-             | PercentAst Pos String
-             | FunctionCall Pos Char [AstNode]
-             | NegateOperation Pos AstNode
-             | NotOperation Pos AstNode
-             | FunctionDef Pos Char [AstNode] AstNode
-             | Assign Pos Char AstNode
-             | IfExpr Pos AstNode AstNode AstNode
-             | ErrorNode String
-             deriving (Eq, Show)
 
 parseBoolean :: CalcLangParser AstNode
 parseBoolean = do

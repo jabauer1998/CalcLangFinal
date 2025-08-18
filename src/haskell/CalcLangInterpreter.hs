@@ -1,8 +1,9 @@
-module CalcLangInterpreter where
+module CalcLangInterpreter(runCalcLang) where
 
 import CalcLangParser
 import Numeric
 import System.IO
+import CalcLangAst
 
 data CalcLangValue = BoolVal Bool
                    | IntVal Int
