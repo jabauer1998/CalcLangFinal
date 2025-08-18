@@ -24,7 +24,7 @@ CFLAGS += -I$(INCDIR)
 HFLAGS += -XForeignFunctionInterface
 HFLAGS += -fPIC
 HFLAGS += -i$(HDIR)
-FLAGS += -flink-rts
+HFLAGS += -flink-rts
 HFLAGS += -hidir $(INTDIR)
 #Here is a specification of the Src for generating the interpreter
 HISRC:= $(HDIR)/CalcLangParser.hs $(HDIR)/CalcLangInterpreter.hs $(HDIR)/CalcLangMain.hs
@@ -43,4 +43,4 @@ all: InterpreterExe
 
 .PHONY: clean
 clean:
-	Remove-Item $(HIOBJS) $(HIINT) $(BDIR)/$(ITARGET)
+	rm -f $(HIOBJS) $(HIINT) $(BDIR)/$(ITARGET)
