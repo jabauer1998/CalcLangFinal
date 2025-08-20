@@ -390,16 +390,16 @@ parseGreaterThenOperation = do
 parseBinaryOperation :: CalcLangParser AstNode
 parseBinaryOperation = try parseLogicalOperation <|> try parseAddSubOp
 
-parseExpressionList :: CalcLangParser [AstNode]
+parseExpressionList :: CalcLangParser SA
 parseExpressionList = do
                       x <- (sepBy1 parseExpression parseComma)
-                      return (reverse x)
+                      return (StoreArray (length x) (reverse x))
 
 
-parseParamaters :: CalcLangParser [AstNode]
+parseParamaters :: CalcLangParser SA
 parseParamaters = do
                   x <- (sepBy parseIdentifier parseComma)
-                  return (reverse x)
+                  return (StoreArray (length x) (reverse x))
 
 parseFunctionDefinition :: CalcLangParser AstNode
 parseFunctionDefinition = do
@@ -428,7 +428,7 @@ parseMacroAssignment = do
 parseAstNode :: CalcLangParser AstNode
 parseAstNode = spaces *> (try parseFunctionDefinition <|> try parseMacroAssignment <|> try parseExpression)
 
-runCalcLangParser :: String -> IO AstNode
+foreign export ccall runCalcLangParser :: String -> IO AstNode
 runCalcLangParser i = do
               parseResult <- (runParserT parseAstNode () "" i)
               case parseResult of

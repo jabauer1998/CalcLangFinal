@@ -127,27 +127,31 @@ interpret node vT fT = case node of
                           IntNumberAst _ x -> (IntVal (read x :: Int), vT, fT) 
                           RealNumberAst _ x -> (RealVal (read x :: Double), vT, fT)
                           BooleanAst _ x -> (BoolVal (if x == "TRUE" then True else False), vT, fT)
-                          SetAst _ x -> (SetVal (map (\s -> (gV (interpret s vT fT))) x), vT, fT)
-                          TupleAst _ x -> (TupleVal (map (\s -> (gV (interpret s vT fT))) x), vT, fT)
+                          SetAst _ x -> case x of
+                                          StoreArray l arr -> (SetVal (map (\s -> (gV (interpret s vT fT))) arr), vT, fT)
+                          TupleAst _ x -> case x of
+                                            StoreArray l arr -> (TupleVal (map (\s -> (gV (interpret s vT fT))) arr), vT, fT)
                           IdentAst _ x -> do
                                           let entry = (getEntryFromEnv vT x)
                                           case entry of
                                             Just y -> (y, vT, fT)
                                             Nothing -> (ErrorVal [("Variable " ++ [x] ++ " not found")], vT, fT)
-                          FunctionCall _ x y -> do
-                                                let entry = (getEntryFromTable fT x)
-                                                case entry of
-                                                    Just (params, retExpr) -> do
-                                                                              let zippedData = (zipWith generateParam params y)
-                                                                              let finalZippedData = (map (\(x, y) -> (x, (gV (interpret y vT fT)))) zippedData)
-                                                                              let addedScopeEnv = addScopeToEnv vT
-                                                                              let vTable = (foldl (\table tuple -> addEntryToEnv table tuple) addedScopeEnv  finalZippedData)
-                                                                              let retVal = (gV (interpret retExpr vTable fT))
-                                                                              (retVal, removeScopeFromEnv vTable, fT)
-                                                    Nothing -> (ErrorVal ["Function " ++ [x] ++ " not found"], vT, fT)
+                          FunctionCall _ x y -> case y of
+                                                  StoreArray l arr -> do
+                                                                      let entry = (getEntryFromTable fT x)
+                                                                      case entry of
+                                                                        Just (params, retExpr) -> do
+                                                                                                  let zippedData = (zipWith generateParam params arr)
+                                                                                                  let finalZippedData = (map (\(x, y) -> (x, (gV (interpret y vT fT)))) zippedData)
+                                                                                                  let addedScopeEnv = addScopeToEnv vT
+                                                                                                  let vTable = (foldl (\table tuple -> addEntryToEnv table tuple) addedScopeEnv  finalZippedData)
+                                                                                                  let retVal = (gV (interpret retExpr vTable fT))
+                                                                                                  (retVal, removeScopeFromEnv vTable, fT)
+                                                                        Nothing -> (ErrorVal ["Function " ++ [x] ++ " not found"], vT, fT)
                           NegateOperation _ x -> (negVal (gV (interpret x vT fT)), vT, fT)
                           NotOperation _ x -> (notVal (gV (interpret x vT fT)), vT, fT)
-                          FunctionDef _ s l e -> (VoidVal, vT, (addEntryToTable fT (s, (l, e)))) 
+                          FunctionDef _ s l e -> case l of
+                                                   StoreArray ll ad -> (VoidVal, vT, (addEntryToTable fT (s, (ad, e)))) 
                           Assign _ s e -> (VoidVal, (addEntryToEnv vT (s, (gV (interpret e vT fT)))),  fT)
                           IfExpr _ cond ifTrue ifFalse -> if (asBool (gV (interpret cond vT fT))) then (interpret ifTrue vT fT) else (interpret ifFalse vT fT)
 

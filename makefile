@@ -10,6 +10,8 @@ CODIR:=$(ODIR)/c
 HODIR:=$(ODIR)/haskell
 INTDIR:=./interface/haskell
 INCDIR:=./include
+HINCLUDE:=$(INCDIR)/haskell
+CINCLUDE:=$(INCDIR)/c
 BDIR:=./bin
 ITARGET:=CalcLang.exe
 # Toolchain definitions
@@ -26,6 +28,7 @@ HFLAGS += -fPIC
 HFLAGS += -i$(HDIR)
 HFLAGS += -flink-rts
 HFLAGS += -hidir $(INTDIR)
+HFLAGS += -stubdir $(HINCLUDE)
 #Here is a specification of the Src for generating the interpreter
 HISRC:=$(HDIR)/CalcLangAst.hs $(HDIR)/CalcLangParser.hs $(HDIR)/CalcLangInterpreter.hs $(HDIR)/CalcLangMain.hs
 HIINT:=$(HISRC:$(HDIR)/%.hs=$(INTDIR)/%.hi)
