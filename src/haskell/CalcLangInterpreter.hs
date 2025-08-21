@@ -4,6 +4,7 @@ import CalcLangParser
 import Numeric
 import System.IO
 import CalcLangAst
+import Data.List
 
 data CalcLangValue = BoolVal Bool
                    | IntVal Int
@@ -85,20 +86,14 @@ toErrorLog :: [String] -> String
 toErrorLog errors = case errors of
                       [] -> ""
                       (current:[]) -> current ++ "\n"
-                      (current:rest) -> (toErrorLog rest) ++ current ++ "\n"                           
+                      (current:rest) -> (toErrorLog rest) ++ current ++ "\n"
 
-toStr :: [CalcLangValue] -> String
-toStr list = case list of
-               [] -> ""
-               (val:[]) -> toString val
-               (val:rest) -> (toStr rest) ++ ", " ++ (toString val)
-
-toString :: CalcLangValue -> String
-toString val = case val of
+toStr :: CalcLangValue -> String
+toStr val = case val of
                  IntVal val -> show val
                  RealVal val -> show val
-                 TupleVal val -> "(" ++ (toStr val) ++ ")"
-                 SetVal val -> "{" ++ (toStr val) ++ "}"
+                 TupleVal val -> "(" ++ (intercalate ", " (map toStr val)) ++ ")"
+                 SetVal val -> "{" ++ (intercalate ", " (map toStr val)) ++ "}"
                  DollarVal val -> "$" ++ (showFFloat (Just 2) val "")
                  PercentVal val -> (showFFloat (Just 2) (val*100.0) "") ++ "%"
                  BoolVal val -> if val then "TRUE" else "FALSE"
@@ -431,5 +426,5 @@ runCommandLine vT fT = do
                               case interpreterResult of
                                     (VoidVal, x, y) -> runCommandLine x y
                                     (a, x, y) -> do
-                                                 putStrLn (toString a)
+                                                 putStrLn (toStr a)
                                                  runCommandLine x y

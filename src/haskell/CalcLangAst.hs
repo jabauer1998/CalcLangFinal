@@ -1,4 +1,4 @@
-module CalcLangAst(Token(..), AstNode(..), SA(..), CSA(..), CSourcePos(..), CAstNode(..)) where
+module CalcLangAst(Token(..), AstNode(..), SA(..), CSA(..), CSourcePos(..), CAstNode(..), toString) where
 --Below are all the Ast Nodes for Tokens
 import Text.Parsec
 import Foreign.Storable (Storable, sizeOf, alignment, peek, poke)
@@ -8,6 +8,7 @@ import Foreign.Storable
 import Foreign.Ptr
 import Text.Parsec.Pos
 import Foreign.Marshal.Array
+import Data.List
 
 data CSourcePos = CSourcePos CString CInt CInt deriving (Eq, Show)
 
@@ -57,6 +58,10 @@ data Token = Ident Char SourcePos
 --Below are all the regular AstNodes
 data SA = StoreArray Int [AstNode] deriving (Eq, Show)
 
+sAToString :: SA -> String
+sAToString a = case a of
+               StoreArray _ l -> intercalate ", " (map toString l)
+
 --Below is the CStruct version
 data CSA = CStoreArray Int [Ptr CAstNode]
 
@@ -102,6 +107,35 @@ data AstNode = EqualOperation SourcePos AstNode AstNode
              | ErrorNode String
              deriving (Eq, Show)
 
+toString :: AstNode -> String
+toString a = case a of
+               EqualOperation _ a1 a2 -> (toString a1) ++ " = " ++ (toString a2)
+               LessThenOrEqualsOperation _ a1 a2 -> (toString a1) ++ " <= " ++ (toString a2)
+               GreaterThenOrEqualsOperation _ a1 a2 -> (toString a1) ++ "> = " ++ (toString a2)
+               LessThenOperation _ a1 a2 -> (toString a1) ++ " < " ++ (toString a2)
+               GreaterThenOperation _ a1 a2 -> (toString a1) ++ " > " ++ (toString a2)
+               AdditionOperation _ a1 a2 -> (toString a1) ++ " > " ++ (toString a2)
+               SubtractionOperation _ a1 a2 -> (toString a1) ++ " - " ++ (toString a2)
+               MultiplicationOperation _ a1 a2 -> (toString a1) ++ " * " ++ (toString a2)
+               DotProductOperation _ a1 a2 -> (toString a1) ++ " . " ++ (toString a2)
+               DivisionOperation _ a1 a2 -> (toString a1) ++ " / " ++ (toString a2)
+               PowerOperation _ a1 a2 -> (toString a1) ++ " ^ " ++ (toString a2)
+               IntNumberAst _ s -> s
+               RealNumberAst _ s -> s
+               BooleanAst _ s -> s
+               SetAst _ s -> '{' : (sAToString s) ++ "}"
+               TupleAst _ s -> '(' : (sAToString s) ++ "}"
+               IdentAst _ c -> [c]
+               DollarAst _ s -> s
+               PercentAst _ s -> s
+               FunctionCall _ c l -> [c, '('] ++ (sAToString l) ++ ")"
+               NegateOperation _ a -> '-' : (toString a)
+               NotOperation _ a -> '\'' : (toString a)
+               FunctionDef _ name param expr -> "func " ++ [name] ++ (sAToString param) ++ " = " ++ (toString expr)
+               Assign _ name expr -> "let " ++ [name] ++ " = " ++ (toString expr)
+               IfExpr _ cond ifTrue ifFalse -> "if " ++ (toString cond) ++ " then " ++ (toString ifTrue) ++ " else " ++ (toString ifFalse)
+               
+
 --Now define the Same Thing that can be utilized in C
 
 data CAstNode = CEqualOperation (Ptr CSourcePos) (Ptr CAstNode) (Ptr CAstNode)
@@ -136,7 +170,7 @@ data CAstNode = CEqualOperation (Ptr CSourcePos) (Ptr CAstNode) (Ptr CAstNode)
     
   
 instance Storable CAstNode where
-    sizeOf _ = sizeOf (undefined :: CInt) + sizeOf (undefined :: Ptr SourcePos) + sizeOf (undefined :: Ptr AstNode) + sizeOf (undefined :: Ptr AstNode) -- Example size, adjust for actual fields
+    sizeOf _ = sizeOf (undefined :: CInt) + sizeOf (undefined :: Ptr SourcePos) + sizeOf (undefined :: Ptr AstNode) + sizeOf (undefined :: Ptr AstNode) + sizeOf (undefined :: Ptr AstNode) -- Example size, adjust for actual fields
     alignment _ = alignment (undefined :: CInt)
 
     peek ptr = do
