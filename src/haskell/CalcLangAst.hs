@@ -1,4 +1,34 @@
+{-# LANGUAGE CPP #-}
+
 module CalcLangAst(Token(..), AstNode(..), SA(..), CSA(..), CSourcePos(..), CAstNode(..), toString) where
+--Below are Some of the preprocessor Statements
+
+#define EQUAL_OPERATION 0
+#define LESS_THEN_OR_EQUALS_OPERATION 1
+#define GREATER_THEN_OR_EQUALS_OPERATION 2
+#define LESS_THEN_OPERATION 3
+#define GREATER_THEN_OPERATION 4
+#define ADDITION_OPERATION 5
+#define SUBTRACTION_OPERATION 6
+#define MULTIPLICATON_OPERATION 7
+#define DOT_PRODUCT_OPERATION 8
+#define DIVISION_OPERATION 9
+#define POWER_OPERATION 10
+#define INT_AST 11
+#define REAL_AST 12
+#define BOOL_AST 13
+#define SET_AST 14
+#define TUPLE_AST 15
+#define IDENT_AST 16
+#define DOLLAR_AST 17
+#define PERCENT_AST 18
+#define FUNCTION_CALL 19
+#define NEGATE_OPERATION 20
+#define NOT_OPERATION 21
+#define FUNCTION_DEFINITION 22
+#define ASSIGN 23
+#define IF_EXPR 24
+
 --Below are all the Ast Nodes for Tokens
 import Text.Parsec
 import Foreign.Storable (Storable, sizeOf, alignment, peek, poke)
@@ -176,118 +206,118 @@ instance Storable CAstNode where
     peek ptr = do
         tag <- peekByteOff ptr 0 :: IO CInt
         case tag of
-            0 -> do
+            EQUAL_OPERATION -> do
                  pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                  leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                  rightPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr SourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                  return (CEqualOperation pos leftPtr rightPtr)
-            1 -> do
+            LESS_THEN_OR_EQUALS_OPERATION -> do
                  pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                  leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                  rightPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                  return (CLessThenOrEqualsOperation pos leftPtr rightPtr)
-            2 -> do
+            GREATER_THEN_OR_EQUALS_OPERATION -> do
                  pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                  leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                  rightPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                  return (CGreaterThenOrEqualsOperation pos leftPtr rightPtr)
-            3 -> do
+            GREATER_THEN_OPERATION -> do
                  pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                  leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                  rightPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                  return (CGreaterThenOperation pos leftPtr rightPtr)
-            4 -> do
+            LESS_THEN_OPERATION -> do
                  pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                  leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                  rightPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                  return (CLessThenOperation pos leftPtr rightPtr)
-            5 -> do
+            ADDITION_OPERATION -> do
                  pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                  leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                  rightPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                  return (CAdditionOperation pos leftPtr rightPtr)
-            6 -> do
+            SUBTRACTION_OPERATION -> do
                  pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                  leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                  rightPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                  return (CSubtractionOperation pos leftPtr rightPtr)
-            7 -> do
+            MULTIPLICATON_OPERATION -> do
                  pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                  leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                  rightPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                  return (CMultiplicationOperation pos leftPtr rightPtr)
-            8 -> do
+            DOT_PRODUCT_OPERATION -> do
                  pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                  leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                  rightPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                  return (CDotProductOperation pos leftPtr rightPtr)
-            9 -> do
+            DIVISION_OPERATION -> do
                  pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                  leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                  rightPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                  return (CDivisionOperation pos leftPtr rightPtr)
-            10 -> do
+            POWER_OPERATION -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                   rightPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                   return (CPowerOperation pos leftPtr rightPtr)
-            11 -> do
+            INT_AST -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   strPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO CString
                   return (CIntNumberAst pos strPtr)
-            12 -> do
+            REAL_AST -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   strPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO CString
                   return (CRealNumberAst pos strPtr)
-            13 -> do
+            BOOL_AST -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   strPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr SourcePos))) :: IO CString
                   return (CBooleanAst pos strPtr)
-            14 -> do
+            SET_AST -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   storageArrayPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CSA)
                   return (CSetAst pos storageArrayPtr)
-            15 -> do
+            TUPLE_AST -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   storageArrayPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CSA)
                   return (CTupleAst pos storageArrayPtr)
-            16 -> do
+            IDENT_AST -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   strPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO CChar
                   return (CIdentAst pos strPtr)
-            17 -> do
+            DOLLAR_AST -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   strPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO CString
                   return (CDollarAst pos strPtr)
-            18 -> do
+            PERCENT_AST -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   strPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO CString
                   return (CPercentAst pos strPtr)
-            19 -> do
+            FUNCTION_CALL -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   strPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO CChar
                   storageArrayPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: CChar))) :: IO (Ptr CSA)
                   return (CFunctionCall pos strPtr storageArrayPtr)
-            20 -> do
+            NEGATE_OPERATION -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   dataPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                   return (CNegateOperation pos dataPtr)
-            21 -> do
+            NOT_OPERATION -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   dataPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                   return (CNotOperation pos dataPtr)
-            22 -> do
+            FUNCTION_DEFINITION -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   namePtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO CChar
                   paramPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: CChar))) :: IO (Ptr CSA)
                   exprPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: CChar)) + (sizeOf (undefined :: Ptr CSA))) :: IO (Ptr CAstNode)
                   return (CFunctionDef pos namePtr paramPtr exprPtr)
-            23 -> do
+            ASSIGN -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   namePtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO CChar
                   exprPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: CChar))) :: IO (Ptr CAstNode)
                   return (CAssign pos namePtr exprPtr)
-            24 -> do
+            IF_EXPR -> do
                   pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
                   condPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos))) :: IO (Ptr CAstNode)
                   leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
