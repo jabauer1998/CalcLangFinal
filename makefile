@@ -30,12 +30,13 @@ HFLAGS += -flink-rts
 HFLAGS += -hidir $(INTDIR)
 HFLAGS += -stubdir $(HINCLUDE)
 #Here is a specification of the Src for generating the interpreter
-HISRC:=$(HDIR)/CalcLangAst.hs $(HDIR)/CalcLangParser.hs $(HDIR)/CalcLangInterpreter.hs $(HDIR)/CalcLangMain.hs
+HISRC:=$(HDIR)/CalcLangAst.hs $(HDIR)/CalcLangMarshall.hs $(HDIR)/CalcLangParser.hs $(HDIR)/CalcLangInterpreter.hs $(HDIR)/CalcLangMain.hs
 HIINT:=$(HISRC:$(HDIR)/%.hs=$(INTDIR)/%.hi)
-HIOBJS:=$(HODIR)/CalcLangMain.o  $(HODIR)/CalcLangInterpreter.o $(HODIR)/CalcLangParser.o $(HODIR)/CalcLangAst.o
+HIOBJS:=$(HODIR)/CalcLangMain.o  $(HODIR)/CalcLangInterpreter.o $(HODIR)/CalcLangParser.o $(HODIR)/CalcLangMarshall.o $(HODIR)/CalcLangAst.o
 
 CalcLangInterpreter:
 	$(GHC) -c $(HDIR)/CalcLangAst.hs -o $(HODIR)/CalcLangAst.o $(HFLAGS)
+	$(GHC) -c $(HDIR)/CalcLangMarshall.hs -o $(HODIR)/CalcLangMarshall.o $(HFLAGS)
 	$(GHC) -c $(HDIR)/CalcLangParser.hs -o $(HODIR)/CalcLangParser.o $(HFLAGS)
 	$(GHC) -c $(HDIR)/CalcLangInterpreter.hs -o $(HODIR)/CalcLangInterpreter.o $(HFLAGS)
 	$(GHC) -c $(HDIR)/CalcLangMain.hs -o $(HODIR)/CalcLangMain.o $(HFLAGS)

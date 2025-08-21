@@ -1,4 +1,4 @@
-module CalcLangParser(runCalcLangLexer, runCalcLangParser) where
+module CalcLangParser(runCalcLangLexer, runCalcLangParser, runCalcLangParserC) where
 
 import Text.Parsec
 import Text.Parsec.String
@@ -7,6 +7,11 @@ import Data.Text (Text)
 import System.IO
 import Numeric
 import CalcLangAst
+import CalcLangMarshall
+import Foreign.C.String
+import Foreign.Ptr
+import Foreign.Marshal.Alloc
+import Foreign.Storable
 
 type CalcLangLexer a = ParsecT String () IO a
 
@@ -428,14 +433,27 @@ parseMacroAssignment = do
 parseAstNode :: CalcLangParser AstNode
 parseAstNode = spaces *> (try parseFunctionDefinition <|> try parseMacroAssignment <|> try parseExpression)
 
-foreign export ccall runCalcLangParser :: String -> IO AstNode
+runCalcLangParser :: String -> IO AstNode
 runCalcLangParser i = do
-              parseResult <- (runParserT parseAstNode () "" i)
-              case parseResult of
-                Left err -> do
-                            print err
-                            return (ErrorNode (show err))
-                Right t -> return t
+                      parseResult <- (runParserT parseAstNode () "" i)
+                      case parseResult of
+                         Left err -> do
+                                     print err
+                                     return (ErrorNode (show err))
+                         Right t -> return t
+
+foreign export ccall runCalcLangParserC :: CString -> IO (Ptr CAstNode)
+runCalcLangParserC i = do
+                       realString <- peekCString i
+                       parseResult <- (runParserT parseAstNode () "" realString)
+                       case parseResult of
+                         Left err -> do
+                                     print err
+                                     ptr <- mallocBytes (sizeOf (undefined :: CAstNode))
+                                     let c = (CErrorNode (show err))
+                                     poke ptr c
+                                     return ptr
+                         Right t -> marshallAstNode t
                 
 
 runCalcLangLexer :: String -> IO [Token]
