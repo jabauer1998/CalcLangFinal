@@ -213,7 +213,7 @@ typedef union {
 
 typedef struct {
   int nodeType;
-  AstNodeType nodeType;
+  AstNodeType actualNodeData;
 } AstNode;
 
 const char* astToString(AstNode* node);

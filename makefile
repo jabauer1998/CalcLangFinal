@@ -34,6 +34,8 @@ HISRC:=$(HDIR)/CalcLangAst.hs $(HDIR)/CalcLangMarshall.hs $(HDIR)/CalcLangParser
 HIINT:=$(HISRC:$(HDIR)/%.hs=$(INTDIR)/%.hi)
 HIOBJS:=$(HODIR)/CalcLangMain.o  $(HODIR)/CalcLangInterpreter.o $(HODIR)/CalcLangParser.o $(HODIR)/CalcLangMarshall.o $(HODIR)/CalcLangAst.o
 
+all: InterpreterExe
+
 CalcLangInterpreter:
 	$(GHC) -c $(HDIR)/CalcLangAst.hs -o $(HODIR)/CalcLangAst.o $(HFLAGS)
 	$(GHC) -c $(HDIR)/CalcLangMarshall.hs -o $(HODIR)/CalcLangMarshall.o $(HFLAGS)
@@ -43,8 +45,6 @@ CalcLangInterpreter:
 
 InterpreterExe: CalcLangInterpreter $(HIOBJS)
 	$(GHC) $(HIOBJS) -o $(BDIR)/$(ITARGET) $(HFLAGS)
-
-all: InterpreterExe
 
 .PHONY: clean
 clean:
