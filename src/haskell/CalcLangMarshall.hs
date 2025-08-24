@@ -1,6 +1,6 @@
 module CalcLangMarshall (marshallAstNode) where
 
-import CalcLangAst
+import CalcLangAstH
 import Foreign.Ptr
 import Text.Parsec.Pos
 import Foreign.Marshal.Alloc

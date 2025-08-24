@@ -1,0 +1,15 @@
+module CalcLangCompiler where
+
+import CalcLangParser
+
+foreign import processASTr :: (Ptr CAstNode) -> IO ()
+
+main :: IO ()
+main = do
+       line <- getLine
+       cLine <- newCString line
+       result <- runCalcLangParserC cLine
+       processAst(result)
+       return ()
+
+

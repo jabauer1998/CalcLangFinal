@@ -26,7 +26,9 @@
 #define NOT_OPERATION 21
 #define FUNCTION_DEFINITION 22
 #define ASSIGN 23
-#define IF_EXPR 24 
+#define IF_EXPR 24
+
+struct ANode;
 
 //Define the struct to keep track of the Source Position and Filename
 typedef struct {
@@ -38,89 +40,89 @@ typedef struct {
 //Define the struct to keep track of Arrays of AstNodes
 typedef struct {
   int length;
-  AstNode* firstElem;
+  struct ANode** firstElem;
 } StoreArray;
 //Now we need to define all the Ops
 typedef struct {
   SourcePos* pos;
-  AstNode* left;
-  AstNode* right;
+  struct ANode* left;
+  struct ANode* right;
 } EqualOperation;
 
 typedef struct {
   SourcePos* pos;
-  AstNode* left;
-  AstNode* right;
+  struct ANode* left;
+  struct ANode* right;
 } LessThenOrEqualsOperation;
 
 typedef struct {
   SourcePos* pos;
-  AstNode* left;
-  AstNode* right;
+  struct ANode* left;
+  struct ANode* right;
 } GreaterThenOrEqualsOperation;
 
 typedef struct {
   SourcePos* pos;
-  AstNode* left;
-  AstNode* right;
+  struct ANode* left;
+  struct ANode* right;
 } LessThenOperation;
 
 typedef struct {
   SourcePos* pos;
-  AstNode* left;
-  AstNode* right;
+  struct ANode* left;
+  struct ANode* right;
 } GreaterThenOperation;
 
 typedef struct {
   SourcePos* pos;
-  AstNode* left;
-  AstNode* right;
+  struct ANode* left;
+  struct ANode* right;
 } AdditionOperation;
 
 typedef struct {
   SourcePos* pos;
-  AstNode* left;
-  AstNode* right;
+  struct ANode* left;
+  struct ANode* right;
 } SubtractionOperation;
 
 typedef struct {
   SourcePos* pos;
-  AstNode* left;
-  AstNode* right;
+  struct ANode* left;
+  struct ANode* right;
 } MultiplicationOperation;
 
 typedef struct {
   SourcePos* pos;
-  AstNode* left;
-  AstNode* right;
+  struct ANode* left;
+  struct ANode* right;
 } DotProductOperation;
 
 typedef struct {
   SourcePos* pos;
-  AstNode* left;
-  AstNode* right;
+  struct ANode* left;
+  struct ANode* right;
 } DivisionOperation;
 
 typedef struct {
   SourcePos* pos;
-  AstNode* left;
-  AstNode* right;
+  struct ANode* left;
+  struct ANode* right;
 } PowerOperation;
 
 typedef struct {
   SourcePos* pos;
-  const char* lexeme;
+  char* lexeme;
 } IntNumberAst;
 
 typedef struct {
   SourcePos* pos;
-  const char* lexeme;
+  char* lexeme;
 } RealNumberAst;
 
 typedef struct {
   SourcePos* pos;
-  const char* lexeme;
-} BoolaenAst;
+  char* lexeme;
+} BooleanAst;
 
 typedef struct {
   SourcePos* pos;
@@ -134,17 +136,17 @@ typedef struct {
 
 typedef struct {
   SourcePos* pos;
-  const char name;
+  char name;
 } IdentAst;
 
 typedef struct {
   SourcePos* pos;
-  const char* lexeme;
+  char* lexeme;
 } DollarAst;
 
 typedef struct {
   SourcePos* pos;
-  const char* lexeme;
+  char* lexeme;
 } PercentAst;
 
 typedef struct {
@@ -155,32 +157,32 @@ typedef struct {
 
 typedef struct {
   SourcePos* pos;
-  AstNode* expr;
+  struct ANode* expr;
 } NegateOperation;
 
 typedef struct {
   SourcePos* pos;
-  AstNode* expr;
+  struct ANode* expr;
 } NotOperation;
 
 typedef struct {
   SourcePos* pos;
   char name;
   StoreArray* param;
-  AstNode* expr;
+  struct ANode* expr;
 } FunctionDef;
 
 typedef struct {
   SourcePos* pos;
   char name;
-  AstNode* expr;
+  struct ANode* expr;
 }Assign;
 
 typedef struct {
   SourcePos* pos;
-  AstNode* cond;
-  AstNode* ifTrue;
-  AstNode* ifFalse;
+  struct ANode* cond;
+  struct ANode* ifTrue;
+  struct ANode* ifFalse;
 }IfExpr;
 
 typedef union {
@@ -211,11 +213,11 @@ typedef union {
   IfExpr ifStatement;
 } AstNodeType;
 
-typedef struct {
+typedef struct ANode{
   int nodeType;
   AstNodeType actualNodeData;
 } AstNode;
 
-const char* astToString(AstNode* node);
+char* astToString(AstNode* node);
 
 #endif

@@ -6,7 +6,7 @@ import Text.Parsec.Char
 import Data.Text (Text)
 import System.IO
 import Numeric
-import CalcLangAst
+import CalcLangAstH
 import CalcLangMarshall
 import Foreign.C.String
 import Foreign.Ptr

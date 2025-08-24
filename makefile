@@ -1,51 +1,7 @@
-#Directory Definitions
-SRCDIR:=./src
-HDIR:=$(SRCDIR)/haskell
-CDIR:=$(SRCDIR)/c
-LDIR:=./lib
-HLDIR:=$(LDIR)/haskell
-CLDIR:=$(LDIR)/c
-ODIR:=./obj
-CODIR:=$(ODIR)/c
-HODIR:=$(ODIR)/haskell
-INTDIR:=./interface/haskell
-INCDIR:=./include
-HINCLUDE:=$(INCDIR)/haskell
-CINCLUDE:=$(INCDIR)/c
-BDIR:=./bin
-ITARGET:=CalcLang.exe
-# Toolchain definitions
-CLANG:=clang
-GHC:=ghc
-# C compilation directives
-CFLAGS += -fPIC
-CFLAGS += -std=c99
-CFLAGS += -g
-CFLAGS += -I$(INCDIR)
-# Haskell compilation directives
-HFLAGS += -XForeignFunctionInterface
-HFLAGS += -fPIC
-HFLAGS += -i$(HDIR)
-HFLAGS += -flink-rts
-HFLAGS += -hidir $(INTDIR)
-HFLAGS += -stubdir $(HINCLUDE)
-#Here is a specification of the Src for generating the interpreter
-HISRC:=$(HDIR)/CalcLangAst.hs $(HDIR)/CalcLangMarshall.hs $(HDIR)/CalcLangParser.hs $(HDIR)/CalcLangInterpreter.hs $(HDIR)/CalcLangMain.hs
-HIINT:=$(HISRC:$(HDIR)/%.hs=$(INTDIR)/%.hi)
-HIOBJS:=$(HODIR)/CalcLangMain.o  $(HODIR)/CalcLangInterpreter.o $(HODIR)/CalcLangParser.o $(HODIR)/CalcLangMarshall.o $(HODIR)/CalcLangAst.o
 
-all: InterpreterExe
-
-CalcLangInterpreter:
-	$(GHC) -c $(HDIR)/CalcLangAst.hs -o $(HODIR)/CalcLangAst.o $(HFLAGS)
-	$(GHC) -c $(HDIR)/CalcLangMarshall.hs -o $(HODIR)/CalcLangMarshall.o $(HFLAGS)
-	$(GHC) -c $(HDIR)/CalcLangParser.hs -o $(HODIR)/CalcLangParser.o $(HFLAGS)
-	$(GHC) -c $(HDIR)/CalcLangInterpreter.hs -o $(HODIR)/CalcLangInterpreter.o $(HFLAGS)
-	$(GHC) -c $(HDIR)/CalcLangMain.hs -o $(HODIR)/CalcLangMain.o $(HFLAGS)
-
-InterpreterExe: CalcLangInterpreter $(HIOBJS)
-	$(GHC) $(HIOBJS) -o $(BDIR)/$(ITARGET) $(HFLAGS)
-
-.PHONY: clean
+build:
+	cabal build
+install:
+	cabal install --installdir="./bin"
 clean:
-	rm -f $(HIOBJS) $(HIINT) $(BDIR)/$(ITARGET)
+	cabal clean
