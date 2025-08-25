@@ -331,121 +331,121 @@ instance Storable CAstNode where
     poke ptr astNode = case astNode of
                          CEqualOperation pos x y -> do
                                                     pokeByteOff ptr 0 (0 :: CInt) -- Tag for EqualOperation
-                                                    pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                    pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
-                                                    pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
+                                                    pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                    pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
+                                                    pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
                          CLessThenOrEqualsOperation  pos x y -> do
                                                                pokeByteOff ptr 0 (1 :: CInt) -- Tag for LessThenOrEqualOperation
-                                                               pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                               pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
-                                                               pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
+                                                               pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                               pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
+                                                               pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
                          CGreaterThenOrEqualsOperation pos x y -> do
                                                                  pokeByteOff ptr 0 (2 :: CInt) -- Tag for GreaterThenOrEqualsOperation
-                                                                 pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                                 pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr SourcePos)) x
-                                                                 pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr SourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
+                                                                 pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                                 pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr SourcePos)) x
+                                                                 pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr SourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
                          CGreaterThenOperation pos x y -> do
                                                          pokeByteOff ptr 0 (3 :: CInt) -- Tag for GreaterThenOperation
-                                                         pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                         pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
-                                                         pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
+                                                         pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                         pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
+                                                         pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
                          CLessThenOperation pos x y -> do
                                                       pokeByteOff ptr 0 (4 :: CInt) -- Tag for LessThenOperation
-                                                      pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                      pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
-                                                      pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
+                                                      pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                      pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
+                                                      pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
                          CAdditionOperation pos x y -> do
                                                       pokeByteOff ptr 0 (5 :: CInt) -- Tag for AdditionOperation
-                                                      pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                      pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
-                                                      pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
+                                                      pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                      pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
+                                                      pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
                          CSubtractionOperation pos x y -> do
                                                          pokeByteOff ptr 0 (6 :: CInt) -- Tag for SubtractionOperation
-                                                         pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                         pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
-                                                         pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
+                                                         pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                         pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
+                                                         pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
                          CMultiplicationOperation pos x y -> do
                                                             pokeByteOff ptr 0 (7 :: CInt) -- Tag for MultiplicationOperation
-                                                            pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                            pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
-                                                            pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
+                                                            pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                            pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
+                                                            pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
                          CDotProductOperation pos x y -> do
                                                         pokeByteOff ptr 0 (8 :: CInt) -- Tag for DotProductOperation
-                                                        pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                        pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
-                                                        pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
+                                                        pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                        pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
+                                                        pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
                          CDivisionOperation pos x y -> do
                                                       pokeByteOff ptr 0 (9 :: CInt) -- Tag for DivisionOperation
-                                                      pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                      pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
-                                                      pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
+                                                      pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                      pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
+                                                      pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
                          CPowerOperation pos x y -> do
                                                    pokeByteOff ptr 0 (10 :: CInt) -- Tag for PowerOperation
-                                                   pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                   pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
-                                                   pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
+                                                   pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                   pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) x
+                                                   pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf(undefined :: Ptr CAstNode)) y
                          CIntNumberAst pos s -> do
                                                pokeByteOff ptr 0 (11 :: CInt)
-                                               pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                               pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) s
+                                               pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                               pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) s
                          CRealNumberAst pos s -> do
                                                 pokeByteOff ptr 0 (12 :: CInt)
-                                                pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) s
+                                                pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) s
                          CBooleanAst pos s -> do
                                              pokeByteOff ptr 0 (13 :: CInt)
-                                             pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                             pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) s
+                                             pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                             pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) s
                          CSetAst pos a -> do
                                          pokeByteOff ptr 0 (14 :: CInt)
-                                         pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                         pokeByteOff ptr (sizeOf(undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) a
+                                         pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                         pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) a
                          CTupleAst pos s -> do
                                            pokeByteOff ptr 0 (15 :: CInt)
-                                           pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                           pokeByteOff ptr (sizeOf(undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) s
+                                           pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                           pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) s
                          CIdentAst pos s -> do
                                            pokeByteOff ptr 0 (16 :: CInt)
-                                           pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                           pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) s
+                                           pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                           pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) s
                          CDollarAst pos s -> do
                                             pokeByteOff ptr 0 (17 :: CInt)
-                                            pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                            pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) s
+                                            pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                            pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) s
                          CPercentAst pos s -> do
                                              pokeByteOff ptr 0 (18 :: CInt)
-                                             pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                             pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr SourcePos)) s
+                                             pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                             pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr SourcePos)) s
                          CFunctionCall pos name l -> do
                                                     pokeByteOff ptr 0 (19 :: CInt)
-                                                    pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                    pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf (undefined :: Ptr SourcePos)) name
-                                                    pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf (undefined :: Ptr SourcePos) + sizeOf (undefined :: CChar)) l
+                                                    pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                    pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf (undefined :: Ptr SourcePos)) name
+                                                    pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf (undefined :: Ptr SourcePos) + sizeOf (undefined :: CChar)) l
                          CNegateOperation pos right -> do
                                                       pokeByteOff ptr 0 (20 :: CInt)
-                                                      pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                      pokeByteOff ptr (sizeOf(undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) right
+                                                      pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                      pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) right
                          CNotOperation pos right -> do
                                                    pokeByteOff ptr 0 (21 :: CInt)
-                                                   pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                   pokeByteOff ptr (sizeOf(undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) right
+                                                   pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                   pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) right
                          CFunctionDef pos name l myExp -> do
                                                        pokeByteOff ptr 0 (22 :: CInt)
-                                                       pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                       pokeByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) name
-                                                       pokeByteOff ptr (sizeOf(undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: CChar)) l
-                                                       pokeByteOff ptr (sizeOf(undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: CChar) + sizeOf (undefined :: Ptr CSA)) myExp
+                                                       pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                       pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) name
+                                                       pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: CChar)) l
+                                                       pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: CChar) + sizeOf (undefined :: Ptr CSA)) myExp
                          CAssign pos name myExp -> do
                                                 pokeByteOff ptr 0 (23 :: CInt)
-                                                pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                pokeByteOff ptr (sizeOf(undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) name
-                                                pokeByteOff ptr (sizeOf(undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: CChar)) myExp
+                                                pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) name
+                                                pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: CChar)) myExp
                          CIfExpr pos cond left right -> do
                                                        pokeByteOff ptr 0 (24 :: CInt)
-                                                       pokeByteOff ptr (sizeOf (undefined :: CInt)) pos
-                                                       pokeByteOff ptr (sizeOf(undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) cond
-                                                       pokeByteOff ptr (sizeOf(undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CAstNode)) left
-                                                       pokeByteOff ptr (sizeOf(undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CAstNode) + (sizeOf (undefined :: Ptr CAstNode))) right
+                                                       pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                       pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) cond
+                                                       pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CAstNode)) left
+                                                       pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CAstNode) + (sizeOf (undefined :: Ptr CAstNode))) right
                          _ -> error "Unknown AST node tag"
 
 
