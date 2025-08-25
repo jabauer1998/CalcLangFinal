@@ -12,7 +12,7 @@ main = do
        line <- getLine
        cLine <- newCString line
        result <- runCalcLangParserC cLine
-       processAST(result)
+       processAST result
        return ()
 
 

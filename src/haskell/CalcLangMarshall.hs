@@ -118,7 +118,7 @@ marshallAstNode a = case a of
                                                 return ptr
                       IntNumberAst pos s -> do
                                             ptr <- mallocBytes (sizeOf (undefined :: CAstNode))
-                                            cStr <- newCString s
+                                            cStr <- (newCString s)
                                             myPos <- (marshallSourcePos pos)
                                             let g = (CIntNumberAst myPos cStr)
                                             poke ptr g

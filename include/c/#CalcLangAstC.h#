@@ -32,7 +32,7 @@ struct ANode;
 
 //Define the struct to keep track of the Source Position and Filename
 typedef struct {
-  char* name;
+  const char* name;
   int lineNumber;
   int linePosition;
 } SourcePos;
@@ -219,6 +219,5 @@ typedef struct ANode{
 } AstNode;
 
 char* astToString(AstNode* node);
-void freeTree(AstNode* node);
 
 #endif

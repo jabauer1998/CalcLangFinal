@@ -36,7 +36,7 @@ parseRealNum :: CalcLangLexer Token
 parseRealNum = do
                start <- getPosition
                result <- many1 digit
-               parsePeriod
+               _ <- parsePeriod
                resultRest <- parseLexeme (many1 digit)
                return (RealNum (result ++ ['.'] ++ resultRest) start)
 
@@ -161,7 +161,7 @@ parseLet = do
 parseDol :: CalcLangLexer Token
 parseDol = do
            startPosition <- getPosition
-           c <- (char '$')
+           _ <- (char '$')
            d <- many1 digit
            p <- (char '.')
            d1 <- digit
@@ -174,7 +174,7 @@ parsePerc = do
             d <- many1 digit
             p <- (char '.')
             delse <- (many1 digit)
-            parseLexeme (char '%')
+            _ <- parseLexeme (char '%')
             return (Perc (d ++ [p] ++ delse) startPosition)
             
             
@@ -196,32 +196,33 @@ parseBoolean = do
                b <- parseBool
                case b of
                  (TF x _) -> return (BooleanAst start x)
+                 _ -> return (ErrorNode "this is an error")
 
 
 parseSet :: CalcLangParser AstNode
 parseSet = do
            start <- getPosition
-           parseLBrack
+           _ <- parseLBrack
            x <- parseExpressionList
-           parseRBrack
+           _ <- parseRBrack
            return (SetAst start x)
 
 parseTuple :: CalcLangParser AstNode
 parseTuple = do
              start <- getPosition
-             parseLPar
+             _ <- parseLPar
              x <- parseExpressionList
-             parseRPar
+             _ <- parseRPar
              return (TupleAst start x)
 
 parseIfExpr :: CalcLangParser AstNode
 parseIfExpr = do
               start <- getPosition
-              parseIf
+              _ <- parseIf
               cond <- parseExpression
-              parseThen
+              _ <- parseThen
               ifTrue <- parseExpression
-              parseElse
+              _ <- parseElse
               ifFalse <- parseExpression
               return (IfExpr start cond ifTrue ifFalse)
 
@@ -230,14 +231,16 @@ parseDollarAst = do
                  start <- getPosition
                  x <- parseDol
                  case x of
-                   Dol a p -> return (DollarAst start a)
+                   Dol a _ -> return (DollarAst start a)
+                   _ -> return (ErrorNode "this is an error")
 
 parsePercentAst :: CalcLangParser AstNode
 parsePercentAst = do
                   start <- getPosition
                   x <- parsePerc
                   case x of
-                    Perc a p -> return (PercentAst start a)
+                    Perc a _ -> return (PercentAst start a)
+                    _ -> return (ErrorNode "this is an error")
 
 
 parseIntNumber :: CalcLangParser AstNode
@@ -245,14 +248,16 @@ parseIntNumber = do
                  startPosition <- getPosition
                  x <- parseIntNum
                  case x of
-                   (IntNum s p) -> return (IntNumberAst p s)
+                   (IntNum s _) -> return (IntNumberAst startPosition s)
+                   _ -> return (ErrorNode "Cant parse error node")
 
 parseRealNumber :: CalcLangParser AstNode
 parseRealNumber = do
                   startPosition <- getPosition
                   x <- parseRealNum
                   case x of
-                    (RealNum s p) -> return (RealNumberAst startPosition s)
+                    (RealNum s _) -> return (RealNumberAst startPosition s)
+                    _ -> return (ErrorNode "Cant build real Num without real number")
 
 parseNumber :: CalcLangParser AstNode
 parseNumber = try parseRealNumber <|> try parseIntNumber
@@ -264,25 +269,28 @@ parseIdentifier = do
                   x <- parseIdent
                   case x of
                     Ident y _ -> return (IdentAst startPosition y)
+                    _ -> return (ErrorNode "Error cant build identifier with no name")
 
 parseFunctionCall :: CalcLangParser AstNode
 parseFunctionCall = do
                     start <- getPosition
                     name <- parseIdentifier
-                    parseLPar
+                    _ <- parseLPar
                     l <- parseExpressionList
-                    parseRPar
+                    _ <- parseRPar
                     case name of
                           IdentAst _ n -> return (FunctionCall start n l)
+                          _ -> return (ErrorNode "Error cant build function call with invalid name")
+                          
 
 parsePrimaryExpression :: CalcLangParser AstNode
 parsePrimaryExpression = try parseDollarAst <|> try parsePercentAst <|> try parseNumber <|> try parseParenExpression <|> try parseTuple <|> try parseSet <|> try parseBoolean <|> try parseIfExpr <|> try parseFunctionCall <|> try parseIdentifier
 
 parseParenExpression :: CalcLangParser AstNode
 parseParenExpression = do
-                       parseLPar
+                       _ <- parseLPar
                        x <- parseExpression
-                       parseRPar
+                       _ <- parseRPar
                        return x
 
 parseUnaryOperation :: CalcLangParser AstNode
@@ -292,17 +300,17 @@ parseUnaryOperation = try parseNotOperation <|> try parseNegationOperation <|> p
 parseNegationOperation :: CalcLangParser AstNode
 parseNegationOperation = do
                          start <- getPosition
-                         parseMinus
-                         exp <- parseUnaryOperation
-                         return (NegateOperation start exp)
+                         _ <- parseMinus
+                         rightExp <- parseUnaryOperation
+                         return (NegateOperation start rightExp)
                          
 
 parseNotOperation :: CalcLangParser AstNode
 parseNotOperation = do
                     start <- getPosition
-                    parseNot
-                    exp <- parseUnaryOperation
-                    return (NotOperation start exp)
+                    _ <- parseNot
+                    leftExp <- parseUnaryOperation
+                    return (NotOperation start leftExp)
 
 parsePowerOp :: CalcLangParser (AstNode -> AstNode -> AstNode)
 parsePowerOp = do
@@ -353,7 +361,7 @@ parseEqualsOperation :: CalcLangParser AstNode
 parseEqualsOperation = do
                        start <- getPosition
                        x <- parseAddSubOp
-                       parseEq
+                       _ <- parseEq
                        y <- parseAddSubOp
                        return (EqualOperation start x y)
 
@@ -361,7 +369,7 @@ parseLessThenOrEqualsOperation :: CalcLangParser AstNode
 parseLessThenOrEqualsOperation = do
                                  start <- getPosition
                                  x <- parseAddSubOp
-                                 parseLtOrEq
+                                 _ <- parseLtOrEq
                                  y <- parseAddSubOp
                                  return (LessThenOrEqualsOperation start x y)
 
@@ -369,7 +377,7 @@ parseLessThenOperation :: CalcLangParser AstNode
 parseLessThenOperation = do
                          start <- getPosition
                          x <- parseAddSubOp
-                         parseLT
+                         _ <- parseLT
                          y <- parseAddSubOp
                          return (LessThenOperation start x y)
 
@@ -377,7 +385,7 @@ parseGreaterThenOrEqualsOperation :: CalcLangParser AstNode
 parseGreaterThenOrEqualsOperation = do
                                     start <- getPosition
                                     x <- parseAddSubOp
-                                    parseGtOrEq
+                                    _ <- parseGtOrEq
                                     y <- parseAddSubOp
                                     return (GreaterThenOrEqualsOperation start x y)
 
@@ -385,7 +393,7 @@ parseGreaterThenOperation :: CalcLangParser AstNode
 parseGreaterThenOperation = do
                             start <- getPosition
                             x <- parseAddSubOp
-                            parseGT
+                            _ <- parseGT
                             y <- parseAddSubOp
                             return (GreaterThenOperation start x y)
 
@@ -409,25 +417,27 @@ parseParamaters = do
 parseFunctionDefinition :: CalcLangParser AstNode
 parseFunctionDefinition = do
                           pos <- getPosition
-                          parseFunc
+                          _ <- parseFunc
                           x <- parseIdentifier
-                          parseLPar
+                          _ <- parseLPar
                           y <- parseParamaters
-                          parseRPar
-                          parseEq
+                          _ <- parseRPar
+                          _ <- parseEq
                           z <- parseExpression
                           case x of
                             IdentAst _ s -> return (FunctionDef pos s y z)
+                            _ -> return (ErrorNode "Error Ident was not parsed")
 
 parseMacroAssignment :: CalcLangParser AstNode
 parseMacroAssignment = do
                        start <- getPosition
-                       parseLet
+                       _ <- parseLet
                        x <- parseIdentifier
-                       parseEq
+                       _ <- parseEq
                        e <- parseExpression
                        case x of
                          IdentAst _ s -> return (Assign start s e)
+                         _ -> return (ErrorNode "identifier didnt parse correctly")
                             
 
 parseAstNode :: CalcLangParser AstNode
@@ -442,7 +452,7 @@ runCalcLangParser i = do
                                      return (ErrorNode (show err))
                          Right t -> return t
 
-foreign export ccall runCalcLangParserC :: CString -> IO (Ptr CAstNode)
+runCalcLangParserC :: CString -> IO (Ptr CAstNode)
 runCalcLangParserC i = do
                        realString <- peekCString i
                        parseResult <- (runParserT parseAstNode () "" realString)

@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define DEBUG
+
 void astToStr(AstNode* node, int size, char* str);
 
 //Function to append a Character to the givin string
@@ -38,98 +40,108 @@ void storeArrayToStr(StoreArray* arrayWithLength, int size, char* str){
 char* astToString(AstNode* node){
   int size = 500;
   char* str = (char*)malloc(size);
+  str[0] = '\0';
   astToStr(node, size, str);
   return str;
 }
 
 void equalOperationToStr(EqualOperation* op, int size, char* str){
+  #ifdef DEBUG
+  printf("Equals");
+  #endif
   astToStr(op->left, size, str);
-  strncat(" = ", str, size);
+  strncat(str, " = ", size);
   astToStr(op->right, size, str);
 }
 
 void lessThenOrEqualsOperationToStr(LessThenOrEqualsOperation* op, int size, char* str){
+  #ifdef DEBUG
+  printf("LessThen");
+  #endif
   astToStr(op->left, size, str);
-  strncat(" <= ", str, size);
+  strncat(str," <= ", size);
   astToStr(op->right, size, str);
 }
 
 void greaterThenOrEqualsOperationToStr(GreaterThenOrEqualsOperation* op, int size, char* str){
   astToStr(op->left, size, str);
-  strncat(" >= ", str, size);
+  strncat(str, " >= ", size);
   astToStr(op->right, size, str);
 }
 
 void lessThenOperationToStr(LessThenOperation* op, int size, char* str){
   astToStr(op->left, size, str);
-  strncat(" < ", str, size);
+  strncat(str, " < ", size);
   astToStr(op->right, size, str);
 }
 
 void greaterThenOperationToStr(GreaterThenOperation* op, int size, char* str){
   astToStr(op->left, size, str);
-  strncat(" > ", str, size);
+  strncat(str, " > ", size);
   astToStr(op->right, size, str);
 }
 
 void additionOperationToStr(AdditionOperation* op, int size, char* str){
+  #ifdef DEBUG
+  printf("Addition");
+  #endif
   astToStr(op->left, size, str);
-  strncat(" + ", str, size);
+  strncat(str, " + ", size);
   astToStr(op->right, size, str);
 }
 
 void subtractionOperationToStr(SubtractionOperation* op, int size, char* str){
   astToStr(op->left, size, str);
-  strncat(" - ", str, size);
+  strncat(str, " - ", size);
   astToStr(op->right, size, str);
 }
 
 void multiplicationOperationToStr(MultiplicationOperation* op, int size, char* str){
   astToStr(op->left, size, str);
-  strncat("*", str, size);
+  strncat(str, "*", size);
   astToStr(op->right, size, str);
 }
 
 void dotProductOperationToStr(DotProductOperation* op, int size, char* str){
   astToStr(op->left, size, str);
-  strncat(" . ", str, size);
+  strncat(str, " . ", size);
   astToStr(op->right, size, str);
 }
 
 void divisionOperationToStr(DivisionOperation* op, int size, char* str){
   astToStr(op->left, size, str);
-  strncat("/", str, size);
+  strncat(str, "/", size);
   astToStr(op->right, size, str);
 }
 
 void powerOperationToStr(PowerOperation* op, int size, char* str){
   astToStr(op->left, size, str);
-  strncat("^", str, size);
+  strncat(str, "^", size);
   astToStr(op->right, size, str);
 }
 
 void integerAstToStr(IntNumberAst* i, int size, char* str){
-  strncat(i->lexeme, str, size);
+  strncat(str, i->lexeme, size);
 }
 
 void realAstToStr(RealNumberAst* i, int size, char* str){
-  strncat(i->lexeme, str, size);
+  strncat(str, i->lexeme, size);
 }
 
 void booleanAstToStr(BooleanAst* i, int size, char* str){
-  strncat(i->lexeme, str, size);
+  strncat(str, i->lexeme, size);
 }
 
 void setAstToStr(SetAst* s, int size, char* str){
-  strncat("{", str, size);
+  strncat(str, "{", size);
   storeArrayToStr(s->arr, size, str);
-  strncat("}", str, size);
+  strncat(str, "}", size);
 }
 
 void tupleAstToStr(TupleAst* s, int size, char* str){
-  strncat("(", str, size);
+  strncat(str, "(", size);
   storeArrayToStr(s->arr, size, str);
-  strncat(")", str, size);
+  strncat(str, ")", size);
 }
 
 void identAstToStr(IdentAst* s, int size, char* str){
@@ -138,11 +150,11 @@ void identAstToStr(IdentAst* s, int size, char* str){
 
 void dollarAstToStr(DollarAst* d, int size, char* str){
   appendStrChr('$', size, str);
-  strncat(d->lexeme, str, size);
+  strncat(str, d->lexeme, size);
 }
 
 void percentAstToStr(PercentAst* p, int size, char* str){
-  strncat(p->lexeme, str, size);
+  strncat(str, p->lexeme, size);
   appendStrChr('%', size, str);
 }
 
@@ -164,31 +176,281 @@ void notOperationToStr(NotOperation* n, int size, char* str){
 }
 
 void functionDefinitionToStr(FunctionDef* d, int size, char* str){
-  strncat("func ", str, size);
+  strncat(str, "func ", size);
   appendStrChr(d->name, size, str);
   appendStrChr('(', size, str);
   storeArrayToStr(d->param, size, str);
-  strncat(") = ", str, size);
+  strncat(str, ") = ", size);
   astToStr(d->expr, size, str);
 }
 
 void assignmentToStr(Assign* a, int size, char* str){
-  strncat("let ", str, size);
+  strncat(str, "let ", size);
   appendStrChr(a->name, size, str);
-  strncat(" = ", str, size);
+  strncat(str, " = ", size);
   astToStr(a->expr, size, str);
 }
 
 void ifExpressionToStr (IfExpr* ify, int size, char* str){
-  strncat("if ", str, size);
+  strncat(str, "if ", size);
   astToStr(ify->cond, size, str);
-  strncat(" then ", str, size);
+  strncat(str, " then ", size);
   astToStr(ify->ifTrue, size, str);
-  strncat(" else ", str, size);
+  strncat(str, " else ", size);
   astToStr(ify->ifFalse, size, str);
 }
 
+//Bellow are all the Free tree methods
+
+void freePosition(SourcePos* pos){
+  free(pos->name);
+  free(pos);
+}
+
+void freeStoreArray(StoreArray* arr){
+  for(int i = 0; i < arr->length; i++){
+    AstNode* node = arr->firstElem[i];
+    freeTree(node);
+  }
+  free(arr->firstElem);
+}
+
+void freeEqualOperation(EqualOperation* op){
+  #ifdef DEBUG
+  printf("Equals");
+  #endif
+  freePosition(op->pos);
+  freeTree(op->left);
+  freeTree(op->right);
+}
+
+void freeLessThenOrEqualsOperation(LessThenOrEqualsOperation* op){
+  #ifdef DEBUG
+  printf("LessThen");
+  #endif
+  freePosition(op->pos);
+  freeTree(op->left);
+  freeTree(op->right);
+}
+
+void freeGreaterThenOrEqualsOperation(GreaterThenOrEqualsOperation* op){
+  freePosition(op->pos);
+  freeTree(op->left);
+  freeTree(op->right);
+}
+
+void freeLessThenOperation(LessThenOperation* op){
+  freePosition(op->pos);
+  freeTree(op->left);
+  freeTree(op->right);
+}
+
+void freeGreaterThenOperation(GreaterThenOperation* op){
+  freePosition(op->pos);
+  freeTree(op->left);
+  freeTree(op->right);
+}
+
+void freeAdditionOperation(AdditionOperation* op){
+  #ifdef DEBUG
+  printf("Addition");
+  #endif
+  freePosition(op->pos);
+  freeTree(op->left);
+  freeTree(op->right);
+}
+
+void freeSubtractionOperation(SubtractionOperation* op){
+  freePosition(op->pos);
+  freeTree(op->left);
+  freeTree(op->right);
+}
+
+void freeMultiplicationOperation(MultiplicationOperation* op){
+  freePosition(op->pos);
+  freeTree(op->left);
+  freeTree(op->right);
+}
+
+void freeDotProductOperation(DotProductOperation* op){
+  freePosition(op->pos);
+  freeTree(op->left);
+  freeTree(op->right);
+}
+
+void freeDivisionOperation(DivisionOperation* op){
+  freePosition(op->pos);
+  freeTree(op->left);
+  freeTree(op->right);
+}
+
+void freePowerOperation(PowerOperation* op){
+  freePosition(op->pos);
+  freeTree(op->left);
+  freeTree(op->right);
+}
+
+void freeIntegerAst(IntNumberAst* i){
+  freePosition(i->pos);
+  free(i->lexeme);
+}
+
+void freeRealAst(RealNumberAst* i){
+  freePosition(i->pos);
+  free(i->lexeme);
+}
+
+void freeBooleanAst(BooleanAst* i){
+  freePosition(i->pos);
+  free(i->lexeme);
+}
+
+void freeSetAst(SetAst* s){
+  freePosition(s->pos);
+  freeStoreArray(s->arr);
+}
+
+void freeTupleAst(TupleAst* s){
+  freePosition(s->pos);
+  freeStoreArray(s->arr);
+}
+
+void freeIdentAst(IdentAst* s){
+  freePosition(s->pos);
+}
+
+void freeDollarAst(DollarAst* d){
+  freePosition(d->pos);
+  free(d->lexeme);
+}
+
+void freePercentAst(PercentAst* p){
+  freePosition(p->pos);
+  free(p->lexeme);
+}
+
+void freeFunctionCall(FunctionCall* f){
+  freePosition(f->pos);
+  freeStoreArray(f->params);
+}
+
+void freeNegateOperation(NegateOperation* n){
+  freePosition(n->pos);
+  freeTree(n->expr);
+}
+
+void freeNotOperation(NotOperation* n){
+  freePosition(n->pos);
+  freeTree(n->expr);
+}
+
+void freeFunctionDefinition(FunctionDef* d){
+  freePosition(d->pos);
+  freeStoreArray(d->param);
+  freeTree(d->expr);
+}
+
+void freeAssignment(Assign* a){
+  freePosition(a->pos);
+  freeTree(a->expr);
+}
+
+void freeIfExpression(IfExpr* ify){
+  freePosition(ify->pos);
+  freeTree(ify->cond);
+  freeTree(ify->ifTrue);
+  freeTree(ify->ifFalse);
+}
+
+void freeTree(AstNode* node){
+  switch(node->nodeType){
+  case EQUAL_OPERATION:
+    freeEqualOperation(&(node->actualNodeData.equalOperation));
+    break;
+  case LESS_THEN_OR_EQUALS_OPERATION:
+    freeLessThenOrEqualsOperation(&(node->actualNodeData.lessOrEqual));
+    break;
+  case GREATER_THEN_OR_EQUALS_OPERATION:
+    freeGreaterThenOrEqualsOperation(&(node->actualNodeData.greaterOrEqual));
+    break;
+  case LESS_THEN_OPERATION:
+    freeLessThenOperation(&(node->actualNodeData.lessThen));
+    break;
+  case GREATER_THEN_OPERATION:
+    freeGreaterThenOperation(&(node->actualNodeData.greaterThen));
+    break;
+  case ADDITION_OPERATION:
+    freeAdditionOperation(&(node->actualNodeData.addition));
+    break;
+  case SUBTRACTION_OPERATION:
+    freeSubtractionOperation(&(node->actualNodeData.subtraction));
+    break;
+  case MULTIPLICATON_OPERATION:
+    freeMultiplicationOperation(&(node->actualNodeData.multiplication));
+    break;
+  case DOT_PRODUCT_OPERATION:
+    freeDotProductOperation(&(node->actualNodeData.dotProduct));
+    break;
+  case DIVISION_OPERATION:
+    freeDivisionOperation(&(node->actualNodeData.division));
+    break;
+  case POWER_OPERATION:
+    freePowerOperation(&(node->actualNodeData.power));
+    break;
+  case INT_AST:
+    freeIntegerAst(&(node->actualNodeData.integer));
+    break;
+  case REAL_AST:
+    freeRealAst(&(node->actualNodeData.real));
+    break;
+  case BOOL_AST:
+    freeBooleanAst(&(node->actualNodeData.bool));
+    break;
+  case SET_AST:
+    freeSetAst(&(node->actualNodeData.set));
+    break;
+  case TUPLE_AST:
+    freeTupleAst(&(node->actualNodeData.tuple));
+    break;
+  case IDENT_AST:
+    freeIdentAst(&(node->actualNodeData.ident));
+    break;
+  case DOLLAR_AST:
+    freeDollarAst(&(node->actualNodeData.dollar));
+    break;
+  case PERCENT_AST:
+    freePercentAst(&(node->actualNodeData.percent));
+    break;
+  case FUNCTION_CALL:
+    freeFunctionCall(&(node->actualNodeData.call));
+    break;
+  case NEGATE_OPERATION:
+    freeNegateOperation(&(node->actualNodeData.negate));
+    break;
+  case NOT_OPERATION:
+    freeNotOperation(&(node->actualNodeData.not));
+    break;
+  case FUNCTION_DEFINITION:
+    freeFunctionDefinition(&(node->actualNodeData.function));
+    break;
+  case ASSIGN:
+    freeAssignment(&(node->actualNodeData.variable));
+    break;
+  case IF_EXPR:
+    freeIfExpression(&(node->actualNodeData.ifStatement));
+    break;
+  default:
+    fprintf(stderr, "Invalid number %d", node->nodeType);
+    break;
+  }
+  free(node);
+}
+
 void astToStr(AstNode* node, int size, char* str){
+  #ifdef DEBUG
+  printf("NodeType %d", node->nodeType);
+  fflush(stdout);
+  #endif
   switch(node->nodeType){
   case EQUAL_OPERATION:
     equalOperationToStr(&(node->actualNodeData.equalOperation), size, str);
@@ -209,7 +471,7 @@ void astToStr(AstNode* node, int size, char* str){
     additionOperationToStr(&(node->actualNodeData.addition), size, str);
     break;
   case SUBTRACTION_OPERATION:
-    subtractionOperationToStr(&node->actualNodeData.subtraction, size, str);
+    subtractionOperationToStr(&(node->actualNodeData.subtraction), size, str);
     break;
   case MULTIPLICATON_OPERATION:
     multiplicationOperationToStr(&(node->actualNodeData.multiplication), size, str);
