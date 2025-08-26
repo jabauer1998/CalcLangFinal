@@ -27,7 +27,7 @@ void storeArrayToStr(StoreArray* arrayWithLength, int size, char* str){
       AstNode* data = array[i];
       astToStr(data, size, str);
     } else {
-      strncat(", ", str, size);
+      strncat(str, ", ", size);
       AstNode* data = array[i];
       astToStr(data, size, str);
     }

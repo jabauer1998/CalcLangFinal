@@ -7,6 +7,7 @@ import Foreign.Marshal.Alloc
 import Foreign.C.String
 import Foreign.Marshal.Array
 import Foreign.Storable
+import Control.Monad
 
 -- First we need to make the SourcePos into a ctype Source Pos
 
@@ -27,8 +28,11 @@ marshallStorageArray :: SA -> IO (Ptr CSA)
 marshallStorageArray a = case a of
                            StoreArray s l -> do
                                              ptr <- mallocBytes (sizeOf (undefined :: CSA))
-                                             list <- mapM marshallAstNode l
-                                             let g = (CStoreArray (fromIntegral s) list)
+                                             array <- mallocBytes ((sizeOf (undefined:: Ptr CAstNode)) * s)
+                                             myL <- mapM marshallAstNode l
+                                             let myRevL = (reverse myL)
+                                             forM_ [0..(s-1)] (\myPoint -> pokeByteOff array (myPoint * sizeOf(undefined :: Ptr CAstNode)) (myRevL !! myPoint))
+                                             let g = (CStoreArray (fromIntegral s) array)
                                              poke ptr g
                                              return ptr
 

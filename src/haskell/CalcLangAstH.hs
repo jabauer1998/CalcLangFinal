@@ -43,17 +43,17 @@ import Data.List
 data CSourcePos = CSourcePos CString CInt CInt deriving (Eq, Show)
 
 instance Storable CSourcePos where
-  sizeOf _ = sizeOf (undefined :: CString) + (sizeOf (undefined :: CInt)) * 2
-  alignment _ = alignment (undefined :: Ptr CString)
+  sizeOf _ = sizeOf (undefined :: CString) + (sizeOf (undefined :: Ptr CInt)) * 2
+  alignment _ = alignment (undefined :: CString)
   peek ptr = do
-             name <- peek (castPtr ptr :: Ptr CString)
+             name <- peekByteOff ptr 0 :: IO CString
              line  <- peekByteOff ptr (sizeOf (undefined :: CString)) :: IO CInt
-             col <- peekByteOff ptr ((sizeOf (undefined :: CString)) + (sizeOf (undefined :: CInt))) :: IO CInt
+             col <- peekByteOff ptr ((sizeOf (undefined :: CString)) + (sizeOf (undefined :: Ptr CInt))) :: IO CInt
              return (CSourcePos name (fromIntegral line) (fromIntegral col))
   poke ptr (CSourcePos name line col) = do  
-                                         poke (castPtr ptr :: Ptr CString) name
+                                         pokeByteOff ptr 0  name
                                          pokeByteOff ptr (sizeOf (undefined :: CString)) line
-                                         pokeByteOff ptr ((sizeOf(undefined :: CString)) + (sizeOf(undefined::Int))) col
+                                         pokeByteOff ptr ((sizeOf(undefined :: CString)) + (sizeOf(undefined :: Ptr Int))) col
 
 data Token = Ident Char SourcePos
            | IntNum String SourcePos
@@ -93,21 +93,19 @@ sAToString a = case a of
                StoreArray _ l -> intercalate ", " (map toString l)
 
 --Below is the CStruct version
-data CSA = CStoreArray Int [Ptr CAstNode]
+data CSA = CStoreArray CInt (Ptr (Ptr CAstNode))
 
 instance Storable CSA  where
-  sizeOf _ = sizeOf (undefined :: CInt) + (sizeOf (undefined :: (Ptr CAstNode)))
+  sizeOf _ = sizeOf (undefined :: Ptr CInt) + sizeOf (undefined :: (Ptr (Ptr CAstNode)))
   alignment _ = alignment (undefined :: (Ptr (Ptr AstNode)))
   peek ptr = do
              size <- peekByteOff ptr 0 :: IO CInt
              arrPtr <- peekByteOff ptr (sizeOf (undefined::CInt)) :: IO (Ptr (Ptr CAstNode))
-             arr <- peekArray (fromIntegral size) arrPtr
-             
-             return (CStoreArray (fromIntegral size) arr)
-  poke _ obj = case obj of
+             return (CStoreArray (fromIntegral size) arrPtr)
+  poke ptr obj = case obj of
                    (CStoreArray a b) -> do
-                                        x <- mallocArray a :: IO (Ptr (Ptr CAstNode))
-                                        pokeArray x b
+                                        pokeByteOff ptr 0 a
+                                        pokeByteOff ptr (sizeOf(undefined::Ptr CInt)) b
 
 data AstNode = EqualOperation SourcePos AstNode AstNode
              | LessThenOrEqualsOperation SourcePos AstNode AstNode
@@ -201,7 +199,7 @@ data CAstNode = CEqualOperation (Ptr CSourcePos) (Ptr CAstNode) (Ptr CAstNode)
     
   
 instance Storable CAstNode where
-    sizeOf _ = sizeOf (undefined :: CInt) + sizeOf (undefined :: Ptr SourcePos) + sizeOf (undefined :: Ptr AstNode) + sizeOf (undefined :: Ptr AstNode) + sizeOf (undefined :: Ptr AstNode) -- Example size, adjust for actual fields
+    sizeOf _ = sizeOf (undefined :: Ptr CInt) + sizeOf (undefined :: Ptr SourcePos) + sizeOf (undefined :: Ptr AstNode) + sizeOf (undefined :: Ptr AstNode) + sizeOf (undefined :: Ptr AstNode) -- Example size, adjust for actual fields
     alignment _ = alignment (undefined :: Ptr CAstNode)
 
     peek ptr = do
@@ -420,7 +418,7 @@ instance Storable CAstNode where
                                                     pokeByteOff ptr 0 (19 :: CInt)
                                                     pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
                                                     pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf (undefined :: Ptr SourcePos)) name
-                                                    pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf (undefined :: Ptr SourcePos) + sizeOf (undefined :: CChar)) l
+                                                    pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf (undefined :: Ptr SourcePos) + sizeOf (undefined :: Ptr CChar)) l
                          CNegateOperation pos right -> do
                                                       pokeByteOff ptr 0 (20 :: CInt)
                                                       pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
@@ -433,13 +431,13 @@ instance Storable CAstNode where
                                                        pokeByteOff ptr 0 (22 :: CInt)
                                                        pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
                                                        pokeByteOff ptr (sizeOf (undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) name
-                                                       pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: CChar)) l
-                                                       pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: CChar) + sizeOf (undefined :: Ptr CSA)) myExp
+                                                       pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar)) l
+                                                       pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar) + sizeOf (undefined :: Ptr CSA)) myExp
                          CAssign pos name myExp -> do
                                                 pokeByteOff ptr 0 (23 :: CInt)
                                                 pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
                                                 pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) name
-                                                pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: CChar)) myExp
+                                                pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar)) myExp
                          CIfExpr pos cond left right -> do
                                                        pokeByteOff ptr 0 (24 :: CInt)
                                                        pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
