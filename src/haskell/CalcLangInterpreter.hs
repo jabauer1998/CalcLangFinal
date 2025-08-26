@@ -139,6 +139,7 @@ interpret node vT fT = case node of
                                                    StoreArray _ ad -> (VoidVal, vT, (addEntryToTable fT (s, (ad, e)))) 
                           Assign _ s e -> (VoidVal, (addEntryToEnv vT (s, (gV (interpret e vT fT)))),  fT)
                           IfExpr _ cond ifTrue ifFalse -> if (asBool (gV (interpret cond vT fT))) then (interpret ifTrue vT fT) else (interpret ifFalse vT fT)
+                          ParenExpr _ expr -> interpret expr vT fT 
                           ErrorNode s -> (ErrorVal ["Error at" ++ (show s)], vT, fT)
 
 gV :: (CalcLangValue, Env, FunctionTable) -> CalcLangValue

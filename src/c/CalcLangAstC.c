@@ -3,8 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define DEBUG
-
 void astToStr(AstNode* node, int size, char* str);
 
 //Function to append a Character to the givin string
@@ -200,6 +198,12 @@ void ifExpressionToStr (IfExpr* ify, int size, char* str){
   astToStr(ify->ifFalse, size, str);
 }
 
+void parenExpressionToStr(ParenExpr* par, int size, char* str){
+  appendStrChr('(', size, str);
+  astToStr(par->expr, size, str);
+  appendStrChr(')', size, str);
+}
+
 //Bellow are all the Free tree methods
 
 void freePosition(SourcePos* pos){
@@ -362,6 +366,11 @@ void freeIfExpression(IfExpr* ify){
   freeTree(ify->ifFalse);
 }
 
+void freeParenExpression(ParenExpr* par){
+  freePosition(par->pos);
+  freeTree(par->expr);
+}
+
 void freeTree(AstNode* node){
   switch(node->nodeType){
   case EQUAL_OPERATION:
@@ -438,6 +447,9 @@ void freeTree(AstNode* node){
     break;
   case IF_EXPR:
     freeIfExpression(&(node->actualNodeData.ifStatement));
+    break;
+  case PAREN_EXPR:
+    freeParenExpression(&(node->actualNodeData.par));
     break;
   default:
     fprintf(stderr, "Invalid number %d", node->nodeType);
@@ -526,6 +538,9 @@ void astToStr(AstNode* node, int size, char* str){
     break;
   case IF_EXPR:
     ifExpressionToStr(&(node->actualNodeData.ifStatement), size, str);
+    break;
+  case PAREN_EXPR:
+    parenExpressionToStr(&(node->actualNodeData.par), size, str);
     break;
   default:
     fprintf(stderr, "Invalid number %d", node->nodeType);

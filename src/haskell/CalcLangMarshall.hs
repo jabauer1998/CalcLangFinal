@@ -224,6 +224,13 @@ marshallAstNode a = case a of
                                                         let g = (CIfExpr myPos myCond left right)
                                                         poke ptr g
                                                         return ptr
+                      ParenExpr pos expr -> do
+                                            ptr <- (mallocBytes (sizeOf(undefined :: CAstNode)))
+                                            myPos <- marshallSourcePos pos
+                                            myExpr <- marshallAstNode expr
+                                            let g = (CParenExpr myPos myExpr)
+                                            poke ptr g
+                                            return ptr
                       _ -> error "Invalid AstNode type"
                                                      
                        

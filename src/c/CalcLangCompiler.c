@@ -7,8 +7,10 @@
 
 
 void processAST (AstNode* node){
+  #ifdef DEBUG
   char* str = astToString((AstNode*)node);
-  printf("C String is: %s", str);
-  freeTree(node);
+  printf("C String is: %s\n", str);
   free(str);
+  #endif
+  freeTree(node);
 }

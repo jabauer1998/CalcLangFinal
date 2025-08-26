@@ -27,6 +27,7 @@
 #define FUNCTION_DEFINITION 22
 #define ASSIGN 23
 #define IF_EXPR 24
+#define PAREN_EXPR 25
 
 struct ANode;
 
@@ -185,6 +186,11 @@ typedef struct {
   struct ANode* ifFalse;
 }IfExpr;
 
+typedef struct {
+  SourcePos* pos;
+  struct ANode* expr;
+} ParenExpr;
+
 typedef union {
   EqualOperation equalOperation;
   LessThenOrEqualsOperation lessOrEqual;
@@ -211,6 +217,7 @@ typedef union {
   FunctionDef function;
   Assign variable;
   IfExpr ifStatement;
+  ParenExpr par;
 } AstNodeType;
 
 typedef struct ANode{

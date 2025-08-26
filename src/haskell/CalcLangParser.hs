@@ -288,10 +288,11 @@ parsePrimaryExpression = try parseDollarAst <|> try parsePercentAst <|> try pars
 
 parseParenExpression :: CalcLangParser AstNode
 parseParenExpression = do
+                       pos <- getPosition
                        _ <- parseLPar
                        x <- parseExpression
                        _ <- parseRPar
-                       return x
+                       return (ParenExpr pos x)
 
 parseUnaryOperation :: CalcLangParser AstNode
 parseUnaryOperation = try parseNotOperation <|> try parseNegationOperation <|> parsePrimaryExpression

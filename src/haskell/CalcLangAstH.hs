@@ -28,6 +28,7 @@ module CalcLangAstH(Token(..), AstNode(..), SA(..), CSA(..), CSourcePos(..), CAs
 #define FUNCTION_DEFINITION 22
 #define ASSIGN 23
 #define IF_EXPR 24
+#define PAREN_EXPR 25
 
 --Below are all the Ast Nodes for Tokens
 import Text.Parsec
@@ -132,6 +133,7 @@ data AstNode = EqualOperation SourcePos AstNode AstNode
              | FunctionDef SourcePos Char SA AstNode
              | Assign SourcePos Char AstNode
              | IfExpr SourcePos AstNode AstNode AstNode
+             | ParenExpr SourcePos AstNode
              | ErrorNode String
              deriving (Eq, Show)
 
@@ -162,6 +164,7 @@ toString myA = case myA of
                FunctionDef _ name param expr -> "func " ++ [name] ++ (sAToString param) ++ " = " ++ (toString expr)
                Assign _ name expr -> "let " ++ [name] ++ " = " ++ (toString expr)
                IfExpr _ cond ifTrue ifFalse -> "if " ++ (toString cond) ++ " then " ++ (toString ifTrue) ++ " else " ++ (toString ifFalse)
+               ParenExpr _ expr -> "(" ++ (toString expr) ++ ")"
                ErrorNode err -> err
                
 
@@ -192,6 +195,7 @@ data CAstNode = CEqualOperation (Ptr CSourcePos) (Ptr CAstNode) (Ptr CAstNode)
               | CFunctionDef (Ptr CSourcePos) CChar (Ptr CSA) (Ptr CAstNode)
               | CAssign (Ptr CSourcePos) CChar (Ptr CAstNode)
               | CIfExpr (Ptr CSourcePos) (Ptr CAstNode) (Ptr CAstNode) (Ptr CAstNode)
+              | CParenExpr (Ptr CSourcePos) (Ptr CAstNode)
               | CErrorNode String
               deriving (Eq, Show)
 
@@ -322,6 +326,10 @@ instance Storable CAstNode where
                   leftPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                   rightPtr <- peekByteOff ptr ((sizeOf (undefined :: CInt)) + (sizeOf (undefined :: Ptr CSourcePos)) + (sizeOf (undefined :: Ptr CAstNode)) + (sizeOf (undefined :: Ptr CAstNode))) :: IO (Ptr CAstNode)
                   return (CIfExpr pos condPtr leftPtr rightPtr)
+            PAREN_EXPR -> do
+                          pos <- peekByteOff ptr (sizeOf (undefined :: CInt)) :: IO (Ptr CSourcePos)
+                          expr <- peekByteOff ptr (sizeOf (undefined :: CInt) + sizeOf(undefined :: Ptr CSourcePos)) :: IO (Ptr CAstNode)
+                          return (CParenExpr pos expr)
             _ -> error "Unknown AST node tag"
 
      
@@ -444,6 +452,10 @@ instance Storable CAstNode where
                                                        pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) cond
                                                        pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CAstNode)) left
                                                        pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CAstNode) + (sizeOf (undefined :: Ptr CAstNode))) right
+                         CParenExpr pos expr -> do
+                                                pokeByteOff ptr 0 (25 :: CInt)
+                                                pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) expr
                          _ -> error "Unknown AST node tag"
 
 
