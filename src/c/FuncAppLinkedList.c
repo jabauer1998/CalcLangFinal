@@ -18,6 +18,34 @@ void addApplicationElem(FuncAppList* list, FuncApp* app){
   }
 }
 
+void freeTypeInfo(TypeInfo* point){
+  free(point);
+}
+
+void freeFuncApplication(FuncApp* application){
+  freeTypeInfo(application->ret);
+  free(origName);
+  free(newAlias);
+  for(int i = 0; i < paramSize; i++){
+    TypeInfo* point = application->params[i];
+    freeTypeInfo(point);
+  }
+  free(application);
+}
+
+void freeFuncAppElem(FuncAppElem* elem){
+  freeFuncApplication(elem->application);
+  free(elem);
+}
+
+void freeFuncAppList(FuncAppList* list){
+  while(*list != NULL){
+    FuncAppElem* current = *list;
+    *list=*list->next;
+    freeFuncAppElem(current);
+  }
+}
+
 char* getFunctionAlias(FuncAppList* list, FuncQueryApp* info){
   for(FuncAppElem* elem = *list; elem != NULL; elem = elem->next){
     if(matchQueryToActual(info, elem->application)){
