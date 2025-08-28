@@ -1,8 +1,0 @@
-#ifndef CALCLANGCOMPILER_H
-#define CALCLANGCOMPILER_H
-
-#include "CalcLangAst.h"
-
-void processAst(AstNode* node);
-
-#endif

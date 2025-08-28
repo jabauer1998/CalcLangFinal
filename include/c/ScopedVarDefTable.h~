@@ -1,0 +1,22 @@
+#ifndef SCOPED_VAR_DEF_TABLE
+#define SCOPED_VAR_DEF_TABLE
+
+#include "CalcLangAst.h"
+#include "VarDefLinkedListh"
+
+typedef struct {
+  VarDefList list;
+  VarScope* next;
+} VarScope;
+
+typedef VarScope* ScopeStack;
+
+ScopeStack createVarTable();
+void pushScope();
+void popScope();
+void freeScope();
+void addElemToVarTable(ScopeStack* stack, VarDefNode* node);
+LLVMValueRef getElemFromVarTable(ScopeStack* stack, char* name);
+LLVMValueRef getElemFromVarScope(ScopeStack* stack, char* name);
+
+#endif
