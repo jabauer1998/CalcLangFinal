@@ -62,9 +62,17 @@ executable CCalcLang
     hs-source-dirs: src/haskell
                   
     install-includes: CalcLangAstC.h,
-                      CalcLangCompiler.h
+                      CalcLangCompiler.h,
+                      FuncDefLinkedList.h,
+                      VarDefLinkedList.h,
+                      ScopedVarDefTable.h,
+                      CalcLangIrGen.h
     includes: CalcLangAstC.h,
-              CalcLangCompiler.h
+              CalcLangCompiler.h,
+              FuncDefLinkedList.h,
+              VarDefLinkedList.h,
+              ScopedVarDefTable.h,
+              CalcLangIrGen.h
 
     build-depends:    base ^>=4.18.3.0,
                       parsec >= 3.1.11 && < 4,
@@ -75,7 +83,12 @@ executable CCalcLang
                    CalcLangParser
                   
     c-sources:     src/c/CalcLangAstC.c,
-                   src/c/CalcLangCompiler.c
+                   src/c/CalcLangCompiler.c,
+                   src/c/FuncAppLinkedList.c,
+                   src/c/FuncDefLinkedList.c,
+                   src/c/VarDefLinkedList.c,
+                   src/c/ScopedVarDefTable.c,
+                   src/c/CalcLangIrGen.c
 
     ghc-options: -Wno-type-defaults -Wno-unused-imports -dynamic -g
 
