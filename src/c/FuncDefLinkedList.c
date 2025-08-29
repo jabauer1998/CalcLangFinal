@@ -47,3 +47,29 @@ FuncDefNode* getFuncDef(FuncDefList* l, char* name){
   }
   return NULL;
 }
+
+void funcDefNodeToStr(FuncDefNode* node, int size, char* str){
+  strncat(str, "{Name: ", size);
+  strncat(str, node->name, size);
+  strncat(str, ", Params: (", size);
+  storeArrayToStr(node->params, size, str);
+  strncat(str, "), Ret: ", size);
+  astNodeToStr(node->expr, size, str);
+  strncat(str, "}", size);
+}
+
+void funcDefListToStr(FuncDefListElem* elem, int size, char* str){
+  if(elem == NULL){
+    strncat(str, "->NULL", size);
+  } else {
+    funcDefNodeToStr(elem->data, size, str);
+    strncat(str, "->", size);
+    funcDefListToStr(elem->next, size, str);
+  }
+}
+
+char* funcDefListToString(FuncDefList l){
+  int size = 10000;
+  char* str = malloc(size);
+  funcDefListToStr(l, size, str);
+}

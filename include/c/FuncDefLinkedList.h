@@ -20,5 +20,6 @@ FuncDefList createFuncDefList();
 void freeFuncDefList(FuncDefList l);
 void addFuncDef(FuncDefList* l, FuncDefNode* node);
 FuncDefNode* getFuncDef(FuncDefList* l, char* name);
+char* funcDefListToString(FuncDefList l);
 
 #endif
