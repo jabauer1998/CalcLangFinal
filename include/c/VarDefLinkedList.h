@@ -2,15 +2,18 @@
 #define VAR_DEF_LINKED_LIST
 
 #include "CalcLangAstC.h"
+#include "FuncAppLinkedList.h"
+#include <llvm-c/Core.h>
 
 typedef struct{
   char* name;
   LLVMValueRef ref;
+  TypeInfo* type;
 }VarDefNode;
 
-typedef struct{
+typedef struct VarDLListElem{
   VarDefNode* data;
-  VarDefListElem* next;
+  struct VarDLListElem* next;
 }VarDefListElem;
 
 typedef VarDefListElem* VarDefList; 

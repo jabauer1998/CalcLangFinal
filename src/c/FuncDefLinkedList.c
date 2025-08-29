@@ -1,8 +1,17 @@
 #include "FuncDefLinkedList.h"
 #include "CalcLangAstC.h"
+#include <stdlib.h>
+#include <string.h>
 
 FuncDefList createDefList(){
   return NULL;
+}
+
+void freeDefData(FuncDefNode* node){
+  free(node->name);
+  freeStoreArray(node->params);
+  freeTree(node->expr);
+  free(node);
 }
 
 void freeDefList(FuncDefList l){
@@ -15,21 +24,14 @@ void freeDefList(FuncDefList l){
   }
 }
 
-void freeDefData(FuncDefNode* node){
-  free(node->name);
-  freeStoreArray(node->params);
-  freeAstNode(node->expr);
-  free(node);
-}
-
 void addFuncDef(FuncDefList* l, FuncDefNode* node){
-  if(*l == NULL){
-    *l = malloc(sizeof(FuncDefListElem));
-    *l->data = node;
-    *l->next = NULL;
+  if((*l) == NULL){
+    (*l) = malloc(sizeof(FuncDefListElem));
+    (*l)->data = node;
+    (*l)->next = NULL;
   } else {
     FuncDefListElem* elem = NULL;
-    for(elem = *l; elem->next != NULL; elem=elem->next);
+    for(elem = (*l); elem->next != NULL; elem=elem->next);
     elem->next = malloc(sizeof(FuncDefListElem));
     elem->next->data = node;
     elem->next->next = NULL;
@@ -38,7 +40,7 @@ void addFuncDef(FuncDefList* l, FuncDefNode* node){
 
 FuncDefNode* getFuncDef(FuncDefList* l, char* name){
   FuncDefListElem* elem = NULL;
-  for(elem = *l; elem != NULL; elem=elem->next){
+  for(elem = (*l); elem != NULL; elem=elem->next){
     if(elem->data != NULL && strcmp(elem->data->name, name) == 0){
       return elem->data;
     }

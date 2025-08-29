@@ -64,12 +64,14 @@ executable CCalcLang
     install-includes: CalcLangAstC.h,
                       CalcLangCompiler.h,
                       FuncDefLinkedList.h,
+                      FuncAppLinkedList.h,
                       VarDefLinkedList.h,
                       ScopedVarDefTable.h,
                       CalcLangIrGen.h
     includes: CalcLangAstC.h,
               CalcLangCompiler.h,
               FuncDefLinkedList.h,
+              FuncAppLinkedList.h,
               VarDefLinkedList.h,
               ScopedVarDefTable.h,
               CalcLangIrGen.h

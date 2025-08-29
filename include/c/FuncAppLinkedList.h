@@ -52,8 +52,8 @@ typedef struct{
   TypeInfo* ret;
 } FuncQueryApp;
 
-typedef struct{
-  FuncAppElem* next;
+typedef struct FAppElem{
+  struct FAppElem* next;
   FuncApp* application;
 } FuncAppElem;
 
@@ -62,7 +62,7 @@ typedef FuncAppElem* FuncAppList;
 FuncAppList createApplicationList();
 void addApplicationElem(FuncAppList* list, FuncApp* info);
 char* getFunctionAlias(FuncAppList* list, FuncQueryApp* info);
-void freeFuncAppList(FuncAppList list);
+void freeFuncAppList(FuncAppList* list);
 int matchTypes(TypeInfo* type1, TypeInfo* type2);
 int matchQueryToActual(FuncQueryApp* query, FuncApp* actual);
 

@@ -9,9 +9,9 @@ typedef struct{
   AstNode* expr;
 }FuncDefNode;
 
-typedef struct{
+typedef struct FDefLElem{
   FuncDefNode* data;
-  FuncDefListElem* next;
+  struct FDefLElem* next;
 }FuncDefListElem;
 
 typedef FuncDefListElem* FuncDefList; 
@@ -19,6 +19,6 @@ typedef FuncDefListElem* FuncDefList;
 FuncDefList createFuncDefList();
 void freeFuncDefList(FuncDefList l);
 void addFuncDef(FuncDefList* l, FuncDefNode* node);
-void getFuncDef(FuncDefList* l, char* name);
+FuncDefNode* getFuncDef(FuncDefList* l, char* name);
 
 #endif

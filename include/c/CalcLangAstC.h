@@ -225,6 +225,7 @@ typedef struct ANode{
   AstNodeType actualNodeData;
 } AstNode;
 
+void freeStoreArray(StoreArray* arr);
 char* astToString(AstNode* node);
 void freeTree(AstNode* node);
 

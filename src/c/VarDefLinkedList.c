@@ -1,13 +1,23 @@
 #include "VarDefLinkedList.h"
 #include "CalcLangAstC.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
-FuncDefList createVarDefList(){
+VarDefList createVarDefList(){
   return NULL;
+}
+
+void freeVarDefData(VarDefNode* node){
+  free(node->name);
+  free(node->type);
+  free(node->ref);
+  free(node);
 }
 
 void freeVarDefList(VarDefList l){
   if(l != NULL && l->next != NULL){
-    freeDefList(l->next);
+    freeVarDefList(l->next);
   }
   if(l != NULL){
     freeVarDefData(l->data);
@@ -15,21 +25,14 @@ void freeVarDefList(VarDefList l){
   }
 }
 
-void freeVarDefData(VarDefNode* node){
-  free(node->name);
-  freeStoreArray(node->params);
-  freeAstNode(node->expr);
-  free(node);
-}
-
-void addVarDef(FuncDefList* l, VarDefNode* node){
-  if(*l == NULL){
-    *l = malloc(sizeof(VarDefListElem));
-    *l->data = node;
-    *l->next = NULL;
+void addVarDef(VarDefList* l, VarDefNode* node){
+  if((*l) == NULL){
+    (*l) = malloc(sizeof(VarDefListElem));
+    (*l)->data = node;
+    (*l)->next = NULL;
   } else {
     VarDefListElem* elem = NULL;
-    for(elem = *l; elem->next != NULL; elem=elem->next);
+    for(elem = (*l); elem->next != NULL; elem=elem->next);
     elem->next = malloc(sizeof(VarDefListElem));
     elem->next->data = node;
     elem->next->next = NULL;
@@ -38,7 +41,7 @@ void addVarDef(FuncDefList* l, VarDefNode* node){
 
 LLVMValueRef getVarDef(VarDefList* l, char* name){
   VarDefListElem* elem = NULL;
-  for(elem = *l; elem != NULL; elem=elem->next){
+  for(elem = (*l); elem != NULL; elem=elem->next){
     if(elem->data != NULL && strcmp(elem->data->name, name) == 0){
       return elem->data->ref;
     }

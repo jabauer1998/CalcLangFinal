@@ -1,30 +1,34 @@
+#include "ScopedVarDefTable.h"
+#include <stdlib.h>
+#include <string.h>
+
 ScopeStack createVarTable(){
   return NULL;
 }
 
-void pushScope(ScopeStack* stack)
+void pushScope(ScopeStack* stack){
   if(*stack == NULL){
     *stack = malloc(sizeof(VarScope));
-    *stack->list = NULL;
-    *stack->next = NULL;
+    (*stack)->list = NULL;
+    (*stack)->next = NULL;
   } else {
     VarScope* currentHead = *stack;
-    *stack = malloc(sizeof(VarScope));
-    *stack->list = NULL;
-    *stack->next = currentHead;
+    (*stack) = malloc(sizeof(VarScope));
+    (*stack)->list = NULL;
+    (*stack)->next = currentHead;
   }
 }
 
 void popScope(ScopeStack* stack){
   if(*stack != NULL){
-    if(*stack->next != NULL){
-      VarScope* scopeToDelete = *stack->next;
-      *stack = *stack->next;
+    if((*stack)->next != NULL){
+      VarScope* scopeToDelete = (*stack)->next;
+      (*stack) = (*stack)->next;
       freeScope(scopeToDelete);
     } else {
-      freeVarDefList(*stack->list);
-      *stack->list = NULL;
-      *stack->next = NULL;
+      freeVarDefList((*stack)->list);
+      (*stack)->list = NULL;
+      (*stack)->next = NULL;
     }
   }
 }
@@ -35,12 +39,12 @@ void freeScope(VarScope* stack){
 }
 
 void addElemToVarTable(ScopeStack* stack, VarDefNode* node){
-  addVarDef(*stack->list, node);
+  addVarDef(&((*stack)->list), node);
 }
 
 LLVMValueRef getElemFromVarTable(ScopeStack* stack, char* name){
-  for(VarScope* interator = *stack; iterator != NULL; interator = iterator->next){
-    LLVMValueRef ref = getVarDef(iterator->list, name);
+  for(VarScope* iterator = *stack; iterator != NULL; iterator = iterator->next){
+    LLVMValueRef ref = getVarDef(&(iterator->list), name);
     if(ref != NULL)
       return ref;
   }
@@ -48,5 +52,5 @@ LLVMValueRef getElemFromVarTable(ScopeStack* stack, char* name){
 }
 
 LLVMValueRef getElemFromVarScope(ScopeStack* stack, char* name){
-  return getVarDef(*stack->list, name);
+  return getVarDef((*stack)->list, name);
 }
