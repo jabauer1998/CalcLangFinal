@@ -1,29 +1,17 @@
 #include "CalcLangAstC.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "TestUtils.h"
 
-int main(){
-  printf("Malloc Pos");
-  fflush(stdout);
+int makeTree(){
   SourcePos* pos = (SourcePos*)malloc(sizeof(SourcePos));
-  printf("setting name");
-  fflush(stdout);
-  pos->name = "Test";
-  printf("Setting position");
-  fflush(stdout);
   pos->lineNumber = 0;
   pos->linePosition = 0;
-
-  printf("Made pos");
-  fflush(stdout);
 
   AstNode* left = (AstNode*)malloc(sizeof(AstNode));
   left->nodeType = 11;
   left->actualNodeData.integer.pos = pos;
   left->actualNodeData.integer.lexeme = "8908";
-
-  printf("Made number");
-  fflush(stdout);
 
   AstNode* right = (AstNode*)malloc(sizeof(AstNode));
   right->nodeType = 11;
@@ -41,11 +29,15 @@ int main(){
   assign->actualNodeData.variable.pos = pos;
   assign->actualNodeData.variable.name = 'x';
   assign->actualNodeData.variable.expr = add;
-
-  printf("Made sources");
-  fflush(stdout);
   
   char* res = astToString(assign);
+  char* res2 = "let x = 8908 + 193874";
 
-  printf("Test result is %s", res);
+  ASSERT_STR_EQ(res, res2, "Error they do not match!!!");
+
+  return 0;
+}
+
+int main(){
+  RUN_TEST(makeTree);
 }
