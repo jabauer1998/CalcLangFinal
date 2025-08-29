@@ -66,6 +66,6 @@ void freeFuncAppList(FuncAppList* list);
 int matchTypes(TypeInfo* type1, TypeInfo* type2);
 int matchQueryToActual(FuncQueryApp* query, FuncApp* actual);
 void typeInfoToStr(TypeInfo* type, int size, char* str);
-char* funcAppListToString(FuncAppList* list);
+char* funcAppListToString(FuncAppList list);
 
 #endif

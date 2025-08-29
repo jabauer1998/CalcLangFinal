@@ -52,5 +52,23 @@ LLVMValueRef getElemFromVarTable(ScopeStack* stack, char* name){
 }
 
 LLVMValueRef getElemFromVarScope(ScopeStack* stack, char* name){
-  return getVarDef((*stack)->list, name);
+  return getVarDef(&((*stack)->list), name);
+}
+
+void varTableToStr(VarScope* scope, int size, char* str){
+  if(scope == NULL){
+    strncat(str, "NULL", size);
+  } else {
+    strncat(str, "List: ", size);
+    varDefListToStr(scope->list, size, str);
+    strncat(str, "\n|\nV\n", size);
+    varTableToStr(scope->next, size, str);
+  }
+}
+
+char* varTableToString(ScopeStack stack){
+  int size = 10000;
+  char* table = malloc(size);
+  varTableToStr(stack, size, table);
+  return table;
 }

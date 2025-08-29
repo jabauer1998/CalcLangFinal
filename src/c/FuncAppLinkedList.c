@@ -1,6 +1,7 @@
 #include "FuncAppLinkedList.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 FuncAppList createApplicationList(){
   return NULL;
@@ -114,7 +115,7 @@ void setTypeToStr(SetType* set, int size, char* str){
   strncat(str, "}", size);
 }
 
-void tupleTypeToStr(TupleType* tup, int size, char* str){
+void tupTypeToStr(TupleType* tup, int size, char* str){
   strncat(str, "(", size);
   for(int i = 0; i < tup->size; i++){
     if(i == 0){
@@ -163,7 +164,7 @@ void funcAppToStr(FuncApp* app, int size, char* str){
     }
   }
   strncat(str, "), Return: ", size);
-  typeInfoToStr(type->ret, size, str);
+  typeInfoToStr(app->ret, size, str);
   strncat(str, "}", size);
 }
 
@@ -177,10 +178,11 @@ void funcAppListElemToStr(FuncAppElem* elem, int size, char* str){
   }
 }
 
-void funcAppListToString(FuncAppList list){
+char* funcAppListToString(FuncAppList list){
   int size = 10000;
   char* str = malloc(size);
   funcAppListElemToStr(list, size, str);
+  return str;
 }
 
 int matchQueryToActual(FuncQueryApp* query, FuncApp* actual){

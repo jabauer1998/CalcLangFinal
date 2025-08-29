@@ -57,7 +57,7 @@ void varDefDataToStr(VarDefNode* d, int size, char* str){
   strncat(str, "}", size);
 }
 
-void varDefListToStr(VarDefELem* listNode, int size, char* str){
+void varDefListToStr(VarDefListElem* listNode, int size, char* str){
   if(listNode != NULL){
     varDefDataToStr(listNode->data, size, str);
     strncat(str, "->", size);
@@ -71,4 +71,5 @@ char* varDefListToString(VarDefList l){
   int size = 10000;
   char* str = malloc(size);
   varDefListToStr(l, size, str);
+  return str;
 }

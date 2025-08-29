@@ -54,7 +54,7 @@ void funcDefNodeToStr(FuncDefNode* node, int size, char* str){
   strncat(str, ", Params: (", size);
   storeArrayToStr(node->params, size, str);
   strncat(str, "), Ret: ", size);
-  astNodeToStr(node->expr, size, str);
+  astToStr(node->expr, size, str);
   strncat(str, "}", size);
 }
 
@@ -72,4 +72,5 @@ char* funcDefListToString(FuncDefList l){
   int size = 10000;
   char* str = malloc(size);
   funcDefListToStr(l, size, str);
+  return str;
 }

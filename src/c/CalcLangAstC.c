@@ -3,8 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-void astToStr(AstNode* node, int size, char* str);
-
 //Function to append a Character to the givin string
 void appendStrChr(char a, int size, char* str){
   int actualLength = strlen(str);

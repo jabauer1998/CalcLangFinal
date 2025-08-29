@@ -18,5 +18,6 @@ void freeScope(VarScope* stack);
 void addElemToVarTable(ScopeStack* stack, VarDefNode* node);
 LLVMValueRef getElemFromVarTable(ScopeStack* stack, char* name);
 LLVMValueRef getElemFromVarScope(ScopeStack* stack, char* name);
+char* varTableToString(ScopeStack stack);
 
 #endif
