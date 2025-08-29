@@ -5,6 +5,10 @@ IncDir:=./include/c
 SrcDir:=./src/c
 ObjDir:=./obj/c
 TestBinDir:=./test/bin
+AbsIncDirC:="/home/jabauer/source/repos/CalcLangFinal/include/c"
+AbsIncDirH:="/home/jabauer/source/repos/CalcLangFinal/include/haskell"
+AbsInstallDir:="/home/jabauer/source/repos/CalcLangFinal/bin"
+
 
 all: clean build install
 
@@ -12,14 +16,16 @@ test: treeprintingtest
 	./test/bin/TreePrintingTest
 
 build:
-	cabal build --extra-include-dirs="/home/jabauer/source/repos/CalcLangFinal/include/c" --extra-include-dirs="/home/jabauer/source/repos/CalcLangFinal/include/haskell" -v3
+	cabal build --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) -v3
 install:
-	cabal install --extra-include-dirs="/home/jabauer/source/repos/CalcLangFinal/include/c" --extra-include-dirs="/home/jabauer/source/repos/CalcLangFinal/include/haskell" --installdir="/home/jabauer/source/repos/CalcLangFinal/bin"
+	cabal install --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --installdir=$(AbsInstallDir)
 
 treeprintingtest:
 	clang -c $(TestSrcDir)/TreePrintingTest.c -o $(TestObjDir)/TreePrintingTest.o -I$(TestIncDir) -I$(IncDir)
 	clang -c $(SrcDir)/CalcLangAstC.c -o $(ObjDir)/CalcLangAstC.o -I$(IncDir)
 	clang -o $(TestBinDir)/TreePrintingTest $(TestObjDir)/TreePrintingTest.o $(ObjDir)/CalcLangAstC.o -I$(IncDir)
+
+
 
 clean:
 	cabal clean

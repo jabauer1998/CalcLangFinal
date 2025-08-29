@@ -48,3 +48,27 @@ LLVMValueRef getVarDef(VarDefList* l, char* name){
   }
   return NULL;
 }
+
+void varDefDataToStr(VarDefNode* d, int size, char* str){
+  strncat(str, "{Name: ", size);
+  strncat(str, d->name, size);
+  strncat(str, ", Type: ", size);
+  typeInfoToStr(d->type, size, str);
+  strncat(str, "}", size);
+}
+
+void varDefListToStr(VarDefELem* listNode, int size, char* str){
+  if(listNode != NULL){
+    varDefDataToStr(listNode->data, size, str);
+    strncat(str, "->", size);
+    varDefListToStr(listNode->next, size, str);
+  } else {
+    strncat(str, "->NULL", size);
+  }
+}
+
+char* varDefListToString(VarDefList l){
+  int size = 10000;
+  char* str = malloc(size);
+  varDefListToStr(l, size, str);
+}

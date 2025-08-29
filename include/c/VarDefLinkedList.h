@@ -22,5 +22,6 @@ VarDefList createVarDefList();
 void freeVarDefList(VarDefList l);
 void addVarDef(VarDefList* l, VarDefNode* node);
 LLVMValueRef getVarDef(VarDefList* l, char* name);
+char* varDefListToString(VarDefList l);
 
 #endif
