@@ -5993,6 +5993,2098 @@ define dso_local ptr @multCalcLangValues(ptr noundef %0, i32 noundef %1, ptr nou
   ret ptr %1504
 }
 
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local ptr @divCalcLangValues(ptr noundef %0, i32 noundef %1, ptr noundef %2, i32 noundef %3) #0 {
+  %5 = alloca ptr, align 8
+  %6 = alloca ptr, align 8
+  %7 = alloca i32, align 4
+  %8 = alloca ptr, align 8
+  %9 = alloca i32, align 4
+  %10 = alloca ptr, align 8
+  %11 = alloca ptr, align 8
+  %12 = alloca ptr, align 8
+  %13 = alloca ptr, align 8
+  %14 = alloca i32, align 4
+  %15 = alloca ptr, align 8
+  %16 = alloca ptr, align 8
+  %17 = alloca i32, align 4
+  %18 = alloca ptr, align 8
+  %19 = alloca ptr, align 8
+  %20 = alloca i32, align 4
+  %21 = alloca ptr, align 8
+  %22 = alloca ptr, align 8
+  %23 = alloca i32, align 4
+  %24 = alloca ptr, align 8
+  %25 = alloca ptr, align 8
+  %26 = alloca i32, align 4
+  %27 = alloca ptr, align 8
+  %28 = alloca ptr, align 8
+  %29 = alloca i32, align 4
+  %30 = alloca ptr, align 8
+  %31 = alloca ptr, align 8
+  %32 = alloca i32, align 4
+  %33 = alloca ptr, align 8
+  %34 = alloca ptr, align 8
+  %35 = alloca i32, align 4
+  %36 = alloca ptr, align 8
+  %37 = alloca ptr, align 8
+  %38 = alloca i32, align 4
+  %39 = alloca ptr, align 8
+  %40 = alloca ptr, align 8
+  %41 = alloca ptr, align 8
+  %42 = alloca i32, align 4
+  %43 = alloca ptr, align 8
+  %44 = alloca ptr, align 8
+  %45 = alloca i32, align 4
+  %46 = alloca ptr, align 8
+  %47 = alloca ptr, align 8
+  %48 = alloca i32, align 4
+  %49 = alloca ptr, align 8
+  %50 = alloca ptr, align 8
+  %51 = alloca i32, align 4
+  %52 = alloca ptr, align 8
+  %53 = alloca ptr, align 8
+  %54 = alloca i32, align 4
+  %55 = alloca ptr, align 8
+  %56 = alloca ptr, align 8
+  %57 = alloca i32, align 4
+  %58 = alloca ptr, align 8
+  %59 = alloca ptr, align 8
+  %60 = alloca i32, align 4
+  %61 = alloca ptr, align 8
+  %62 = alloca ptr, align 8
+  %63 = alloca i32, align 4
+  %64 = alloca ptr, align 8
+  %65 = alloca ptr, align 8
+  %66 = alloca i32, align 4
+  store ptr %0, ptr %6, align 8
+  store i32 %1, ptr %7, align 4
+  store ptr %2, ptr %8, align 8
+  store i32 %3, ptr %9, align 4
+  %67 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %67, ptr %10, align 8
+  %68 = load ptr, ptr %6, align 8
+  %69 = getelementptr inbounds %struct.CalcLangVal, ptr %68, i32 0, i32 0
+  %70 = load i32, ptr %69, align 8
+  %71 = icmp eq i32 %70, 0
+  br i1 %71, label %72, label %91
+
+72:                                               ; preds = %4
+  %73 = load ptr, ptr %8, align 8
+  %74 = getelementptr inbounds %struct.CalcLangVal, ptr %73, i32 0, i32 0
+  %75 = load i32, ptr %74, align 8
+  %76 = icmp eq i32 %75, 0
+  br i1 %76, label %77, label %91
+
+77:                                               ; preds = %72
+  %78 = load ptr, ptr %10, align 8
+  %79 = getelementptr inbounds %struct.CalcLangVal, ptr %78, i32 0, i32 0
+  store i32 1, ptr %79, align 8
+  %80 = load ptr, ptr %6, align 8
+  %81 = getelementptr inbounds %struct.CalcLangVal, ptr %80, i32 0, i32 1
+  %82 = load i32, ptr %81, align 8
+  %83 = sitofp i32 %82 to double
+  %84 = load ptr, ptr %8, align 8
+  %85 = getelementptr inbounds %struct.CalcLangVal, ptr %84, i32 0, i32 1
+  %86 = load i32, ptr %85, align 8
+  %87 = sitofp i32 %86 to double
+  %88 = fdiv double %83, %87
+  %89 = load ptr, ptr %10, align 8
+  %90 = getelementptr inbounds %struct.CalcLangVal, ptr %89, i32 0, i32 1
+  store double %88, ptr %90, align 8
+  br label %1468
+
+91:                                               ; preds = %72, %4
+  %92 = load ptr, ptr %6, align 8
+  %93 = getelementptr inbounds %struct.CalcLangVal, ptr %92, i32 0, i32 0
+  %94 = load i32, ptr %93, align 8
+  %95 = icmp eq i32 %94, 1
+  br i1 %95, label %96, label %113
+
+96:                                               ; preds = %91
+  %97 = load ptr, ptr %8, align 8
+  %98 = getelementptr inbounds %struct.CalcLangVal, ptr %97, i32 0, i32 0
+  %99 = load i32, ptr %98, align 8
+  %100 = icmp eq i32 %99, 1
+  br i1 %100, label %101, label %113
+
+101:                                              ; preds = %96
+  %102 = load ptr, ptr %10, align 8
+  %103 = getelementptr inbounds %struct.CalcLangVal, ptr %102, i32 0, i32 0
+  store i32 1, ptr %103, align 8
+  %104 = load ptr, ptr %6, align 8
+  %105 = getelementptr inbounds %struct.CalcLangVal, ptr %104, i32 0, i32 1
+  %106 = load double, ptr %105, align 8
+  %107 = load ptr, ptr %8, align 8
+  %108 = getelementptr inbounds %struct.CalcLangVal, ptr %107, i32 0, i32 1
+  %109 = load double, ptr %108, align 8
+  %110 = fdiv double %106, %109
+  %111 = load ptr, ptr %10, align 8
+  %112 = getelementptr inbounds %struct.CalcLangVal, ptr %111, i32 0, i32 1
+  store double %110, ptr %112, align 8
+  br label %1467
+
+113:                                              ; preds = %96, %91
+  %114 = load ptr, ptr %6, align 8
+  %115 = getelementptr inbounds %struct.CalcLangVal, ptr %114, i32 0, i32 0
+  %116 = load i32, ptr %115, align 8
+  %117 = icmp eq i32 %116, 0
+  br i1 %117, label %118, label %136
+
+118:                                              ; preds = %113
+  %119 = load ptr, ptr %8, align 8
+  %120 = getelementptr inbounds %struct.CalcLangVal, ptr %119, i32 0, i32 0
+  %121 = load i32, ptr %120, align 8
+  %122 = icmp eq i32 %121, 1
+  br i1 %122, label %123, label %136
+
+123:                                              ; preds = %118
+  %124 = load ptr, ptr %10, align 8
+  %125 = getelementptr inbounds %struct.CalcLangVal, ptr %124, i32 0, i32 0
+  store i32 1, ptr %125, align 8
+  %126 = load ptr, ptr %6, align 8
+  %127 = getelementptr inbounds %struct.CalcLangVal, ptr %126, i32 0, i32 1
+  %128 = load i32, ptr %127, align 8
+  %129 = sitofp i32 %128 to double
+  %130 = load ptr, ptr %8, align 8
+  %131 = getelementptr inbounds %struct.CalcLangVal, ptr %130, i32 0, i32 1
+  %132 = load double, ptr %131, align 8
+  %133 = fdiv double %129, %132
+  %134 = load ptr, ptr %10, align 8
+  %135 = getelementptr inbounds %struct.CalcLangVal, ptr %134, i32 0, i32 1
+  store double %133, ptr %135, align 8
+  br label %1466
+
+136:                                              ; preds = %118, %113
+  %137 = load ptr, ptr %6, align 8
+  %138 = getelementptr inbounds %struct.CalcLangVal, ptr %137, i32 0, i32 0
+  %139 = load i32, ptr %138, align 8
+  %140 = icmp eq i32 %139, 1
+  br i1 %140, label %141, label %159
+
+141:                                              ; preds = %136
+  %142 = load ptr, ptr %8, align 8
+  %143 = getelementptr inbounds %struct.CalcLangVal, ptr %142, i32 0, i32 0
+  %144 = load i32, ptr %143, align 8
+  %145 = icmp eq i32 %144, 0
+  br i1 %145, label %146, label %159
+
+146:                                              ; preds = %141
+  %147 = load ptr, ptr %10, align 8
+  %148 = getelementptr inbounds %struct.CalcLangVal, ptr %147, i32 0, i32 0
+  store i32 1, ptr %148, align 8
+  %149 = load ptr, ptr %6, align 8
+  %150 = getelementptr inbounds %struct.CalcLangVal, ptr %149, i32 0, i32 1
+  %151 = load double, ptr %150, align 8
+  %152 = load ptr, ptr %8, align 8
+  %153 = getelementptr inbounds %struct.CalcLangVal, ptr %152, i32 0, i32 1
+  %154 = load i32, ptr %153, align 8
+  %155 = sitofp i32 %154 to double
+  %156 = fdiv double %151, %155
+  %157 = load ptr, ptr %10, align 8
+  %158 = getelementptr inbounds %struct.CalcLangVal, ptr %157, i32 0, i32 1
+  store double %156, ptr %158, align 8
+  br label %1465
+
+159:                                              ; preds = %141, %136
+  %160 = load ptr, ptr %6, align 8
+  %161 = getelementptr inbounds %struct.CalcLangVal, ptr %160, i32 0, i32 0
+  %162 = load i32, ptr %161, align 8
+  %163 = icmp eq i32 %162, 3
+  br i1 %163, label %164, label %182
+
+164:                                              ; preds = %159
+  %165 = load ptr, ptr %8, align 8
+  %166 = getelementptr inbounds %struct.CalcLangVal, ptr %165, i32 0, i32 0
+  %167 = load i32, ptr %166, align 8
+  %168 = icmp eq i32 %167, 0
+  br i1 %168, label %169, label %182
+
+169:                                              ; preds = %164
+  %170 = load ptr, ptr %10, align 8
+  %171 = getelementptr inbounds %struct.CalcLangVal, ptr %170, i32 0, i32 0
+  store i32 3, ptr %171, align 8
+  %172 = load ptr, ptr %6, align 8
+  %173 = getelementptr inbounds %struct.CalcLangVal, ptr %172, i32 0, i32 1
+  %174 = load double, ptr %173, align 8
+  %175 = load ptr, ptr %8, align 8
+  %176 = getelementptr inbounds %struct.CalcLangVal, ptr %175, i32 0, i32 1
+  %177 = load i32, ptr %176, align 8
+  %178 = sitofp i32 %177 to double
+  %179 = fdiv double %174, %178
+  %180 = load ptr, ptr %10, align 8
+  %181 = getelementptr inbounds %struct.CalcLangVal, ptr %180, i32 0, i32 1
+  store double %179, ptr %181, align 8
+  br label %1464
+
+182:                                              ; preds = %164, %159
+  %183 = load ptr, ptr %6, align 8
+  %184 = getelementptr inbounds %struct.CalcLangVal, ptr %183, i32 0, i32 0
+  %185 = load i32, ptr %184, align 8
+  %186 = icmp eq i32 %185, 3
+  br i1 %186, label %187, label %204
+
+187:                                              ; preds = %182
+  %188 = load ptr, ptr %8, align 8
+  %189 = getelementptr inbounds %struct.CalcLangVal, ptr %188, i32 0, i32 0
+  %190 = load i32, ptr %189, align 8
+  %191 = icmp eq i32 %190, 3
+  br i1 %191, label %192, label %204
+
+192:                                              ; preds = %187
+  %193 = load ptr, ptr %10, align 8
+  %194 = getelementptr inbounds %struct.CalcLangVal, ptr %193, i32 0, i32 0
+  store i32 1, ptr %194, align 8
+  %195 = load ptr, ptr %6, align 8
+  %196 = getelementptr inbounds %struct.CalcLangVal, ptr %195, i32 0, i32 1
+  %197 = load double, ptr %196, align 8
+  %198 = load ptr, ptr %8, align 8
+  %199 = getelementptr inbounds %struct.CalcLangVal, ptr %198, i32 0, i32 1
+  %200 = load double, ptr %199, align 8
+  %201 = fdiv double %197, %200
+  %202 = load ptr, ptr %10, align 8
+  %203 = getelementptr inbounds %struct.CalcLangVal, ptr %202, i32 0, i32 1
+  store double %201, ptr %203, align 8
+  br label %1463
+
+204:                                              ; preds = %187, %182
+  %205 = load ptr, ptr %6, align 8
+  %206 = getelementptr inbounds %struct.CalcLangVal, ptr %205, i32 0, i32 0
+  %207 = load i32, ptr %206, align 8
+  %208 = icmp eq i32 %207, 3
+  br i1 %208, label %209, label %226
+
+209:                                              ; preds = %204
+  %210 = load ptr, ptr %8, align 8
+  %211 = getelementptr inbounds %struct.CalcLangVal, ptr %210, i32 0, i32 0
+  %212 = load i32, ptr %211, align 8
+  %213 = icmp eq i32 %212, 1
+  br i1 %213, label %214, label %226
+
+214:                                              ; preds = %209
+  %215 = load ptr, ptr %10, align 8
+  %216 = getelementptr inbounds %struct.CalcLangVal, ptr %215, i32 0, i32 0
+  store i32 3, ptr %216, align 8
+  %217 = load ptr, ptr %6, align 8
+  %218 = getelementptr inbounds %struct.CalcLangVal, ptr %217, i32 0, i32 1
+  %219 = load double, ptr %218, align 8
+  %220 = load ptr, ptr %8, align 8
+  %221 = getelementptr inbounds %struct.CalcLangVal, ptr %220, i32 0, i32 1
+  %222 = load double, ptr %221, align 8
+  %223 = fdiv double %219, %222
+  %224 = load ptr, ptr %10, align 8
+  %225 = getelementptr inbounds %struct.CalcLangVal, ptr %224, i32 0, i32 1
+  store double %223, ptr %225, align 8
+  br label %1462
+
+226:                                              ; preds = %209, %204
+  %227 = load ptr, ptr %6, align 8
+  %228 = getelementptr inbounds %struct.CalcLangVal, ptr %227, i32 0, i32 0
+  %229 = load i32, ptr %228, align 8
+  %230 = icmp eq i32 %229, 4
+  br i1 %230, label %231, label %249
+
+231:                                              ; preds = %226
+  %232 = load ptr, ptr %8, align 8
+  %233 = getelementptr inbounds %struct.CalcLangVal, ptr %232, i32 0, i32 0
+  %234 = load i32, ptr %233, align 8
+  %235 = icmp eq i32 %234, 0
+  br i1 %235, label %236, label %249
+
+236:                                              ; preds = %231
+  %237 = load ptr, ptr %10, align 8
+  %238 = getelementptr inbounds %struct.CalcLangVal, ptr %237, i32 0, i32 0
+  store i32 4, ptr %238, align 8
+  %239 = load ptr, ptr %6, align 8
+  %240 = getelementptr inbounds %struct.CalcLangVal, ptr %239, i32 0, i32 1
+  %241 = load double, ptr %240, align 8
+  %242 = load ptr, ptr %8, align 8
+  %243 = getelementptr inbounds %struct.CalcLangVal, ptr %242, i32 0, i32 1
+  %244 = load i32, ptr %243, align 8
+  %245 = sitofp i32 %244 to double
+  %246 = fdiv double %241, %245
+  %247 = load ptr, ptr %10, align 8
+  %248 = getelementptr inbounds %struct.CalcLangVal, ptr %247, i32 0, i32 1
+  store double %246, ptr %248, align 8
+  br label %1461
+
+249:                                              ; preds = %231, %226
+  %250 = load ptr, ptr %6, align 8
+  %251 = getelementptr inbounds %struct.CalcLangVal, ptr %250, i32 0, i32 0
+  %252 = load i32, ptr %251, align 8
+  %253 = icmp eq i32 %252, 0
+  br i1 %253, label %254, label %272
+
+254:                                              ; preds = %249
+  %255 = load ptr, ptr %8, align 8
+  %256 = getelementptr inbounds %struct.CalcLangVal, ptr %255, i32 0, i32 0
+  %257 = load i32, ptr %256, align 8
+  %258 = icmp eq i32 %257, 4
+  br i1 %258, label %259, label %272
+
+259:                                              ; preds = %254
+  %260 = load ptr, ptr %10, align 8
+  %261 = getelementptr inbounds %struct.CalcLangVal, ptr %260, i32 0, i32 0
+  store i32 4, ptr %261, align 8
+  %262 = load ptr, ptr %6, align 8
+  %263 = getelementptr inbounds %struct.CalcLangVal, ptr %262, i32 0, i32 1
+  %264 = load i32, ptr %263, align 8
+  %265 = sitofp i32 %264 to double
+  %266 = load ptr, ptr %8, align 8
+  %267 = getelementptr inbounds %struct.CalcLangVal, ptr %266, i32 0, i32 1
+  %268 = load double, ptr %267, align 8
+  %269 = fdiv double %265, %268
+  %270 = load ptr, ptr %10, align 8
+  %271 = getelementptr inbounds %struct.CalcLangVal, ptr %270, i32 0, i32 1
+  store double %269, ptr %271, align 8
+  br label %1460
+
+272:                                              ; preds = %254, %249
+  %273 = load ptr, ptr %6, align 8
+  %274 = getelementptr inbounds %struct.CalcLangVal, ptr %273, i32 0, i32 0
+  %275 = load i32, ptr %274, align 8
+  %276 = icmp eq i32 %275, 1
+  br i1 %276, label %277, label %294
+
+277:                                              ; preds = %272
+  %278 = load ptr, ptr %8, align 8
+  %279 = getelementptr inbounds %struct.CalcLangVal, ptr %278, i32 0, i32 0
+  %280 = load i32, ptr %279, align 8
+  %281 = icmp eq i32 %280, 4
+  br i1 %281, label %282, label %294
+
+282:                                              ; preds = %277
+  %283 = load ptr, ptr %10, align 8
+  %284 = getelementptr inbounds %struct.CalcLangVal, ptr %283, i32 0, i32 0
+  store i32 4, ptr %284, align 8
+  %285 = load ptr, ptr %6, align 8
+  %286 = getelementptr inbounds %struct.CalcLangVal, ptr %285, i32 0, i32 1
+  %287 = load double, ptr %286, align 8
+  %288 = load ptr, ptr %8, align 8
+  %289 = getelementptr inbounds %struct.CalcLangVal, ptr %288, i32 0, i32 1
+  %290 = load double, ptr %289, align 8
+  %291 = fdiv double %287, %290
+  %292 = load ptr, ptr %10, align 8
+  %293 = getelementptr inbounds %struct.CalcLangVal, ptr %292, i32 0, i32 1
+  store double %291, ptr %293, align 8
+  br label %1459
+
+294:                                              ; preds = %277, %272
+  %295 = load ptr, ptr %6, align 8
+  %296 = getelementptr inbounds %struct.CalcLangVal, ptr %295, i32 0, i32 0
+  %297 = load i32, ptr %296, align 8
+  %298 = icmp eq i32 %297, 4
+  br i1 %298, label %299, label %316
+
+299:                                              ; preds = %294
+  %300 = load ptr, ptr %8, align 8
+  %301 = getelementptr inbounds %struct.CalcLangVal, ptr %300, i32 0, i32 0
+  %302 = load i32, ptr %301, align 8
+  %303 = icmp eq i32 %302, 1
+  br i1 %303, label %304, label %316
+
+304:                                              ; preds = %299
+  %305 = load ptr, ptr %10, align 8
+  %306 = getelementptr inbounds %struct.CalcLangVal, ptr %305, i32 0, i32 0
+  store i32 4, ptr %306, align 8
+  %307 = load ptr, ptr %6, align 8
+  %308 = getelementptr inbounds %struct.CalcLangVal, ptr %307, i32 0, i32 1
+  %309 = load double, ptr %308, align 8
+  %310 = load ptr, ptr %8, align 8
+  %311 = getelementptr inbounds %struct.CalcLangVal, ptr %310, i32 0, i32 1
+  %312 = load double, ptr %311, align 8
+  %313 = fdiv double %309, %312
+  %314 = load ptr, ptr %10, align 8
+  %315 = getelementptr inbounds %struct.CalcLangVal, ptr %314, i32 0, i32 1
+  store double %313, ptr %315, align 8
+  br label %1458
+
+316:                                              ; preds = %299, %294
+  %317 = load ptr, ptr %6, align 8
+  %318 = getelementptr inbounds %struct.CalcLangVal, ptr %317, i32 0, i32 0
+  %319 = load i32, ptr %318, align 8
+  %320 = icmp eq i32 %319, 4
+  br i1 %320, label %321, label %338
+
+321:                                              ; preds = %316
+  %322 = load ptr, ptr %8, align 8
+  %323 = getelementptr inbounds %struct.CalcLangVal, ptr %322, i32 0, i32 0
+  %324 = load i32, ptr %323, align 8
+  %325 = icmp eq i32 %324, 4
+  br i1 %325, label %326, label %338
+
+326:                                              ; preds = %321
+  %327 = load ptr, ptr %10, align 8
+  %328 = getelementptr inbounds %struct.CalcLangVal, ptr %327, i32 0, i32 0
+  store i32 4, ptr %328, align 8
+  %329 = load ptr, ptr %6, align 8
+  %330 = getelementptr inbounds %struct.CalcLangVal, ptr %329, i32 0, i32 1
+  %331 = load double, ptr %330, align 8
+  %332 = load ptr, ptr %8, align 8
+  %333 = getelementptr inbounds %struct.CalcLangVal, ptr %332, i32 0, i32 1
+  %334 = load double, ptr %333, align 8
+  %335 = fdiv double %331, %334
+  %336 = load ptr, ptr %10, align 8
+  %337 = getelementptr inbounds %struct.CalcLangVal, ptr %336, i32 0, i32 1
+  store double %335, ptr %337, align 8
+  br label %1457
+
+338:                                              ; preds = %321, %316
+  %339 = load ptr, ptr %6, align 8
+  %340 = getelementptr inbounds %struct.CalcLangVal, ptr %339, i32 0, i32 0
+  %341 = load i32, ptr %340, align 8
+  %342 = icmp eq i32 %341, 7
+  br i1 %342, label %343, label %416
+
+343:                                              ; preds = %338
+  %344 = load ptr, ptr %8, align 8
+  %345 = getelementptr inbounds %struct.CalcLangVal, ptr %344, i32 0, i32 0
+  %346 = load i32, ptr %345, align 8
+  %347 = icmp eq i32 %346, 7
+  br i1 %347, label %348, label %416
+
+348:                                              ; preds = %343
+  %349 = load ptr, ptr %6, align 8
+  %350 = getelementptr inbounds %struct.CalcLangVal, ptr %349, i32 0, i32 1
+  %351 = load ptr, ptr %350, align 8
+  store ptr %351, ptr %11, align 8
+  %352 = load ptr, ptr %8, align 8
+  %353 = getelementptr inbounds %struct.CalcLangVal, ptr %352, i32 0, i32 1
+  %354 = load ptr, ptr %353, align 8
+  store ptr %354, ptr %12, align 8
+  %355 = load ptr, ptr %12, align 8
+  %356 = getelementptr inbounds %struct.TupleValue, ptr %355, i32 0, i32 0
+  %357 = load i32, ptr %356, align 8
+  %358 = load ptr, ptr %11, align 8
+  %359 = getelementptr inbounds %struct.TupleValue, ptr %358, i32 0, i32 0
+  %360 = load i32, ptr %359, align 8
+  %361 = icmp eq i32 %357, %360
+  br i1 %361, label %362, label %414
+
+362:                                              ; preds = %348
+  %363 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %363, ptr %13, align 8
+  %364 = load ptr, ptr %11, align 8
+  %365 = getelementptr inbounds %struct.TupleValue, ptr %364, i32 0, i32 0
+  %366 = load i32, ptr %365, align 8
+  %367 = load ptr, ptr %13, align 8
+  %368 = getelementptr inbounds %struct.TupleValue, ptr %367, i32 0, i32 0
+  store i32 %366, ptr %368, align 8
+  %369 = load ptr, ptr %13, align 8
+  %370 = getelementptr inbounds %struct.TupleValue, ptr %369, i32 0, i32 0
+  %371 = load i32, ptr %370, align 8
+  %372 = sext i32 %371 to i64
+  %373 = mul i64 8, %372
+  %374 = call noalias ptr @malloc(i64 noundef %373) #4
+  %375 = load ptr, ptr %13, align 8
+  %376 = getelementptr inbounds %struct.TupleValue, ptr %375, i32 0, i32 1
+  store ptr %374, ptr %376, align 8
+  store i32 0, ptr %14, align 4
+  br label %377
+
+377:                                              ; preds = %405, %362
+  %378 = load i32, ptr %14, align 4
+  %379 = load ptr, ptr %11, align 8
+  %380 = getelementptr inbounds %struct.TupleValue, ptr %379, i32 0, i32 0
+  %381 = load i32, ptr %380, align 8
+  %382 = icmp slt i32 %378, %381
+  br i1 %382, label %383, label %408
+
+383:                                              ; preds = %377
+  %384 = load ptr, ptr %11, align 8
+  %385 = getelementptr inbounds %struct.TupleValue, ptr %384, i32 0, i32 1
+  %386 = load ptr, ptr %385, align 8
+  %387 = load i32, ptr %14, align 4
+  %388 = sext i32 %387 to i64
+  %389 = getelementptr inbounds ptr, ptr %386, i64 %388
+  %390 = load ptr, ptr %389, align 8
+  %391 = load ptr, ptr %12, align 8
+  %392 = getelementptr inbounds %struct.TupleValue, ptr %391, i32 0, i32 1
+  %393 = load ptr, ptr %392, align 8
+  %394 = load i32, ptr %14, align 4
+  %395 = sext i32 %394 to i64
+  %396 = getelementptr inbounds ptr, ptr %393, i64 %395
+  %397 = load ptr, ptr %396, align 8
+  %398 = call ptr @divCalcLangValues(ptr noundef %390, i32 noundef 1, ptr noundef %397, i32 noundef 0)
+  %399 = load ptr, ptr %13, align 8
+  %400 = getelementptr inbounds %struct.TupleValue, ptr %399, i32 0, i32 1
+  %401 = load ptr, ptr %400, align 8
+  %402 = load i32, ptr %14, align 4
+  %403 = sext i32 %402 to i64
+  %404 = getelementptr inbounds ptr, ptr %401, i64 %403
+  store ptr %398, ptr %404, align 8
+  br label %405
+
+405:                                              ; preds = %383
+  %406 = load i32, ptr %14, align 4
+  %407 = add nsw i32 %406, 1
+  store i32 %407, ptr %14, align 4
+  br label %377, !llvm.loop !61
+
+408:                                              ; preds = %377
+  %409 = load ptr, ptr %10, align 8
+  %410 = getelementptr inbounds %struct.CalcLangVal, ptr %409, i32 0, i32 0
+  store i32 7, ptr %410, align 8
+  %411 = load ptr, ptr %13, align 8
+  %412 = load ptr, ptr %10, align 8
+  %413 = getelementptr inbounds %struct.CalcLangVal, ptr %412, i32 0, i32 1
+  store ptr %411, ptr %413, align 8
+  br label %415
+
+414:                                              ; preds = %348
+  call void @perror(ptr noundef @.str) #5
+  store ptr null, ptr %5, align 8
+  br label %1481
+
+415:                                              ; preds = %408
+  br label %1456
+
+416:                                              ; preds = %343, %338
+  %417 = load ptr, ptr %6, align 8
+  %418 = getelementptr inbounds %struct.CalcLangVal, ptr %417, i32 0, i32 0
+  %419 = load i32, ptr %418, align 8
+  %420 = icmp eq i32 %419, 7
+  br i1 %420, label %421, label %475
+
+421:                                              ; preds = %416
+  %422 = load ptr, ptr %8, align 8
+  %423 = getelementptr inbounds %struct.CalcLangVal, ptr %422, i32 0, i32 0
+  %424 = load i32, ptr %423, align 8
+  %425 = icmp eq i32 %424, 0
+  br i1 %425, label %426, label %475
+
+426:                                              ; preds = %421
+  %427 = load ptr, ptr %6, align 8
+  %428 = getelementptr inbounds %struct.CalcLangVal, ptr %427, i32 0, i32 1
+  %429 = load ptr, ptr %428, align 8
+  store ptr %429, ptr %15, align 8
+  %430 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %430, ptr %16, align 8
+  %431 = load ptr, ptr %15, align 8
+  %432 = getelementptr inbounds %struct.TupleValue, ptr %431, i32 0, i32 0
+  %433 = load i32, ptr %432, align 8
+  %434 = load ptr, ptr %16, align 8
+  %435 = getelementptr inbounds %struct.TupleValue, ptr %434, i32 0, i32 0
+  store i32 %433, ptr %435, align 8
+  %436 = load ptr, ptr %16, align 8
+  %437 = getelementptr inbounds %struct.TupleValue, ptr %436, i32 0, i32 0
+  %438 = load i32, ptr %437, align 8
+  %439 = sext i32 %438 to i64
+  %440 = mul i64 8, %439
+  %441 = call noalias ptr @malloc(i64 noundef %440) #4
+  %442 = load ptr, ptr %16, align 8
+  %443 = getelementptr inbounds %struct.TupleValue, ptr %442, i32 0, i32 1
+  store ptr %441, ptr %443, align 8
+  store i32 0, ptr %17, align 4
+  br label %444
+
+444:                                              ; preds = %466, %426
+  %445 = load i32, ptr %17, align 4
+  %446 = load ptr, ptr %15, align 8
+  %447 = getelementptr inbounds %struct.TupleValue, ptr %446, i32 0, i32 0
+  %448 = load i32, ptr %447, align 8
+  %449 = icmp slt i32 %445, %448
+  br i1 %449, label %450, label %469
+
+450:                                              ; preds = %444
+  %451 = load ptr, ptr %15, align 8
+  %452 = getelementptr inbounds %struct.TupleValue, ptr %451, i32 0, i32 1
+  %453 = load ptr, ptr %452, align 8
+  %454 = load i32, ptr %17, align 4
+  %455 = sext i32 %454 to i64
+  %456 = getelementptr inbounds ptr, ptr %453, i64 %455
+  %457 = load ptr, ptr %456, align 8
+  %458 = load ptr, ptr %8, align 8
+  %459 = call ptr @divCalcLangValues(ptr noundef %457, i32 noundef 1, ptr noundef %458, i32 noundef 0)
+  %460 = load ptr, ptr %16, align 8
+  %461 = getelementptr inbounds %struct.TupleValue, ptr %460, i32 0, i32 1
+  %462 = load ptr, ptr %461, align 8
+  %463 = load i32, ptr %17, align 4
+  %464 = sext i32 %463 to i64
+  %465 = getelementptr inbounds ptr, ptr %462, i64 %464
+  store ptr %459, ptr %465, align 8
+  br label %466
+
+466:                                              ; preds = %450
+  %467 = load i32, ptr %17, align 4
+  %468 = add nsw i32 %467, 1
+  store i32 %468, ptr %17, align 4
+  br label %444, !llvm.loop !62
+
+469:                                              ; preds = %444
+  %470 = load ptr, ptr %10, align 8
+  %471 = getelementptr inbounds %struct.CalcLangVal, ptr %470, i32 0, i32 0
+  store i32 7, ptr %471, align 8
+  %472 = load ptr, ptr %16, align 8
+  %473 = load ptr, ptr %10, align 8
+  %474 = getelementptr inbounds %struct.CalcLangVal, ptr %473, i32 0, i32 1
+  store ptr %472, ptr %474, align 8
+  br label %1455
+
+475:                                              ; preds = %421, %416
+  %476 = load ptr, ptr %6, align 8
+  %477 = getelementptr inbounds %struct.CalcLangVal, ptr %476, i32 0, i32 0
+  %478 = load i32, ptr %477, align 8
+  %479 = icmp eq i32 %478, 0
+  br i1 %479, label %480, label %534
+
+480:                                              ; preds = %475
+  %481 = load ptr, ptr %8, align 8
+  %482 = getelementptr inbounds %struct.CalcLangVal, ptr %481, i32 0, i32 0
+  %483 = load i32, ptr %482, align 8
+  %484 = icmp eq i32 %483, 7
+  br i1 %484, label %485, label %534
+
+485:                                              ; preds = %480
+  %486 = load ptr, ptr %8, align 8
+  %487 = getelementptr inbounds %struct.CalcLangVal, ptr %486, i32 0, i32 1
+  %488 = load ptr, ptr %487, align 8
+  store ptr %488, ptr %18, align 8
+  %489 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %489, ptr %19, align 8
+  %490 = load ptr, ptr %18, align 8
+  %491 = getelementptr inbounds %struct.TupleValue, ptr %490, i32 0, i32 0
+  %492 = load i32, ptr %491, align 8
+  %493 = load ptr, ptr %19, align 8
+  %494 = getelementptr inbounds %struct.TupleValue, ptr %493, i32 0, i32 0
+  store i32 %492, ptr %494, align 8
+  %495 = load ptr, ptr %19, align 8
+  %496 = getelementptr inbounds %struct.TupleValue, ptr %495, i32 0, i32 0
+  %497 = load i32, ptr %496, align 8
+  %498 = sext i32 %497 to i64
+  %499 = mul i64 8, %498
+  %500 = call noalias ptr @malloc(i64 noundef %499) #4
+  %501 = load ptr, ptr %19, align 8
+  %502 = getelementptr inbounds %struct.TupleValue, ptr %501, i32 0, i32 1
+  store ptr %500, ptr %502, align 8
+  store i32 0, ptr %20, align 4
+  br label %503
+
+503:                                              ; preds = %525, %485
+  %504 = load i32, ptr %20, align 4
+  %505 = load ptr, ptr %18, align 8
+  %506 = getelementptr inbounds %struct.TupleValue, ptr %505, i32 0, i32 0
+  %507 = load i32, ptr %506, align 8
+  %508 = icmp slt i32 %504, %507
+  br i1 %508, label %509, label %528
+
+509:                                              ; preds = %503
+  %510 = load ptr, ptr %6, align 8
+  %511 = load ptr, ptr %18, align 8
+  %512 = getelementptr inbounds %struct.TupleValue, ptr %511, i32 0, i32 1
+  %513 = load ptr, ptr %512, align 8
+  %514 = load i32, ptr %20, align 4
+  %515 = sext i32 %514 to i64
+  %516 = getelementptr inbounds ptr, ptr %513, i64 %515
+  %517 = load ptr, ptr %516, align 8
+  %518 = call ptr @divCalcLangValues(ptr noundef %510, i32 noundef 0, ptr noundef %517, i32 noundef 1)
+  %519 = load ptr, ptr %19, align 8
+  %520 = getelementptr inbounds %struct.TupleValue, ptr %519, i32 0, i32 1
+  %521 = load ptr, ptr %520, align 8
+  %522 = load i32, ptr %20, align 4
+  %523 = sext i32 %522 to i64
+  %524 = getelementptr inbounds ptr, ptr %521, i64 %523
+  store ptr %518, ptr %524, align 8
+  br label %525
+
+525:                                              ; preds = %509
+  %526 = load i32, ptr %20, align 4
+  %527 = add nsw i32 %526, 1
+  store i32 %527, ptr %20, align 4
+  br label %503, !llvm.loop !63
+
+528:                                              ; preds = %503
+  %529 = load ptr, ptr %10, align 8
+  %530 = getelementptr inbounds %struct.CalcLangVal, ptr %529, i32 0, i32 0
+  store i32 7, ptr %530, align 8
+  %531 = load ptr, ptr %19, align 8
+  %532 = load ptr, ptr %10, align 8
+  %533 = getelementptr inbounds %struct.CalcLangVal, ptr %532, i32 0, i32 1
+  store ptr %531, ptr %533, align 8
+  br label %1454
+
+534:                                              ; preds = %480, %475
+  %535 = load ptr, ptr %6, align 8
+  %536 = getelementptr inbounds %struct.CalcLangVal, ptr %535, i32 0, i32 0
+  %537 = load i32, ptr %536, align 8
+  %538 = icmp eq i32 %537, 7
+  br i1 %538, label %539, label %593
+
+539:                                              ; preds = %534
+  %540 = load ptr, ptr %8, align 8
+  %541 = getelementptr inbounds %struct.CalcLangVal, ptr %540, i32 0, i32 0
+  %542 = load i32, ptr %541, align 8
+  %543 = icmp eq i32 %542, 1
+  br i1 %543, label %544, label %593
+
+544:                                              ; preds = %539
+  %545 = load ptr, ptr %6, align 8
+  %546 = getelementptr inbounds %struct.CalcLangVal, ptr %545, i32 0, i32 1
+  %547 = load ptr, ptr %546, align 8
+  store ptr %547, ptr %21, align 8
+  %548 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %548, ptr %22, align 8
+  %549 = load ptr, ptr %21, align 8
+  %550 = getelementptr inbounds %struct.TupleValue, ptr %549, i32 0, i32 0
+  %551 = load i32, ptr %550, align 8
+  %552 = load ptr, ptr %22, align 8
+  %553 = getelementptr inbounds %struct.TupleValue, ptr %552, i32 0, i32 0
+  store i32 %551, ptr %553, align 8
+  %554 = load ptr, ptr %22, align 8
+  %555 = getelementptr inbounds %struct.TupleValue, ptr %554, i32 0, i32 0
+  %556 = load i32, ptr %555, align 8
+  %557 = sext i32 %556 to i64
+  %558 = mul i64 8, %557
+  %559 = call noalias ptr @malloc(i64 noundef %558) #4
+  %560 = load ptr, ptr %22, align 8
+  %561 = getelementptr inbounds %struct.TupleValue, ptr %560, i32 0, i32 1
+  store ptr %559, ptr %561, align 8
+  store i32 0, ptr %23, align 4
+  br label %562
+
+562:                                              ; preds = %584, %544
+  %563 = load i32, ptr %23, align 4
+  %564 = load ptr, ptr %21, align 8
+  %565 = getelementptr inbounds %struct.TupleValue, ptr %564, i32 0, i32 0
+  %566 = load i32, ptr %565, align 8
+  %567 = icmp slt i32 %563, %566
+  br i1 %567, label %568, label %587
+
+568:                                              ; preds = %562
+  %569 = load ptr, ptr %21, align 8
+  %570 = getelementptr inbounds %struct.TupleValue, ptr %569, i32 0, i32 1
+  %571 = load ptr, ptr %570, align 8
+  %572 = load i32, ptr %23, align 4
+  %573 = sext i32 %572 to i64
+  %574 = getelementptr inbounds ptr, ptr %571, i64 %573
+  %575 = load ptr, ptr %574, align 8
+  %576 = load ptr, ptr %8, align 8
+  %577 = call ptr @divCalcLangValues(ptr noundef %575, i32 noundef 1, ptr noundef %576, i32 noundef 0)
+  %578 = load ptr, ptr %22, align 8
+  %579 = getelementptr inbounds %struct.TupleValue, ptr %578, i32 0, i32 1
+  %580 = load ptr, ptr %579, align 8
+  %581 = load i32, ptr %23, align 4
+  %582 = sext i32 %581 to i64
+  %583 = getelementptr inbounds ptr, ptr %580, i64 %582
+  store ptr %577, ptr %583, align 8
+  br label %584
+
+584:                                              ; preds = %568
+  %585 = load i32, ptr %23, align 4
+  %586 = add nsw i32 %585, 1
+  store i32 %586, ptr %23, align 4
+  br label %562, !llvm.loop !64
+
+587:                                              ; preds = %562
+  %588 = load ptr, ptr %10, align 8
+  %589 = getelementptr inbounds %struct.CalcLangVal, ptr %588, i32 0, i32 0
+  store i32 7, ptr %589, align 8
+  %590 = load ptr, ptr %22, align 8
+  %591 = load ptr, ptr %10, align 8
+  %592 = getelementptr inbounds %struct.CalcLangVal, ptr %591, i32 0, i32 1
+  store ptr %590, ptr %592, align 8
+  br label %1453
+
+593:                                              ; preds = %539, %534
+  %594 = load ptr, ptr %6, align 8
+  %595 = getelementptr inbounds %struct.CalcLangVal, ptr %594, i32 0, i32 0
+  %596 = load i32, ptr %595, align 8
+  %597 = icmp eq i32 %596, 1
+  br i1 %597, label %598, label %652
+
+598:                                              ; preds = %593
+  %599 = load ptr, ptr %8, align 8
+  %600 = getelementptr inbounds %struct.CalcLangVal, ptr %599, i32 0, i32 0
+  %601 = load i32, ptr %600, align 8
+  %602 = icmp eq i32 %601, 7
+  br i1 %602, label %603, label %652
+
+603:                                              ; preds = %598
+  %604 = load ptr, ptr %8, align 8
+  %605 = getelementptr inbounds %struct.CalcLangVal, ptr %604, i32 0, i32 1
+  %606 = load ptr, ptr %605, align 8
+  store ptr %606, ptr %24, align 8
+  %607 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %607, ptr %25, align 8
+  %608 = load ptr, ptr %24, align 8
+  %609 = getelementptr inbounds %struct.TupleValue, ptr %608, i32 0, i32 0
+  %610 = load i32, ptr %609, align 8
+  %611 = load ptr, ptr %25, align 8
+  %612 = getelementptr inbounds %struct.TupleValue, ptr %611, i32 0, i32 0
+  store i32 %610, ptr %612, align 8
+  %613 = load ptr, ptr %25, align 8
+  %614 = getelementptr inbounds %struct.TupleValue, ptr %613, i32 0, i32 0
+  %615 = load i32, ptr %614, align 8
+  %616 = sext i32 %615 to i64
+  %617 = mul i64 8, %616
+  %618 = call noalias ptr @malloc(i64 noundef %617) #4
+  %619 = load ptr, ptr %25, align 8
+  %620 = getelementptr inbounds %struct.TupleValue, ptr %619, i32 0, i32 1
+  store ptr %618, ptr %620, align 8
+  store i32 0, ptr %26, align 4
+  br label %621
+
+621:                                              ; preds = %643, %603
+  %622 = load i32, ptr %26, align 4
+  %623 = load ptr, ptr %24, align 8
+  %624 = getelementptr inbounds %struct.TupleValue, ptr %623, i32 0, i32 0
+  %625 = load i32, ptr %624, align 8
+  %626 = icmp slt i32 %622, %625
+  br i1 %626, label %627, label %646
+
+627:                                              ; preds = %621
+  %628 = load ptr, ptr %6, align 8
+  %629 = load ptr, ptr %24, align 8
+  %630 = getelementptr inbounds %struct.TupleValue, ptr %629, i32 0, i32 1
+  %631 = load ptr, ptr %630, align 8
+  %632 = load i32, ptr %26, align 4
+  %633 = sext i32 %632 to i64
+  %634 = getelementptr inbounds ptr, ptr %631, i64 %633
+  %635 = load ptr, ptr %634, align 8
+  %636 = call ptr @divCalcLangValues(ptr noundef %628, i32 noundef 0, ptr noundef %635, i32 noundef 1)
+  %637 = load ptr, ptr %25, align 8
+  %638 = getelementptr inbounds %struct.TupleValue, ptr %637, i32 0, i32 1
+  %639 = load ptr, ptr %638, align 8
+  %640 = load i32, ptr %26, align 4
+  %641 = sext i32 %640 to i64
+  %642 = getelementptr inbounds ptr, ptr %639, i64 %641
+  store ptr %636, ptr %642, align 8
+  br label %643
+
+643:                                              ; preds = %627
+  %644 = load i32, ptr %26, align 4
+  %645 = add nsw i32 %644, 1
+  store i32 %645, ptr %26, align 4
+  br label %621, !llvm.loop !65
+
+646:                                              ; preds = %621
+  %647 = load ptr, ptr %10, align 8
+  %648 = getelementptr inbounds %struct.CalcLangVal, ptr %647, i32 0, i32 0
+  store i32 7, ptr %648, align 8
+  %649 = load ptr, ptr %25, align 8
+  %650 = load ptr, ptr %10, align 8
+  %651 = getelementptr inbounds %struct.CalcLangVal, ptr %650, i32 0, i32 1
+  store ptr %649, ptr %651, align 8
+  br label %1452
+
+652:                                              ; preds = %598, %593
+  %653 = load ptr, ptr %6, align 8
+  %654 = getelementptr inbounds %struct.CalcLangVal, ptr %653, i32 0, i32 0
+  %655 = load i32, ptr %654, align 8
+  %656 = icmp eq i32 %655, 7
+  br i1 %656, label %657, label %711
+
+657:                                              ; preds = %652
+  %658 = load ptr, ptr %8, align 8
+  %659 = getelementptr inbounds %struct.CalcLangVal, ptr %658, i32 0, i32 0
+  %660 = load i32, ptr %659, align 8
+  %661 = icmp eq i32 %660, 3
+  br i1 %661, label %662, label %711
+
+662:                                              ; preds = %657
+  %663 = load ptr, ptr %6, align 8
+  %664 = getelementptr inbounds %struct.CalcLangVal, ptr %663, i32 0, i32 1
+  %665 = load ptr, ptr %664, align 8
+  store ptr %665, ptr %27, align 8
+  %666 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %666, ptr %28, align 8
+  %667 = load ptr, ptr %27, align 8
+  %668 = getelementptr inbounds %struct.TupleValue, ptr %667, i32 0, i32 0
+  %669 = load i32, ptr %668, align 8
+  %670 = load ptr, ptr %28, align 8
+  %671 = getelementptr inbounds %struct.TupleValue, ptr %670, i32 0, i32 0
+  store i32 %669, ptr %671, align 8
+  %672 = load ptr, ptr %28, align 8
+  %673 = getelementptr inbounds %struct.TupleValue, ptr %672, i32 0, i32 0
+  %674 = load i32, ptr %673, align 8
+  %675 = sext i32 %674 to i64
+  %676 = mul i64 8, %675
+  %677 = call noalias ptr @malloc(i64 noundef %676) #4
+  %678 = load ptr, ptr %28, align 8
+  %679 = getelementptr inbounds %struct.TupleValue, ptr %678, i32 0, i32 1
+  store ptr %677, ptr %679, align 8
+  store i32 0, ptr %29, align 4
+  br label %680
+
+680:                                              ; preds = %702, %662
+  %681 = load i32, ptr %29, align 4
+  %682 = load ptr, ptr %27, align 8
+  %683 = getelementptr inbounds %struct.TupleValue, ptr %682, i32 0, i32 0
+  %684 = load i32, ptr %683, align 8
+  %685 = icmp slt i32 %681, %684
+  br i1 %685, label %686, label %705
+
+686:                                              ; preds = %680
+  %687 = load ptr, ptr %27, align 8
+  %688 = getelementptr inbounds %struct.TupleValue, ptr %687, i32 0, i32 1
+  %689 = load ptr, ptr %688, align 8
+  %690 = load i32, ptr %29, align 4
+  %691 = sext i32 %690 to i64
+  %692 = getelementptr inbounds ptr, ptr %689, i64 %691
+  %693 = load ptr, ptr %692, align 8
+  %694 = load ptr, ptr %8, align 8
+  %695 = call ptr @divCalcLangValues(ptr noundef %693, i32 noundef 1, ptr noundef %694, i32 noundef 0)
+  %696 = load ptr, ptr %28, align 8
+  %697 = getelementptr inbounds %struct.TupleValue, ptr %696, i32 0, i32 1
+  %698 = load ptr, ptr %697, align 8
+  %699 = load i32, ptr %29, align 4
+  %700 = sext i32 %699 to i64
+  %701 = getelementptr inbounds ptr, ptr %698, i64 %700
+  store ptr %695, ptr %701, align 8
+  br label %702
+
+702:                                              ; preds = %686
+  %703 = load i32, ptr %29, align 4
+  %704 = add nsw i32 %703, 1
+  store i32 %704, ptr %29, align 4
+  br label %680, !llvm.loop !66
+
+705:                                              ; preds = %680
+  %706 = load ptr, ptr %10, align 8
+  %707 = getelementptr inbounds %struct.CalcLangVal, ptr %706, i32 0, i32 0
+  store i32 7, ptr %707, align 8
+  %708 = load ptr, ptr %28, align 8
+  %709 = load ptr, ptr %10, align 8
+  %710 = getelementptr inbounds %struct.CalcLangVal, ptr %709, i32 0, i32 1
+  store ptr %708, ptr %710, align 8
+  br label %1451
+
+711:                                              ; preds = %657, %652
+  %712 = load ptr, ptr %6, align 8
+  %713 = getelementptr inbounds %struct.CalcLangVal, ptr %712, i32 0, i32 0
+  %714 = load i32, ptr %713, align 8
+  %715 = icmp eq i32 %714, 3
+  br i1 %715, label %716, label %770
+
+716:                                              ; preds = %711
+  %717 = load ptr, ptr %8, align 8
+  %718 = getelementptr inbounds %struct.CalcLangVal, ptr %717, i32 0, i32 0
+  %719 = load i32, ptr %718, align 8
+  %720 = icmp eq i32 %719, 7
+  br i1 %720, label %721, label %770
+
+721:                                              ; preds = %716
+  %722 = load ptr, ptr %8, align 8
+  %723 = getelementptr inbounds %struct.CalcLangVal, ptr %722, i32 0, i32 1
+  %724 = load ptr, ptr %723, align 8
+  store ptr %724, ptr %30, align 8
+  %725 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %725, ptr %31, align 8
+  %726 = load ptr, ptr %30, align 8
+  %727 = getelementptr inbounds %struct.TupleValue, ptr %726, i32 0, i32 0
+  %728 = load i32, ptr %727, align 8
+  %729 = load ptr, ptr %31, align 8
+  %730 = getelementptr inbounds %struct.TupleValue, ptr %729, i32 0, i32 0
+  store i32 %728, ptr %730, align 8
+  %731 = load ptr, ptr %31, align 8
+  %732 = getelementptr inbounds %struct.TupleValue, ptr %731, i32 0, i32 0
+  %733 = load i32, ptr %732, align 8
+  %734 = sext i32 %733 to i64
+  %735 = mul i64 8, %734
+  %736 = call noalias ptr @malloc(i64 noundef %735) #4
+  %737 = load ptr, ptr %31, align 8
+  %738 = getelementptr inbounds %struct.TupleValue, ptr %737, i32 0, i32 1
+  store ptr %736, ptr %738, align 8
+  store i32 0, ptr %32, align 4
+  br label %739
+
+739:                                              ; preds = %761, %721
+  %740 = load i32, ptr %32, align 4
+  %741 = load ptr, ptr %30, align 8
+  %742 = getelementptr inbounds %struct.TupleValue, ptr %741, i32 0, i32 0
+  %743 = load i32, ptr %742, align 8
+  %744 = icmp slt i32 %740, %743
+  br i1 %744, label %745, label %764
+
+745:                                              ; preds = %739
+  %746 = load ptr, ptr %6, align 8
+  %747 = load ptr, ptr %30, align 8
+  %748 = getelementptr inbounds %struct.TupleValue, ptr %747, i32 0, i32 1
+  %749 = load ptr, ptr %748, align 8
+  %750 = load i32, ptr %32, align 4
+  %751 = sext i32 %750 to i64
+  %752 = getelementptr inbounds ptr, ptr %749, i64 %751
+  %753 = load ptr, ptr %752, align 8
+  %754 = call ptr @divCalcLangValues(ptr noundef %746, i32 noundef 0, ptr noundef %753, i32 noundef 1)
+  %755 = load ptr, ptr %31, align 8
+  %756 = getelementptr inbounds %struct.TupleValue, ptr %755, i32 0, i32 1
+  %757 = load ptr, ptr %756, align 8
+  %758 = load i32, ptr %32, align 4
+  %759 = sext i32 %758 to i64
+  %760 = getelementptr inbounds ptr, ptr %757, i64 %759
+  store ptr %754, ptr %760, align 8
+  br label %761
+
+761:                                              ; preds = %745
+  %762 = load i32, ptr %32, align 4
+  %763 = add nsw i32 %762, 1
+  store i32 %763, ptr %32, align 4
+  br label %739, !llvm.loop !67
+
+764:                                              ; preds = %739
+  %765 = load ptr, ptr %10, align 8
+  %766 = getelementptr inbounds %struct.CalcLangVal, ptr %765, i32 0, i32 0
+  store i32 7, ptr %766, align 8
+  %767 = load ptr, ptr %31, align 8
+  %768 = load ptr, ptr %10, align 8
+  %769 = getelementptr inbounds %struct.CalcLangVal, ptr %768, i32 0, i32 1
+  store ptr %767, ptr %769, align 8
+  br label %1450
+
+770:                                              ; preds = %716, %711
+  %771 = load ptr, ptr %6, align 8
+  %772 = getelementptr inbounds %struct.CalcLangVal, ptr %771, i32 0, i32 0
+  %773 = load i32, ptr %772, align 8
+  %774 = icmp eq i32 %773, 7
+  br i1 %774, label %775, label %829
+
+775:                                              ; preds = %770
+  %776 = load ptr, ptr %8, align 8
+  %777 = getelementptr inbounds %struct.CalcLangVal, ptr %776, i32 0, i32 0
+  %778 = load i32, ptr %777, align 8
+  %779 = icmp eq i32 %778, 4
+  br i1 %779, label %780, label %829
+
+780:                                              ; preds = %775
+  %781 = load ptr, ptr %6, align 8
+  %782 = getelementptr inbounds %struct.CalcLangVal, ptr %781, i32 0, i32 1
+  %783 = load ptr, ptr %782, align 8
+  store ptr %783, ptr %33, align 8
+  %784 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %784, ptr %34, align 8
+  %785 = load ptr, ptr %33, align 8
+  %786 = getelementptr inbounds %struct.TupleValue, ptr %785, i32 0, i32 0
+  %787 = load i32, ptr %786, align 8
+  %788 = load ptr, ptr %34, align 8
+  %789 = getelementptr inbounds %struct.TupleValue, ptr %788, i32 0, i32 0
+  store i32 %787, ptr %789, align 8
+  %790 = load ptr, ptr %34, align 8
+  %791 = getelementptr inbounds %struct.TupleValue, ptr %790, i32 0, i32 0
+  %792 = load i32, ptr %791, align 8
+  %793 = sext i32 %792 to i64
+  %794 = mul i64 8, %793
+  %795 = call noalias ptr @malloc(i64 noundef %794) #4
+  %796 = load ptr, ptr %34, align 8
+  %797 = getelementptr inbounds %struct.TupleValue, ptr %796, i32 0, i32 1
+  store ptr %795, ptr %797, align 8
+  store i32 0, ptr %35, align 4
+  br label %798
+
+798:                                              ; preds = %820, %780
+  %799 = load i32, ptr %35, align 4
+  %800 = load ptr, ptr %33, align 8
+  %801 = getelementptr inbounds %struct.TupleValue, ptr %800, i32 0, i32 0
+  %802 = load i32, ptr %801, align 8
+  %803 = icmp slt i32 %799, %802
+  br i1 %803, label %804, label %823
+
+804:                                              ; preds = %798
+  %805 = load ptr, ptr %33, align 8
+  %806 = getelementptr inbounds %struct.TupleValue, ptr %805, i32 0, i32 1
+  %807 = load ptr, ptr %806, align 8
+  %808 = load i32, ptr %35, align 4
+  %809 = sext i32 %808 to i64
+  %810 = getelementptr inbounds ptr, ptr %807, i64 %809
+  %811 = load ptr, ptr %810, align 8
+  %812 = load ptr, ptr %8, align 8
+  %813 = call ptr @divCalcLangValues(ptr noundef %811, i32 noundef 1, ptr noundef %812, i32 noundef 0)
+  %814 = load ptr, ptr %34, align 8
+  %815 = getelementptr inbounds %struct.TupleValue, ptr %814, i32 0, i32 1
+  %816 = load ptr, ptr %815, align 8
+  %817 = load i32, ptr %35, align 4
+  %818 = sext i32 %817 to i64
+  %819 = getelementptr inbounds ptr, ptr %816, i64 %818
+  store ptr %813, ptr %819, align 8
+  br label %820
+
+820:                                              ; preds = %804
+  %821 = load i32, ptr %35, align 4
+  %822 = add nsw i32 %821, 1
+  store i32 %822, ptr %35, align 4
+  br label %798, !llvm.loop !68
+
+823:                                              ; preds = %798
+  %824 = load ptr, ptr %10, align 8
+  %825 = getelementptr inbounds %struct.CalcLangVal, ptr %824, i32 0, i32 0
+  store i32 7, ptr %825, align 8
+  %826 = load ptr, ptr %34, align 8
+  %827 = load ptr, ptr %10, align 8
+  %828 = getelementptr inbounds %struct.CalcLangVal, ptr %827, i32 0, i32 1
+  store ptr %826, ptr %828, align 8
+  br label %1449
+
+829:                                              ; preds = %775, %770
+  %830 = load ptr, ptr %6, align 8
+  %831 = getelementptr inbounds %struct.CalcLangVal, ptr %830, i32 0, i32 0
+  %832 = load i32, ptr %831, align 8
+  %833 = icmp eq i32 %832, 4
+  br i1 %833, label %834, label %888
+
+834:                                              ; preds = %829
+  %835 = load ptr, ptr %8, align 8
+  %836 = getelementptr inbounds %struct.CalcLangVal, ptr %835, i32 0, i32 0
+  %837 = load i32, ptr %836, align 8
+  %838 = icmp eq i32 %837, 7
+  br i1 %838, label %839, label %888
+
+839:                                              ; preds = %834
+  %840 = load ptr, ptr %8, align 8
+  %841 = getelementptr inbounds %struct.CalcLangVal, ptr %840, i32 0, i32 1
+  %842 = load ptr, ptr %841, align 8
+  store ptr %842, ptr %36, align 8
+  %843 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %843, ptr %37, align 8
+  %844 = load ptr, ptr %36, align 8
+  %845 = getelementptr inbounds %struct.TupleValue, ptr %844, i32 0, i32 0
+  %846 = load i32, ptr %845, align 8
+  %847 = load ptr, ptr %37, align 8
+  %848 = getelementptr inbounds %struct.TupleValue, ptr %847, i32 0, i32 0
+  store i32 %846, ptr %848, align 8
+  %849 = load ptr, ptr %37, align 8
+  %850 = getelementptr inbounds %struct.TupleValue, ptr %849, i32 0, i32 0
+  %851 = load i32, ptr %850, align 8
+  %852 = sext i32 %851 to i64
+  %853 = mul i64 8, %852
+  %854 = call noalias ptr @malloc(i64 noundef %853) #4
+  %855 = load ptr, ptr %37, align 8
+  %856 = getelementptr inbounds %struct.TupleValue, ptr %855, i32 0, i32 1
+  store ptr %854, ptr %856, align 8
+  store i32 0, ptr %38, align 4
+  br label %857
+
+857:                                              ; preds = %879, %839
+  %858 = load i32, ptr %38, align 4
+  %859 = load ptr, ptr %36, align 8
+  %860 = getelementptr inbounds %struct.TupleValue, ptr %859, i32 0, i32 0
+  %861 = load i32, ptr %860, align 8
+  %862 = icmp slt i32 %858, %861
+  br i1 %862, label %863, label %882
+
+863:                                              ; preds = %857
+  %864 = load ptr, ptr %6, align 8
+  %865 = load ptr, ptr %36, align 8
+  %866 = getelementptr inbounds %struct.TupleValue, ptr %865, i32 0, i32 1
+  %867 = load ptr, ptr %866, align 8
+  %868 = load i32, ptr %38, align 4
+  %869 = sext i32 %868 to i64
+  %870 = getelementptr inbounds ptr, ptr %867, i64 %869
+  %871 = load ptr, ptr %870, align 8
+  %872 = call ptr @divCalcLangValues(ptr noundef %864, i32 noundef 0, ptr noundef %871, i32 noundef 1)
+  %873 = load ptr, ptr %37, align 8
+  %874 = getelementptr inbounds %struct.TupleValue, ptr %873, i32 0, i32 1
+  %875 = load ptr, ptr %874, align 8
+  %876 = load i32, ptr %38, align 4
+  %877 = sext i32 %876 to i64
+  %878 = getelementptr inbounds ptr, ptr %875, i64 %877
+  store ptr %872, ptr %878, align 8
+  br label %879
+
+879:                                              ; preds = %863
+  %880 = load i32, ptr %38, align 4
+  %881 = add nsw i32 %880, 1
+  store i32 %881, ptr %38, align 4
+  br label %857, !llvm.loop !69
+
+882:                                              ; preds = %857
+  %883 = load ptr, ptr %10, align 8
+  %884 = getelementptr inbounds %struct.CalcLangVal, ptr %883, i32 0, i32 0
+  store i32 7, ptr %884, align 8
+  %885 = load ptr, ptr %37, align 8
+  %886 = load ptr, ptr %10, align 8
+  %887 = getelementptr inbounds %struct.CalcLangVal, ptr %886, i32 0, i32 1
+  store ptr %885, ptr %887, align 8
+  br label %1448
+
+888:                                              ; preds = %834, %829
+  %889 = load ptr, ptr %6, align 8
+  %890 = getelementptr inbounds %struct.CalcLangVal, ptr %889, i32 0, i32 0
+  %891 = load i32, ptr %890, align 8
+  %892 = icmp eq i32 %891, 6
+  br i1 %892, label %893, label %966
+
+893:                                              ; preds = %888
+  %894 = load ptr, ptr %8, align 8
+  %895 = getelementptr inbounds %struct.CalcLangVal, ptr %894, i32 0, i32 0
+  %896 = load i32, ptr %895, align 8
+  %897 = icmp eq i32 %896, 6
+  br i1 %897, label %898, label %966
+
+898:                                              ; preds = %893
+  %899 = load ptr, ptr %6, align 8
+  %900 = getelementptr inbounds %struct.CalcLangVal, ptr %899, i32 0, i32 1
+  %901 = load ptr, ptr %900, align 8
+  store ptr %901, ptr %39, align 8
+  %902 = load ptr, ptr %8, align 8
+  %903 = getelementptr inbounds %struct.CalcLangVal, ptr %902, i32 0, i32 1
+  %904 = load ptr, ptr %903, align 8
+  store ptr %904, ptr %40, align 8
+  %905 = load ptr, ptr %40, align 8
+  %906 = getelementptr inbounds %struct.SetValue, ptr %905, i32 0, i32 0
+  %907 = load i32, ptr %906, align 8
+  %908 = load ptr, ptr %39, align 8
+  %909 = getelementptr inbounds %struct.SetValue, ptr %908, i32 0, i32 0
+  %910 = load i32, ptr %909, align 8
+  %911 = icmp eq i32 %907, %910
+  br i1 %911, label %912, label %964
+
+912:                                              ; preds = %898
+  %913 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %913, ptr %41, align 8
+  %914 = load ptr, ptr %39, align 8
+  %915 = getelementptr inbounds %struct.SetValue, ptr %914, i32 0, i32 0
+  %916 = load i32, ptr %915, align 8
+  %917 = load ptr, ptr %41, align 8
+  %918 = getelementptr inbounds %struct.SetValue, ptr %917, i32 0, i32 0
+  store i32 %916, ptr %918, align 8
+  %919 = load ptr, ptr %41, align 8
+  %920 = getelementptr inbounds %struct.SetValue, ptr %919, i32 0, i32 0
+  %921 = load i32, ptr %920, align 8
+  %922 = sext i32 %921 to i64
+  %923 = mul i64 8, %922
+  %924 = call noalias ptr @malloc(i64 noundef %923) #4
+  %925 = load ptr, ptr %41, align 8
+  %926 = getelementptr inbounds %struct.SetValue, ptr %925, i32 0, i32 1
+  store ptr %924, ptr %926, align 8
+  store i32 0, ptr %42, align 4
+  br label %927
+
+927:                                              ; preds = %955, %912
+  %928 = load i32, ptr %42, align 4
+  %929 = load ptr, ptr %39, align 8
+  %930 = getelementptr inbounds %struct.SetValue, ptr %929, i32 0, i32 0
+  %931 = load i32, ptr %930, align 8
+  %932 = icmp slt i32 %928, %931
+  br i1 %932, label %933, label %958
+
+933:                                              ; preds = %927
+  %934 = load ptr, ptr %39, align 8
+  %935 = getelementptr inbounds %struct.SetValue, ptr %934, i32 0, i32 1
+  %936 = load ptr, ptr %935, align 8
+  %937 = load i32, ptr %42, align 4
+  %938 = sext i32 %937 to i64
+  %939 = getelementptr inbounds ptr, ptr %936, i64 %938
+  %940 = load ptr, ptr %939, align 8
+  %941 = load ptr, ptr %40, align 8
+  %942 = getelementptr inbounds %struct.SetValue, ptr %941, i32 0, i32 1
+  %943 = load ptr, ptr %942, align 8
+  %944 = load i32, ptr %42, align 4
+  %945 = sext i32 %944 to i64
+  %946 = getelementptr inbounds ptr, ptr %943, i64 %945
+  %947 = load ptr, ptr %946, align 8
+  %948 = call ptr @divCalcLangValues(ptr noundef %940, i32 noundef 1, ptr noundef %947, i32 noundef 1)
+  %949 = load ptr, ptr %41, align 8
+  %950 = getelementptr inbounds %struct.SetValue, ptr %949, i32 0, i32 1
+  %951 = load ptr, ptr %950, align 8
+  %952 = load i32, ptr %42, align 4
+  %953 = sext i32 %952 to i64
+  %954 = getelementptr inbounds ptr, ptr %951, i64 %953
+  store ptr %948, ptr %954, align 8
+  br label %955
+
+955:                                              ; preds = %933
+  %956 = load i32, ptr %42, align 4
+  %957 = add nsw i32 %956, 1
+  store i32 %957, ptr %42, align 4
+  br label %927, !llvm.loop !70
+
+958:                                              ; preds = %927
+  %959 = load ptr, ptr %10, align 8
+  %960 = getelementptr inbounds %struct.CalcLangVal, ptr %959, i32 0, i32 0
+  store i32 6, ptr %960, align 8
+  %961 = load ptr, ptr %41, align 8
+  %962 = load ptr, ptr %10, align 8
+  %963 = getelementptr inbounds %struct.CalcLangVal, ptr %962, i32 0, i32 1
+  store ptr %961, ptr %963, align 8
+  br label %965
+
+964:                                              ; preds = %898
+  call void @perror(ptr noundef @.str) #5
+  store ptr null, ptr %5, align 8
+  br label %1481
+
+965:                                              ; preds = %958
+  br label %1447
+
+966:                                              ; preds = %893, %888
+  %967 = load ptr, ptr %6, align 8
+  %968 = getelementptr inbounds %struct.CalcLangVal, ptr %967, i32 0, i32 0
+  %969 = load i32, ptr %968, align 8
+  %970 = icmp eq i32 %969, 6
+  br i1 %970, label %971, label %1025
+
+971:                                              ; preds = %966
+  %972 = load ptr, ptr %8, align 8
+  %973 = getelementptr inbounds %struct.CalcLangVal, ptr %972, i32 0, i32 0
+  %974 = load i32, ptr %973, align 8
+  %975 = icmp eq i32 %974, 0
+  br i1 %975, label %976, label %1025
+
+976:                                              ; preds = %971
+  %977 = load ptr, ptr %6, align 8
+  %978 = getelementptr inbounds %struct.CalcLangVal, ptr %977, i32 0, i32 1
+  %979 = load ptr, ptr %978, align 8
+  store ptr %979, ptr %43, align 8
+  %980 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %980, ptr %44, align 8
+  %981 = load ptr, ptr %43, align 8
+  %982 = getelementptr inbounds %struct.SetValue, ptr %981, i32 0, i32 0
+  %983 = load i32, ptr %982, align 8
+  %984 = load ptr, ptr %44, align 8
+  %985 = getelementptr inbounds %struct.SetValue, ptr %984, i32 0, i32 0
+  store i32 %983, ptr %985, align 8
+  %986 = load ptr, ptr %44, align 8
+  %987 = getelementptr inbounds %struct.SetValue, ptr %986, i32 0, i32 0
+  %988 = load i32, ptr %987, align 8
+  %989 = sext i32 %988 to i64
+  %990 = mul i64 8, %989
+  %991 = call noalias ptr @malloc(i64 noundef %990) #4
+  %992 = load ptr, ptr %44, align 8
+  %993 = getelementptr inbounds %struct.SetValue, ptr %992, i32 0, i32 1
+  store ptr %991, ptr %993, align 8
+  store i32 0, ptr %45, align 4
+  br label %994
+
+994:                                              ; preds = %1016, %976
+  %995 = load i32, ptr %45, align 4
+  %996 = load ptr, ptr %43, align 8
+  %997 = getelementptr inbounds %struct.SetValue, ptr %996, i32 0, i32 0
+  %998 = load i32, ptr %997, align 8
+  %999 = icmp slt i32 %995, %998
+  br i1 %999, label %1000, label %1019
+
+1000:                                             ; preds = %994
+  %1001 = load ptr, ptr %43, align 8
+  %1002 = getelementptr inbounds %struct.SetValue, ptr %1001, i32 0, i32 1
+  %1003 = load ptr, ptr %1002, align 8
+  %1004 = load i32, ptr %45, align 4
+  %1005 = sext i32 %1004 to i64
+  %1006 = getelementptr inbounds ptr, ptr %1003, i64 %1005
+  %1007 = load ptr, ptr %1006, align 8
+  %1008 = load ptr, ptr %8, align 8
+  %1009 = call ptr @divCalcLangValues(ptr noundef %1007, i32 noundef 1, ptr noundef %1008, i32 noundef 0)
+  %1010 = load ptr, ptr %44, align 8
+  %1011 = getelementptr inbounds %struct.SetValue, ptr %1010, i32 0, i32 1
+  %1012 = load ptr, ptr %1011, align 8
+  %1013 = load i32, ptr %45, align 4
+  %1014 = sext i32 %1013 to i64
+  %1015 = getelementptr inbounds ptr, ptr %1012, i64 %1014
+  store ptr %1009, ptr %1015, align 8
+  br label %1016
+
+1016:                                             ; preds = %1000
+  %1017 = load i32, ptr %45, align 4
+  %1018 = add nsw i32 %1017, 1
+  store i32 %1018, ptr %45, align 4
+  br label %994, !llvm.loop !71
+
+1019:                                             ; preds = %994
+  %1020 = load ptr, ptr %10, align 8
+  %1021 = getelementptr inbounds %struct.CalcLangVal, ptr %1020, i32 0, i32 0
+  store i32 6, ptr %1021, align 8
+  %1022 = load ptr, ptr %44, align 8
+  %1023 = load ptr, ptr %10, align 8
+  %1024 = getelementptr inbounds %struct.CalcLangVal, ptr %1023, i32 0, i32 1
+  store ptr %1022, ptr %1024, align 8
+  br label %1446
+
+1025:                                             ; preds = %971, %966
+  %1026 = load ptr, ptr %6, align 8
+  %1027 = getelementptr inbounds %struct.CalcLangVal, ptr %1026, i32 0, i32 0
+  %1028 = load i32, ptr %1027, align 8
+  %1029 = icmp eq i32 %1028, 0
+  br i1 %1029, label %1030, label %1084
+
+1030:                                             ; preds = %1025
+  %1031 = load ptr, ptr %8, align 8
+  %1032 = getelementptr inbounds %struct.CalcLangVal, ptr %1031, i32 0, i32 0
+  %1033 = load i32, ptr %1032, align 8
+  %1034 = icmp eq i32 %1033, 6
+  br i1 %1034, label %1035, label %1084
+
+1035:                                             ; preds = %1030
+  %1036 = load ptr, ptr %8, align 8
+  %1037 = getelementptr inbounds %struct.CalcLangVal, ptr %1036, i32 0, i32 1
+  %1038 = load ptr, ptr %1037, align 8
+  store ptr %1038, ptr %46, align 8
+  %1039 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %1039, ptr %47, align 8
+  %1040 = load ptr, ptr %46, align 8
+  %1041 = getelementptr inbounds %struct.SetValue, ptr %1040, i32 0, i32 0
+  %1042 = load i32, ptr %1041, align 8
+  %1043 = load ptr, ptr %47, align 8
+  %1044 = getelementptr inbounds %struct.SetValue, ptr %1043, i32 0, i32 0
+  store i32 %1042, ptr %1044, align 8
+  %1045 = load ptr, ptr %47, align 8
+  %1046 = getelementptr inbounds %struct.SetValue, ptr %1045, i32 0, i32 0
+  %1047 = load i32, ptr %1046, align 8
+  %1048 = sext i32 %1047 to i64
+  %1049 = mul i64 8, %1048
+  %1050 = call noalias ptr @malloc(i64 noundef %1049) #4
+  %1051 = load ptr, ptr %47, align 8
+  %1052 = getelementptr inbounds %struct.SetValue, ptr %1051, i32 0, i32 1
+  store ptr %1050, ptr %1052, align 8
+  store i32 0, ptr %48, align 4
+  br label %1053
+
+1053:                                             ; preds = %1075, %1035
+  %1054 = load i32, ptr %48, align 4
+  %1055 = load ptr, ptr %46, align 8
+  %1056 = getelementptr inbounds %struct.SetValue, ptr %1055, i32 0, i32 0
+  %1057 = load i32, ptr %1056, align 8
+  %1058 = icmp slt i32 %1054, %1057
+  br i1 %1058, label %1059, label %1078
+
+1059:                                             ; preds = %1053
+  %1060 = load ptr, ptr %6, align 8
+  %1061 = load ptr, ptr %46, align 8
+  %1062 = getelementptr inbounds %struct.SetValue, ptr %1061, i32 0, i32 1
+  %1063 = load ptr, ptr %1062, align 8
+  %1064 = load i32, ptr %48, align 4
+  %1065 = sext i32 %1064 to i64
+  %1066 = getelementptr inbounds ptr, ptr %1063, i64 %1065
+  %1067 = load ptr, ptr %1066, align 8
+  %1068 = call ptr @divCalcLangValues(ptr noundef %1060, i32 noundef 0, ptr noundef %1067, i32 noundef 1)
+  %1069 = load ptr, ptr %47, align 8
+  %1070 = getelementptr inbounds %struct.SetValue, ptr %1069, i32 0, i32 1
+  %1071 = load ptr, ptr %1070, align 8
+  %1072 = load i32, ptr %48, align 4
+  %1073 = sext i32 %1072 to i64
+  %1074 = getelementptr inbounds ptr, ptr %1071, i64 %1073
+  store ptr %1068, ptr %1074, align 8
+  br label %1075
+
+1075:                                             ; preds = %1059
+  %1076 = load i32, ptr %48, align 4
+  %1077 = add nsw i32 %1076, 1
+  store i32 %1077, ptr %48, align 4
+  br label %1053, !llvm.loop !72
+
+1078:                                             ; preds = %1053
+  %1079 = load ptr, ptr %10, align 8
+  %1080 = getelementptr inbounds %struct.CalcLangVal, ptr %1079, i32 0, i32 0
+  store i32 6, ptr %1080, align 8
+  %1081 = load ptr, ptr %47, align 8
+  %1082 = load ptr, ptr %10, align 8
+  %1083 = getelementptr inbounds %struct.CalcLangVal, ptr %1082, i32 0, i32 1
+  store ptr %1081, ptr %1083, align 8
+  br label %1445
+
+1084:                                             ; preds = %1030, %1025
+  %1085 = load ptr, ptr %6, align 8
+  %1086 = getelementptr inbounds %struct.CalcLangVal, ptr %1085, i32 0, i32 0
+  %1087 = load i32, ptr %1086, align 8
+  %1088 = icmp eq i32 %1087, 6
+  br i1 %1088, label %1089, label %1143
+
+1089:                                             ; preds = %1084
+  %1090 = load ptr, ptr %8, align 8
+  %1091 = getelementptr inbounds %struct.CalcLangVal, ptr %1090, i32 0, i32 0
+  %1092 = load i32, ptr %1091, align 8
+  %1093 = icmp eq i32 %1092, 1
+  br i1 %1093, label %1094, label %1143
+
+1094:                                             ; preds = %1089
+  %1095 = load ptr, ptr %6, align 8
+  %1096 = getelementptr inbounds %struct.CalcLangVal, ptr %1095, i32 0, i32 1
+  %1097 = load ptr, ptr %1096, align 8
+  store ptr %1097, ptr %49, align 8
+  %1098 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %1098, ptr %50, align 8
+  %1099 = load ptr, ptr %49, align 8
+  %1100 = getelementptr inbounds %struct.SetValue, ptr %1099, i32 0, i32 0
+  %1101 = load i32, ptr %1100, align 8
+  %1102 = load ptr, ptr %50, align 8
+  %1103 = getelementptr inbounds %struct.SetValue, ptr %1102, i32 0, i32 0
+  store i32 %1101, ptr %1103, align 8
+  %1104 = load ptr, ptr %50, align 8
+  %1105 = getelementptr inbounds %struct.SetValue, ptr %1104, i32 0, i32 0
+  %1106 = load i32, ptr %1105, align 8
+  %1107 = sext i32 %1106 to i64
+  %1108 = mul i64 8, %1107
+  %1109 = call noalias ptr @malloc(i64 noundef %1108) #4
+  %1110 = load ptr, ptr %50, align 8
+  %1111 = getelementptr inbounds %struct.SetValue, ptr %1110, i32 0, i32 1
+  store ptr %1109, ptr %1111, align 8
+  store i32 0, ptr %51, align 4
+  br label %1112
+
+1112:                                             ; preds = %1134, %1094
+  %1113 = load i32, ptr %51, align 4
+  %1114 = load ptr, ptr %49, align 8
+  %1115 = getelementptr inbounds %struct.SetValue, ptr %1114, i32 0, i32 0
+  %1116 = load i32, ptr %1115, align 8
+  %1117 = icmp slt i32 %1113, %1116
+  br i1 %1117, label %1118, label %1137
+
+1118:                                             ; preds = %1112
+  %1119 = load ptr, ptr %49, align 8
+  %1120 = getelementptr inbounds %struct.SetValue, ptr %1119, i32 0, i32 1
+  %1121 = load ptr, ptr %1120, align 8
+  %1122 = load i32, ptr %51, align 4
+  %1123 = sext i32 %1122 to i64
+  %1124 = getelementptr inbounds ptr, ptr %1121, i64 %1123
+  %1125 = load ptr, ptr %1124, align 8
+  %1126 = load ptr, ptr %8, align 8
+  %1127 = call ptr @divCalcLangValues(ptr noundef %1125, i32 noundef 1, ptr noundef %1126, i32 noundef 0)
+  %1128 = load ptr, ptr %50, align 8
+  %1129 = getelementptr inbounds %struct.SetValue, ptr %1128, i32 0, i32 1
+  %1130 = load ptr, ptr %1129, align 8
+  %1131 = load i32, ptr %51, align 4
+  %1132 = sext i32 %1131 to i64
+  %1133 = getelementptr inbounds ptr, ptr %1130, i64 %1132
+  store ptr %1127, ptr %1133, align 8
+  br label %1134
+
+1134:                                             ; preds = %1118
+  %1135 = load i32, ptr %51, align 4
+  %1136 = add nsw i32 %1135, 1
+  store i32 %1136, ptr %51, align 4
+  br label %1112, !llvm.loop !73
+
+1137:                                             ; preds = %1112
+  %1138 = load ptr, ptr %10, align 8
+  %1139 = getelementptr inbounds %struct.CalcLangVal, ptr %1138, i32 0, i32 0
+  store i32 7, ptr %1139, align 8
+  %1140 = load ptr, ptr %50, align 8
+  %1141 = load ptr, ptr %10, align 8
+  %1142 = getelementptr inbounds %struct.CalcLangVal, ptr %1141, i32 0, i32 1
+  store ptr %1140, ptr %1142, align 8
+  br label %1444
+
+1143:                                             ; preds = %1089, %1084
+  %1144 = load ptr, ptr %6, align 8
+  %1145 = getelementptr inbounds %struct.CalcLangVal, ptr %1144, i32 0, i32 0
+  %1146 = load i32, ptr %1145, align 8
+  %1147 = icmp eq i32 %1146, 1
+  br i1 %1147, label %1148, label %1202
+
+1148:                                             ; preds = %1143
+  %1149 = load ptr, ptr %8, align 8
+  %1150 = getelementptr inbounds %struct.CalcLangVal, ptr %1149, i32 0, i32 0
+  %1151 = load i32, ptr %1150, align 8
+  %1152 = icmp eq i32 %1151, 6
+  br i1 %1152, label %1153, label %1202
+
+1153:                                             ; preds = %1148
+  %1154 = load ptr, ptr %8, align 8
+  %1155 = getelementptr inbounds %struct.CalcLangVal, ptr %1154, i32 0, i32 1
+  %1156 = load ptr, ptr %1155, align 8
+  store ptr %1156, ptr %52, align 8
+  %1157 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %1157, ptr %53, align 8
+  %1158 = load ptr, ptr %52, align 8
+  %1159 = getelementptr inbounds %struct.SetValue, ptr %1158, i32 0, i32 0
+  %1160 = load i32, ptr %1159, align 8
+  %1161 = load ptr, ptr %53, align 8
+  %1162 = getelementptr inbounds %struct.SetValue, ptr %1161, i32 0, i32 0
+  store i32 %1160, ptr %1162, align 8
+  %1163 = load ptr, ptr %53, align 8
+  %1164 = getelementptr inbounds %struct.SetValue, ptr %1163, i32 0, i32 0
+  %1165 = load i32, ptr %1164, align 8
+  %1166 = sext i32 %1165 to i64
+  %1167 = mul i64 8, %1166
+  %1168 = call noalias ptr @malloc(i64 noundef %1167) #4
+  %1169 = load ptr, ptr %53, align 8
+  %1170 = getelementptr inbounds %struct.SetValue, ptr %1169, i32 0, i32 1
+  store ptr %1168, ptr %1170, align 8
+  store i32 0, ptr %54, align 4
+  br label %1171
+
+1171:                                             ; preds = %1193, %1153
+  %1172 = load i32, ptr %54, align 4
+  %1173 = load ptr, ptr %52, align 8
+  %1174 = getelementptr inbounds %struct.SetValue, ptr %1173, i32 0, i32 0
+  %1175 = load i32, ptr %1174, align 8
+  %1176 = icmp slt i32 %1172, %1175
+  br i1 %1176, label %1177, label %1196
+
+1177:                                             ; preds = %1171
+  %1178 = load ptr, ptr %6, align 8
+  %1179 = load ptr, ptr %52, align 8
+  %1180 = getelementptr inbounds %struct.SetValue, ptr %1179, i32 0, i32 1
+  %1181 = load ptr, ptr %1180, align 8
+  %1182 = load i32, ptr %54, align 4
+  %1183 = sext i32 %1182 to i64
+  %1184 = getelementptr inbounds ptr, ptr %1181, i64 %1183
+  %1185 = load ptr, ptr %1184, align 8
+  %1186 = call ptr @divCalcLangValues(ptr noundef %1178, i32 noundef 0, ptr noundef %1185, i32 noundef 1)
+  %1187 = load ptr, ptr %53, align 8
+  %1188 = getelementptr inbounds %struct.SetValue, ptr %1187, i32 0, i32 1
+  %1189 = load ptr, ptr %1188, align 8
+  %1190 = load i32, ptr %54, align 4
+  %1191 = sext i32 %1190 to i64
+  %1192 = getelementptr inbounds ptr, ptr %1189, i64 %1191
+  store ptr %1186, ptr %1192, align 8
+  br label %1193
+
+1193:                                             ; preds = %1177
+  %1194 = load i32, ptr %54, align 4
+  %1195 = add nsw i32 %1194, 1
+  store i32 %1195, ptr %54, align 4
+  br label %1171, !llvm.loop !74
+
+1196:                                             ; preds = %1171
+  %1197 = load ptr, ptr %10, align 8
+  %1198 = getelementptr inbounds %struct.CalcLangVal, ptr %1197, i32 0, i32 0
+  store i32 6, ptr %1198, align 8
+  %1199 = load ptr, ptr %53, align 8
+  %1200 = load ptr, ptr %10, align 8
+  %1201 = getelementptr inbounds %struct.CalcLangVal, ptr %1200, i32 0, i32 1
+  store ptr %1199, ptr %1201, align 8
+  br label %1443
+
+1202:                                             ; preds = %1148, %1143
+  %1203 = load ptr, ptr %6, align 8
+  %1204 = getelementptr inbounds %struct.CalcLangVal, ptr %1203, i32 0, i32 0
+  %1205 = load i32, ptr %1204, align 8
+  %1206 = icmp eq i32 %1205, 6
+  br i1 %1206, label %1207, label %1261
+
+1207:                                             ; preds = %1202
+  %1208 = load ptr, ptr %8, align 8
+  %1209 = getelementptr inbounds %struct.CalcLangVal, ptr %1208, i32 0, i32 0
+  %1210 = load i32, ptr %1209, align 8
+  %1211 = icmp eq i32 %1210, 3
+  br i1 %1211, label %1212, label %1261
+
+1212:                                             ; preds = %1207
+  %1213 = load ptr, ptr %6, align 8
+  %1214 = getelementptr inbounds %struct.CalcLangVal, ptr %1213, i32 0, i32 1
+  %1215 = load ptr, ptr %1214, align 8
+  store ptr %1215, ptr %55, align 8
+  %1216 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %1216, ptr %56, align 8
+  %1217 = load ptr, ptr %55, align 8
+  %1218 = getelementptr inbounds %struct.SetValue, ptr %1217, i32 0, i32 0
+  %1219 = load i32, ptr %1218, align 8
+  %1220 = load ptr, ptr %56, align 8
+  %1221 = getelementptr inbounds %struct.SetValue, ptr %1220, i32 0, i32 0
+  store i32 %1219, ptr %1221, align 8
+  %1222 = load ptr, ptr %56, align 8
+  %1223 = getelementptr inbounds %struct.SetValue, ptr %1222, i32 0, i32 0
+  %1224 = load i32, ptr %1223, align 8
+  %1225 = sext i32 %1224 to i64
+  %1226 = mul i64 8, %1225
+  %1227 = call noalias ptr @malloc(i64 noundef %1226) #4
+  %1228 = load ptr, ptr %56, align 8
+  %1229 = getelementptr inbounds %struct.SetValue, ptr %1228, i32 0, i32 1
+  store ptr %1227, ptr %1229, align 8
+  store i32 0, ptr %57, align 4
+  br label %1230
+
+1230:                                             ; preds = %1252, %1212
+  %1231 = load i32, ptr %57, align 4
+  %1232 = load ptr, ptr %55, align 8
+  %1233 = getelementptr inbounds %struct.SetValue, ptr %1232, i32 0, i32 0
+  %1234 = load i32, ptr %1233, align 8
+  %1235 = icmp slt i32 %1231, %1234
+  br i1 %1235, label %1236, label %1255
+
+1236:                                             ; preds = %1230
+  %1237 = load ptr, ptr %55, align 8
+  %1238 = getelementptr inbounds %struct.SetValue, ptr %1237, i32 0, i32 1
+  %1239 = load ptr, ptr %1238, align 8
+  %1240 = load i32, ptr %57, align 4
+  %1241 = sext i32 %1240 to i64
+  %1242 = getelementptr inbounds ptr, ptr %1239, i64 %1241
+  %1243 = load ptr, ptr %1242, align 8
+  %1244 = load ptr, ptr %8, align 8
+  %1245 = call ptr @divCalcLangValues(ptr noundef %1243, i32 noundef 1, ptr noundef %1244, i32 noundef 0)
+  %1246 = load ptr, ptr %56, align 8
+  %1247 = getelementptr inbounds %struct.SetValue, ptr %1246, i32 0, i32 1
+  %1248 = load ptr, ptr %1247, align 8
+  %1249 = load i32, ptr %57, align 4
+  %1250 = sext i32 %1249 to i64
+  %1251 = getelementptr inbounds ptr, ptr %1248, i64 %1250
+  store ptr %1245, ptr %1251, align 8
+  br label %1252
+
+1252:                                             ; preds = %1236
+  %1253 = load i32, ptr %57, align 4
+  %1254 = add nsw i32 %1253, 1
+  store i32 %1254, ptr %57, align 4
+  br label %1230, !llvm.loop !75
+
+1255:                                             ; preds = %1230
+  %1256 = load ptr, ptr %10, align 8
+  %1257 = getelementptr inbounds %struct.CalcLangVal, ptr %1256, i32 0, i32 0
+  store i32 6, ptr %1257, align 8
+  %1258 = load ptr, ptr %56, align 8
+  %1259 = load ptr, ptr %10, align 8
+  %1260 = getelementptr inbounds %struct.CalcLangVal, ptr %1259, i32 0, i32 1
+  store ptr %1258, ptr %1260, align 8
+  br label %1442
+
+1261:                                             ; preds = %1207, %1202
+  %1262 = load ptr, ptr %6, align 8
+  %1263 = getelementptr inbounds %struct.CalcLangVal, ptr %1262, i32 0, i32 0
+  %1264 = load i32, ptr %1263, align 8
+  %1265 = icmp eq i32 %1264, 3
+  br i1 %1265, label %1266, label %1320
+
+1266:                                             ; preds = %1261
+  %1267 = load ptr, ptr %8, align 8
+  %1268 = getelementptr inbounds %struct.CalcLangVal, ptr %1267, i32 0, i32 0
+  %1269 = load i32, ptr %1268, align 8
+  %1270 = icmp eq i32 %1269, 6
+  br i1 %1270, label %1271, label %1320
+
+1271:                                             ; preds = %1266
+  %1272 = load ptr, ptr %8, align 8
+  %1273 = getelementptr inbounds %struct.CalcLangVal, ptr %1272, i32 0, i32 1
+  %1274 = load ptr, ptr %1273, align 8
+  store ptr %1274, ptr %58, align 8
+  %1275 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %1275, ptr %59, align 8
+  %1276 = load ptr, ptr %58, align 8
+  %1277 = getelementptr inbounds %struct.SetValue, ptr %1276, i32 0, i32 0
+  %1278 = load i32, ptr %1277, align 8
+  %1279 = load ptr, ptr %59, align 8
+  %1280 = getelementptr inbounds %struct.SetValue, ptr %1279, i32 0, i32 0
+  store i32 %1278, ptr %1280, align 8
+  %1281 = load ptr, ptr %59, align 8
+  %1282 = getelementptr inbounds %struct.SetValue, ptr %1281, i32 0, i32 0
+  %1283 = load i32, ptr %1282, align 8
+  %1284 = sext i32 %1283 to i64
+  %1285 = mul i64 8, %1284
+  %1286 = call noalias ptr @malloc(i64 noundef %1285) #4
+  %1287 = load ptr, ptr %59, align 8
+  %1288 = getelementptr inbounds %struct.SetValue, ptr %1287, i32 0, i32 1
+  store ptr %1286, ptr %1288, align 8
+  store i32 0, ptr %60, align 4
+  br label %1289
+
+1289:                                             ; preds = %1311, %1271
+  %1290 = load i32, ptr %60, align 4
+  %1291 = load ptr, ptr %58, align 8
+  %1292 = getelementptr inbounds %struct.SetValue, ptr %1291, i32 0, i32 0
+  %1293 = load i32, ptr %1292, align 8
+  %1294 = icmp slt i32 %1290, %1293
+  br i1 %1294, label %1295, label %1314
+
+1295:                                             ; preds = %1289
+  %1296 = load ptr, ptr %6, align 8
+  %1297 = load ptr, ptr %58, align 8
+  %1298 = getelementptr inbounds %struct.SetValue, ptr %1297, i32 0, i32 1
+  %1299 = load ptr, ptr %1298, align 8
+  %1300 = load i32, ptr %60, align 4
+  %1301 = sext i32 %1300 to i64
+  %1302 = getelementptr inbounds ptr, ptr %1299, i64 %1301
+  %1303 = load ptr, ptr %1302, align 8
+  %1304 = call ptr @divCalcLangValues(ptr noundef %1296, i32 noundef 0, ptr noundef %1303, i32 noundef 1)
+  %1305 = load ptr, ptr %59, align 8
+  %1306 = getelementptr inbounds %struct.SetValue, ptr %1305, i32 0, i32 1
+  %1307 = load ptr, ptr %1306, align 8
+  %1308 = load i32, ptr %60, align 4
+  %1309 = sext i32 %1308 to i64
+  %1310 = getelementptr inbounds ptr, ptr %1307, i64 %1309
+  store ptr %1304, ptr %1310, align 8
+  br label %1311
+
+1311:                                             ; preds = %1295
+  %1312 = load i32, ptr %60, align 4
+  %1313 = add nsw i32 %1312, 1
+  store i32 %1313, ptr %60, align 4
+  br label %1289, !llvm.loop !76
+
+1314:                                             ; preds = %1289
+  %1315 = load ptr, ptr %10, align 8
+  %1316 = getelementptr inbounds %struct.CalcLangVal, ptr %1315, i32 0, i32 0
+  store i32 6, ptr %1316, align 8
+  %1317 = load ptr, ptr %59, align 8
+  %1318 = load ptr, ptr %10, align 8
+  %1319 = getelementptr inbounds %struct.CalcLangVal, ptr %1318, i32 0, i32 1
+  store ptr %1317, ptr %1319, align 8
+  br label %1441
+
+1320:                                             ; preds = %1266, %1261
+  %1321 = load ptr, ptr %6, align 8
+  %1322 = getelementptr inbounds %struct.CalcLangVal, ptr %1321, i32 0, i32 0
+  %1323 = load i32, ptr %1322, align 8
+  %1324 = icmp eq i32 %1323, 6
+  br i1 %1324, label %1325, label %1379
+
+1325:                                             ; preds = %1320
+  %1326 = load ptr, ptr %8, align 8
+  %1327 = getelementptr inbounds %struct.CalcLangVal, ptr %1326, i32 0, i32 0
+  %1328 = load i32, ptr %1327, align 8
+  %1329 = icmp eq i32 %1328, 4
+  br i1 %1329, label %1330, label %1379
+
+1330:                                             ; preds = %1325
+  %1331 = load ptr, ptr %6, align 8
+  %1332 = getelementptr inbounds %struct.CalcLangVal, ptr %1331, i32 0, i32 1
+  %1333 = load ptr, ptr %1332, align 8
+  store ptr %1333, ptr %61, align 8
+  %1334 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %1334, ptr %62, align 8
+  %1335 = load ptr, ptr %61, align 8
+  %1336 = getelementptr inbounds %struct.SetValue, ptr %1335, i32 0, i32 0
+  %1337 = load i32, ptr %1336, align 8
+  %1338 = load ptr, ptr %62, align 8
+  %1339 = getelementptr inbounds %struct.SetValue, ptr %1338, i32 0, i32 0
+  store i32 %1337, ptr %1339, align 8
+  %1340 = load ptr, ptr %62, align 8
+  %1341 = getelementptr inbounds %struct.SetValue, ptr %1340, i32 0, i32 0
+  %1342 = load i32, ptr %1341, align 8
+  %1343 = sext i32 %1342 to i64
+  %1344 = mul i64 8, %1343
+  %1345 = call noalias ptr @malloc(i64 noundef %1344) #4
+  %1346 = load ptr, ptr %62, align 8
+  %1347 = getelementptr inbounds %struct.SetValue, ptr %1346, i32 0, i32 1
+  store ptr %1345, ptr %1347, align 8
+  store i32 0, ptr %63, align 4
+  br label %1348
+
+1348:                                             ; preds = %1370, %1330
+  %1349 = load i32, ptr %63, align 4
+  %1350 = load ptr, ptr %61, align 8
+  %1351 = getelementptr inbounds %struct.SetValue, ptr %1350, i32 0, i32 0
+  %1352 = load i32, ptr %1351, align 8
+  %1353 = icmp slt i32 %1349, %1352
+  br i1 %1353, label %1354, label %1373
+
+1354:                                             ; preds = %1348
+  %1355 = load ptr, ptr %61, align 8
+  %1356 = getelementptr inbounds %struct.SetValue, ptr %1355, i32 0, i32 1
+  %1357 = load ptr, ptr %1356, align 8
+  %1358 = load i32, ptr %63, align 4
+  %1359 = sext i32 %1358 to i64
+  %1360 = getelementptr inbounds ptr, ptr %1357, i64 %1359
+  %1361 = load ptr, ptr %1360, align 8
+  %1362 = load ptr, ptr %8, align 8
+  %1363 = call ptr @divCalcLangValues(ptr noundef %1361, i32 noundef 1, ptr noundef %1362, i32 noundef 0)
+  %1364 = load ptr, ptr %62, align 8
+  %1365 = getelementptr inbounds %struct.SetValue, ptr %1364, i32 0, i32 1
+  %1366 = load ptr, ptr %1365, align 8
+  %1367 = load i32, ptr %63, align 4
+  %1368 = sext i32 %1367 to i64
+  %1369 = getelementptr inbounds ptr, ptr %1366, i64 %1368
+  store ptr %1363, ptr %1369, align 8
+  br label %1370
+
+1370:                                             ; preds = %1354
+  %1371 = load i32, ptr %63, align 4
+  %1372 = add nsw i32 %1371, 1
+  store i32 %1372, ptr %63, align 4
+  br label %1348, !llvm.loop !77
+
+1373:                                             ; preds = %1348
+  %1374 = load ptr, ptr %10, align 8
+  %1375 = getelementptr inbounds %struct.CalcLangVal, ptr %1374, i32 0, i32 0
+  store i32 6, ptr %1375, align 8
+  %1376 = load ptr, ptr %62, align 8
+  %1377 = load ptr, ptr %10, align 8
+  %1378 = getelementptr inbounds %struct.CalcLangVal, ptr %1377, i32 0, i32 1
+  store ptr %1376, ptr %1378, align 8
+  br label %1440
+
+1379:                                             ; preds = %1325, %1320
+  %1380 = load ptr, ptr %6, align 8
+  %1381 = getelementptr inbounds %struct.CalcLangVal, ptr %1380, i32 0, i32 0
+  %1382 = load i32, ptr %1381, align 8
+  %1383 = icmp eq i32 %1382, 4
+  br i1 %1383, label %1384, label %1438
+
+1384:                                             ; preds = %1379
+  %1385 = load ptr, ptr %8, align 8
+  %1386 = getelementptr inbounds %struct.CalcLangVal, ptr %1385, i32 0, i32 0
+  %1387 = load i32, ptr %1386, align 8
+  %1388 = icmp eq i32 %1387, 6
+  br i1 %1388, label %1389, label %1438
+
+1389:                                             ; preds = %1384
+  %1390 = load ptr, ptr %8, align 8
+  %1391 = getelementptr inbounds %struct.CalcLangVal, ptr %1390, i32 0, i32 1
+  %1392 = load ptr, ptr %1391, align 8
+  store ptr %1392, ptr %64, align 8
+  %1393 = call noalias ptr @malloc(i64 noundef 16) #4
+  store ptr %1393, ptr %65, align 8
+  %1394 = load ptr, ptr %64, align 8
+  %1395 = getelementptr inbounds %struct.SetValue, ptr %1394, i32 0, i32 0
+  %1396 = load i32, ptr %1395, align 8
+  %1397 = load ptr, ptr %65, align 8
+  %1398 = getelementptr inbounds %struct.SetValue, ptr %1397, i32 0, i32 0
+  store i32 %1396, ptr %1398, align 8
+  %1399 = load ptr, ptr %65, align 8
+  %1400 = getelementptr inbounds %struct.SetValue, ptr %1399, i32 0, i32 0
+  %1401 = load i32, ptr %1400, align 8
+  %1402 = sext i32 %1401 to i64
+  %1403 = mul i64 8, %1402
+  %1404 = call noalias ptr @malloc(i64 noundef %1403) #4
+  %1405 = load ptr, ptr %65, align 8
+  %1406 = getelementptr inbounds %struct.SetValue, ptr %1405, i32 0, i32 1
+  store ptr %1404, ptr %1406, align 8
+  store i32 0, ptr %66, align 4
+  br label %1407
+
+1407:                                             ; preds = %1429, %1389
+  %1408 = load i32, ptr %66, align 4
+  %1409 = load ptr, ptr %64, align 8
+  %1410 = getelementptr inbounds %struct.SetValue, ptr %1409, i32 0, i32 0
+  %1411 = load i32, ptr %1410, align 8
+  %1412 = icmp slt i32 %1408, %1411
+  br i1 %1412, label %1413, label %1432
+
+1413:                                             ; preds = %1407
+  %1414 = load ptr, ptr %6, align 8
+  %1415 = load ptr, ptr %64, align 8
+  %1416 = getelementptr inbounds %struct.SetValue, ptr %1415, i32 0, i32 1
+  %1417 = load ptr, ptr %1416, align 8
+  %1418 = load i32, ptr %66, align 4
+  %1419 = sext i32 %1418 to i64
+  %1420 = getelementptr inbounds ptr, ptr %1417, i64 %1419
+  %1421 = load ptr, ptr %1420, align 8
+  %1422 = call ptr @divCalcLangValues(ptr noundef %1414, i32 noundef 0, ptr noundef %1421, i32 noundef 1)
+  %1423 = load ptr, ptr %65, align 8
+  %1424 = getelementptr inbounds %struct.SetValue, ptr %1423, i32 0, i32 1
+  %1425 = load ptr, ptr %1424, align 8
+  %1426 = load i32, ptr %66, align 4
+  %1427 = sext i32 %1426 to i64
+  %1428 = getelementptr inbounds ptr, ptr %1425, i64 %1427
+  store ptr %1422, ptr %1428, align 8
+  br label %1429
+
+1429:                                             ; preds = %1413
+  %1430 = load i32, ptr %66, align 4
+  %1431 = add nsw i32 %1430, 1
+  store i32 %1431, ptr %66, align 4
+  br label %1407, !llvm.loop !78
+
+1432:                                             ; preds = %1407
+  %1433 = load ptr, ptr %10, align 8
+  %1434 = getelementptr inbounds %struct.CalcLangVal, ptr %1433, i32 0, i32 0
+  store i32 6, ptr %1434, align 8
+  %1435 = load ptr, ptr %65, align 8
+  %1436 = load ptr, ptr %10, align 8
+  %1437 = getelementptr inbounds %struct.CalcLangVal, ptr %1436, i32 0, i32 1
+  store ptr %1435, ptr %1437, align 8
+  br label %1439
+
+1438:                                             ; preds = %1384, %1379
+  call void @perror(ptr noundef @.str.1) #5
+  br label %1439
+
+1439:                                             ; preds = %1438, %1432
+  br label %1440
+
+1440:                                             ; preds = %1439, %1373
+  br label %1441
+
+1441:                                             ; preds = %1440, %1314
+  br label %1442
+
+1442:                                             ; preds = %1441, %1255
+  br label %1443
+
+1443:                                             ; preds = %1442, %1196
+  br label %1444
+
+1444:                                             ; preds = %1443, %1137
+  br label %1445
+
+1445:                                             ; preds = %1444, %1078
+  br label %1446
+
+1446:                                             ; preds = %1445, %1019
+  br label %1447
+
+1447:                                             ; preds = %1446, %965
+  br label %1448
+
+1448:                                             ; preds = %1447, %882
+  br label %1449
+
+1449:                                             ; preds = %1448, %823
+  br label %1450
+
+1450:                                             ; preds = %1449, %764
+  br label %1451
+
+1451:                                             ; preds = %1450, %705
+  br label %1452
+
+1452:                                             ; preds = %1451, %646
+  br label %1453
+
+1453:                                             ; preds = %1452, %587
+  br label %1454
+
+1454:                                             ; preds = %1453, %528
+  br label %1455
+
+1455:                                             ; preds = %1454, %469
+  br label %1456
+
+1456:                                             ; preds = %1455, %415
+  br label %1457
+
+1457:                                             ; preds = %1456, %326
+  br label %1458
+
+1458:                                             ; preds = %1457, %304
+  br label %1459
+
+1459:                                             ; preds = %1458, %282
+  br label %1460
+
+1460:                                             ; preds = %1459, %259
+  br label %1461
+
+1461:                                             ; preds = %1460, %236
+  br label %1462
+
+1462:                                             ; preds = %1461, %214
+  br label %1463
+
+1463:                                             ; preds = %1462, %192
+  br label %1464
+
+1464:                                             ; preds = %1463, %169
+  br label %1465
+
+1465:                                             ; preds = %1464, %146
+  br label %1466
+
+1466:                                             ; preds = %1465, %123
+  br label %1467
+
+1467:                                             ; preds = %1466, %101
+  br label %1468
+
+1468:                                             ; preds = %1467, %77
+  %1469 = load i32, ptr %7, align 4
+  %1470 = icmp ne i32 %1469, 0
+  br i1 %1470, label %1471, label %1473
+
+1471:                                             ; preds = %1468
+  %1472 = load ptr, ptr %6, align 8
+  call void @freeCalcLangValue(ptr noundef %1472)
+  br label %1479
+
+1473:                                             ; preds = %1468
+  %1474 = load i32, ptr %9, align 4
+  %1475 = icmp ne i32 %1474, 0
+  br i1 %1475, label %1476, label %1478
+
+1476:                                             ; preds = %1473
+  %1477 = load ptr, ptr %8, align 8
+  call void @freeCalcLangValue(ptr noundef %1477)
+  br label %1478
+
+1478:                                             ; preds = %1476, %1473
+  br label %1479
+
+1479:                                             ; preds = %1478, %1471
+  %1480 = load ptr, ptr %10, align 8
+  store ptr %1480, ptr %5, align 8
+  br label %1481
+
+1481:                                             ; preds = %1479, %964, %414
+  %1482 = load ptr, ptr %5, align 8
+  ret ptr %1482
+}
+
 attributes #0 = { noinline nounwind optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 attributes #1 = { nounwind allocsize(0) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 attributes #2 = { cold "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
@@ -6064,3 +8156,21 @@ attributes #5 = { cold }
 !58 = distinct !{!58, !7}
 !59 = distinct !{!59, !7}
 !60 = distinct !{!60, !7}
+!61 = distinct !{!61, !7}
+!62 = distinct !{!62, !7}
+!63 = distinct !{!63, !7}
+!64 = distinct !{!64, !7}
+!65 = distinct !{!65, !7}
+!66 = distinct !{!66, !7}
+!67 = distinct !{!67, !7}
+!68 = distinct !{!68, !7}
+!69 = distinct !{!69, !7}
+!70 = distinct !{!70, !7}
+!71 = distinct !{!71, !7}
+!72 = distinct !{!72, !7}
+!73 = distinct !{!73, !7}
+!74 = distinct !{!74, !7}
+!75 = distinct !{!75, !7}
+!76 = distinct !{!76, !7}
+!77 = distinct !{!77, !7}
+!78 = distinct !{!78, !7}
