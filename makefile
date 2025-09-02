@@ -10,15 +10,18 @@ AbsIncDirH:="/home/jabauer/source/repos/CalcLangFinal/include/haskell"
 AbsInstallDir:="/home/jabauer/source/repos/CalcLangFinal/bin"
 
 
-all: clean build install
+all: clean build-haskell install-haskell
 
 test: treeprintingtest
 	./test/bin/TreePrintingTest
 
-build:
+build-haskell:
 	cabal build --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) -v3
-install:
+install-haskell:
 	cabal install --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --installdir=$(AbsInstallDir)
+
+build-lib:
+	clang -S -emit-llvm src/c/LinkToCalcLang.c -o ir/c/LinkToCalcLang.ll -I$(IncDir)
 
 treeprintingtest:
 	clang -c $(TestSrcDir)/TreePrintingTest.c -o $(TestObjDir)/TreePrintingTest.o -I$(TestIncDir) -I$(IncDir)

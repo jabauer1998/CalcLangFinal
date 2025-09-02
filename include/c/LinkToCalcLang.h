@@ -1,0 +1,61 @@
+#ifndef LINK_TO_CALC_LANG
+#define LINK_TO_CALC_LANG
+
+#define TRUE 1
+#define FALSE 0
+
+#define IS_INT 0
+#define IS_REAL 1
+#define IS_DOLLAR 3
+#define IS_PERCENT 4
+#define IS_BOOL 5
+#define IS_SET 6
+#define IS_TUPLE 7
+
+struct CalcLangVal;
+
+typedef struct{
+  int size;
+  struct CalcLangVal** list;
+} TupleValue;
+
+typedef struct{
+  int size;
+  struct CalcLangVal** list;
+} SetValue;
+
+typedef union CalcLangValData{
+  TupleValue* tuple;
+  SetValue* set;
+  int integer;
+  double real;
+  double dollar;
+  double percent;
+} CalcLangValueData;
+
+typedef struct CalcLangVal{
+  int valType;
+  CalcLangValueData valData;
+} CalcLangValue;
+
+CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
+CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
+CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
+CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
+CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
+CalcLangValue* dotProductCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
+CalcLangValue* equalsCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
+CalcLangValue* lessThenCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
+CalcLangValue* greaterThenCalcLangValue(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
+CalcLangValue* lessThenOrEqualToCalcLangValue(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* greaterThenOrEqualToCalcLangValue(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* notCalcLangValue(CalcLangValue* value);
+CalcLangValue* negateCalcLangValue(CalcLangValue* value);
+CalcLangValue* newIntValue(int input);
+CalcLangValue* newRealValue(double input);
+CalcLangValue* newDollarValue(double input);
+CalcLangValue* newPercentValue(double percent);
+CalcLangValue* newTupleValue(CalcLangValue**values, int size);
+CalcLangValue* newSetValue(CalcLangValue**values, int size);
+
+#endif
