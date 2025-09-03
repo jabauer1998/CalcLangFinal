@@ -31,6 +31,7 @@ typedef union CalcLangValData{
   double real;
   double dollar;
   double percent;
+  int bool;
 } CalcLangValueData;
 
 typedef struct CalcLangVal{
@@ -46,16 +47,17 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
 CalcLangValue* dotProductCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
 CalcLangValue* equalsCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
 CalcLangValue* lessThenCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* greaterThenCalcLangValue(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* lessThenOrEqualToCalcLangValue(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* greaterThenOrEqualToCalcLangValue(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* notCalcLangValue(CalcLangValue* value);
-CalcLangValue* negateCalcLangValue(CalcLangValue* value);
+CalcLangValue* greaterThenCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
+CalcLangValue* lessThenOrEqualToCalcLangValue(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
+CalcLangValue* greaterThenOrEqualToCalcLangValue(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
+CalcLangValue* notCalcLangValue(CalcLangValue* value, int freeRight);
+CalcLangValue* negateCalcLangValue(CalcLangValue* value, int freeRight);
 CalcLangValue* newIntValue(int input);
 CalcLangValue* newRealValue(double input);
 CalcLangValue* newDollarValue(double input);
 CalcLangValue* newPercentValue(double percent);
 CalcLangValue* newTupleValue(CalcLangValue**values, int size);
 CalcLangValue* newSetValue(CalcLangValue**values, int size);
+void printValue(CalcLangValue* calcLang);
 
 #endif
