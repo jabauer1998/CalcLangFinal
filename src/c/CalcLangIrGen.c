@@ -4,7 +4,7 @@
 #include <llvm-c/Core.h>
 #include <stdlib.h>
 
-void loadCalcLangLinkerFile(LLVMModuleRef module, LLVMContextRef ctx, LLVMBuilderRef builder){
+oid loadCalcLangLinkerFile(LLVMModuleRef module, LLVMContextRef ctx, LLVMBuilderRef builder){
     LLVMMemoryBufferRef MemBuf;
     char *Message;
     if (LLVMCreateMemoryBufferWithContentsOfFile("../ir/c/LinkToCalcLang,ll", &MemBuf, &Message)){
@@ -214,6 +214,7 @@ LLVMValueRef codeGenTupleValue(SetAst* val, LLVMBuilderRef builder, LLVMModuleRe
   LVMValueRef args[] = { vals, length };
   return LLVMBuildCall(builder, myFunc, args, 2, "");
 }
+
 
 
 
