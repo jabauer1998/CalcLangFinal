@@ -4,7 +4,7 @@
 #include <llvm-c/Core.h>
 #include <stdlib.h>
 
-oid loadCalcLangLinkerFile(LLVMModuleRef module, LLVMContextRef ctx, LLVMBuilderRef builder){
+void loadCalcLangLinkerFile(LLVMModuleRef module, LLVMContextRef ctx, LLVMBuilderRef builder){
     LLVMMemoryBufferRef MemBuf;
     char *Message;
     if (LLVMCreateMemoryBufferWithContentsOfFile("../ir/c/LinkToCalcLang,ll", &MemBuf, &Message)){
