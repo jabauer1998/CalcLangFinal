@@ -12,6 +12,13 @@ CalcLangValue* newIntValue(int myInt){
   return toRet;
 }
 
+CalcLangValue* newBoolValue(int val){
+  CalcLangValue* toBool = malloc(sizeof(CalcLangValue));
+  toBool->valType = IS_BOOL;
+  toBool->valData.bool = val;
+  return toBool;
+}
+
 CalcLangValue* newRealValue(double myReal){
   CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
   toRet->valType = IS_REAL;
@@ -31,6 +38,10 @@ CalcLangValue* newPercentValue(double myPercent){
   toRet->valType = IS_PERCENT;
   toRet->valData.dollar = myPercent;
   return toRet;
+}
+
+CalcLangValue* newSetValue(CalcLangValue* value, int size){
+  
 }
 
 CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){
