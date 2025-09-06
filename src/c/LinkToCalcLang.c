@@ -40,8 +40,24 @@ CalcLangValue* newPercentValue(double myPercent){
   return toRet;
 }
 
-CalcLangValue* newSetValue(CalcLangValue* value, int size){
-  
+CalcLangValue* newSetValue(CalcLangValue** value, int size){
+  CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
+  SetValue* set = 
+  toRet->valType = IS_SET;
+  toRet->valData.set = malloc(sizeof(SetValue));
+  toRet->valData.set->size = size;
+  toRet->valData.set->list = value;
+  return toRet;
+}
+
+CalcLangValue* newTupleValue(CalcLangValue** value, int size){
+  CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
+  SetValue* set = 
+  toRet->valType = IS_TUPLE;
+  toRet->valData.set = malloc(sizeof(TupleValue));
+  toRet->valData.set->size = size;
+  toRet->valData.set->list = value;
+  return toRet;
 }
 
 CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){

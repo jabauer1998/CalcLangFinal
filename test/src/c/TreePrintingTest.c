@@ -35,7 +35,7 @@ int makeTree(){
 
   ASSERT_STR_EQ(res, res2, "Error they do not match!!!");
 
-  return 0;
+  return 1;
 }
 
 int main(){

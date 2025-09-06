@@ -216,7 +216,35 @@ LLVMValueRef codeGenTupleValue(SetAst* val, LLVMBuilderRef builder, LLVMModuleRe
 }
 
 
+LLVMValueRef findLocalValueByName(LLVMValueRef Fn, const char* name) {
+    // Get the first basic block of the function
+    LLVMBasicBlockRef BB = LLVMGetFirstBasicBlock(Fn);
 
+    // Iterate through all basic blocks
+    while (BB) {
+        // Get the first instruction of the basic block
+        LLVMValueRef Inst = LLVMGetFirstInstruction(BB);
+
+        // Iterate through all instructions in the basic block
+        while (Inst) {
+            // Get the name of the current instruction
+            const char* instName = LLVMGetValueName(Inst);
+            if (instName && strcmp(instName, name) == 0) {
+                return Inst; // Found the value, return it
+            }
+            // Move to the next instruction
+            Inst = LLVMGetNextInstruction(Inst);
+        }
+        // Move to the next basic block
+        BB = LLVMGetNextBasicBlock(BB);
+    }
+    return NULL; // Value not found
+}
+
+
+LLVMValueRef codeGenIdentifierValue(IdentAst* ident, LLVMBuilderRef builder, LLVMModuleRef mod, LLVmContextRef ctx){
+  
+}
 
 
 LLVMValueRef codeGenExpression(AstNode* node, LLVMBuilderRef builder, LLVMModuleRef mod, LLVMContextRef ctx){
@@ -233,7 +261,11 @@ LLVMValueRef codeGenExpression(AstNode* node, LLVMBuilderRef builder, LLVMModule
   case DIVISION_OPERATION: return codeGenDivisionOperation(&(node->actualNodeData.divisionOperation), builder, mod, ctx);
   case POWER_OPERATION: return codeGenPowerOperation(&(node->actualNodeData.powerOperation), builder, mod, ctx);
   case INT_AST: return codeGenIntegerValue(&(node->actualNodeData.integer), builder, mod, ctx);
-  case 
+  case REAL_AST: return codeGenRealValue(&(node->actualNodeData.real), builder, mod, ctx);
+  case BOOL_AST: return codeGenBooleanValue(&(node->actualNodeData.bool), builder, mod, ctx);
+  case SET_AST: return codeGenSetValue(&(node->actualNodeData.set), builder, mod, ctx);
+  case TUPLE_AST: return codeGenTupleValue(&(node->actualNodeData.tuple), builder, mod, ctx);
+  case IDENT_AST: return codeGenIdentifierValue(&(node->actualNodeData.identifier), builder, mod, ctx);
   }
 }
 

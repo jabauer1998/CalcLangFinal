@@ -12,9 +12,6 @@ AbsInstallDir:="/home/jabauer/source/repos/CalcLangFinal/bin"
 
 all: clean build-haskell install-haskell
 
-test: treeprintingtest
-	./test/bin/TreePrintingTest
-
 build-haskell:
 	cabal build --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) -v3
 install-haskell:
@@ -23,12 +20,18 @@ install-haskell:
 build-lib:
 	clang -S -emit-llvm src/c/LinkToCalcLang.c -o ir/c/LinkToCalcLang.ll -I$(IncDir)
 
-treeprintingtest:
+tree-printing-test:
 	clang -c $(TestSrcDir)/TreePrintingTest.c -o $(TestObjDir)/TreePrintingTest.o -I$(TestIncDir) -I$(IncDir)
 	clang -c $(SrcDir)/CalcLangAstC.c -o $(ObjDir)/CalcLangAstC.o -I$(IncDir)
 	clang -o $(TestBinDir)/TreePrintingTest $(TestObjDir)/TreePrintingTest.o $(ObjDir)/CalcLangAstC.o -I$(IncDir)
+var-def-list-test:
+	clang -c $(TestSrcDir)/VarDefLinkedListTest.c -o $(TestObjDir)/VarDefLinkedListTest.o -I$(TestIncDir) -I$(IncDir)
+	clang -c $(SrcDir)/VarDefLinkedList.c -o $(ObjDir)/VarDefLinkedList.o -I$(IncDir)
+	clang -o $(TestBinDir)/VarDefLinkedListTest $(TestObjDir)/VarDefLinkedListTest.o $(ObjDir)/VarDefLinkedList.o -I$(IncDir)
 
-
+test: tree-printing-test var-def-list-test
+	$(TestBinDir)/TreePrintingTest
+	$(TestBinDir)/VarDefLinkedListTest
 
 clean:
 	cabal clean

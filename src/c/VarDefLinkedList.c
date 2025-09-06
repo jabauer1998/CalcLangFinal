@@ -10,7 +10,6 @@ VarDefList createVarDefList(){
 
 void freeVarDefData(VarDefNode* node){
   free(node->name);
-  free(node->type);
   free(node->ref);
   free(node);
 }
@@ -52,8 +51,6 @@ LLVMValueRef getVarDef(VarDefList* l, char* name){
 void varDefDataToStr(VarDefNode* d, int size, char* str){
   strncat(str, "{Name: ", size);
   strncat(str, d->name, size);
-  strncat(str, ", Type: ", size);
-  typeInfoToStr(d->type, size, str);
   strncat(str, "}", size);
 }
 
