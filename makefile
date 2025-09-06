@@ -8,6 +8,7 @@ TestBinDir:=./test/bin
 AbsIncDirC:="/home/jabauer/source/repos/CalcLangFinal/include/c"
 AbsIncDirH:="/home/jabauer/source/repos/CalcLangFinal/include/haskell"
 AbsInstallDir:="/home/jabauer/source/repos/CalcLangFinal/bin"
+LLVMLib:="/usr/lib/llvm-18/lib"
 
 
 all: clean build-haskell install-haskell
@@ -27,7 +28,7 @@ tree-printing-test:
 var-def-list-test:
 	clang -c $(TestSrcDir)/VarDefLinkedListTest.c -o $(TestObjDir)/VarDefLinkedListTest.o -I$(TestIncDir) -I$(IncDir)
 	clang -c $(SrcDir)/VarDefLinkedList.c -o $(ObjDir)/VarDefLinkedList.o -I$(IncDir)
-	clang -o $(TestBinDir)/VarDefLinkedListTest $(TestObjDir)/VarDefLinkedListTest.o $(ObjDir)/VarDefLinkedList.o -I$(IncDir)
+	clang -o $(TestBinDir)/VarDefLinkedListTest $(TestObjDir)/VarDefLinkedListTest.o $(ObjDir)/VarDefLinkedList.o -L$(LLVMLib) -lLLVM $(llvm-config --cflags --ldflags --libs core) -I$(IncDir)
 
 test: tree-printing-test var-def-list-test
 	$(TestBinDir)/TreePrintingTest
