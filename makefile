@@ -28,7 +28,7 @@ tree-printing-test:
 var-def-list-test:
 	clang -c $(TestSrcDir)/VarDefLinkedListTest.c -o $(TestObjDir)/VarDefLinkedListTest.o -I$(TestIncDir) -I$(IncDir)
 	clang -c $(SrcDir)/VarDefLinkedList.c -o $(ObjDir)/VarDefLinkedList.o -I$(IncDir)
-	clang -o $(TestBinDir)/VarDefLinkedListTest $(TestObjDir)/VarDefLinkedListTest.o $(ObjDir)/VarDefLinkedList.o -L$(LLVMLib) -lLLVM $(llvm-config --cflags --ldflags --libs core) -I$(IncDir)
+	clang -o $(TestBinDir)/VarDefLinkedListTest $(TestObjDir)/VarDefLinkedListTest.o $(ObjDir)/VarDefLinkedList.o -L$(LLVMLib) -lLLVM -I$(IncDir)
 
 test: tree-printing-test var-def-list-test
 	$(TestBinDir)/TreePrintingTest

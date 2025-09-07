@@ -15,7 +15,7 @@ ScopeStack createVarTable();
 void pushScope(ScopeStack* stack);
 void popScope(ScopeStack* stack);
 void freeScope(VarScope* stack);
-void addElemToVarTable(ScopeStack* stack, VarDefNode* node);
+void addElemToVarTable(ScopeStack* stack, char* name, LLVMValueRef ref);
 LLVMValueRef getElemFromVarTable(ScopeStack* stack, char* name);
 LLVMValueRef getElemFromVarScope(ScopeStack* stack, char* name);
 char* varTableToString(ScopeStack stack);

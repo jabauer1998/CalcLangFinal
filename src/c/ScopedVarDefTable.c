@@ -38,8 +38,8 @@ void freeScope(VarScope* stack){
   free(stack);
 }
 
-void addElemToVarTable(ScopeStack* stack, VarDefNode* node){
-  addVarDef(&((*stack)->list), node);
+void addElemToVarTable(ScopeStack* stack, char* name, LLVMValueRef ref){
+  addVarDef(&((*stack)->list), name, ref);
 }
 
 LLVMValueRef getElemFromVarTable(ScopeStack* stack, char* name){

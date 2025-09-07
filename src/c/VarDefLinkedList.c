@@ -10,7 +10,6 @@ VarDefList createVarDefList(){
 
 void freeVarDefData(VarDefNode* node){
   free(node->name);
-  free(node->ref);
   free(node);
 }
 
@@ -24,7 +23,12 @@ void freeVarDefList(VarDefList l){
   }
 }
 
-void addVarDef(VarDefList* l, VarDefNode* node){
+void addVarDef(VarDefList* l, char* name, LLVMValueRef ref){
+  VarDefNode* node = malloc(sizeof(VarDefNode));
+  int len = strlen(name);
+  node->name = malloc(sizeof(char) * (len + 1));
+  memcpy(node->name, name, len + 1);
+  node->ref = ref;
   if((*l) == NULL){
     (*l) = malloc(sizeof(VarDefListElem));
     (*l)->data = node;
@@ -38,9 +42,9 @@ void addVarDef(VarDefList* l, VarDefNode* node){
   }
 }
 
-LLVMValueRef getVarDef(VarDefList* l, char* name){
+LLVMValueRef getVarDef(VarDefList l, char* name){
   VarDefListElem* elem = NULL;
-  for(elem = (*l); elem != NULL; elem=elem->next){
+  for(elem = l; elem != NULL; elem=elem->next){
     if(elem->data != NULL && strcmp(elem->data->name, name) == 0){
       return elem->data->ref;
     }
@@ -60,7 +64,7 @@ void varDefListToStr(VarDefListElem* listNode, int size, char* str){
     strncat(str, "->", size);
     varDefListToStr(listNode->next, size, str);
   } else {
-    strncat(str, "->NULL", size);
+    strncat(str, "NULL", size);
   }
 }
 
