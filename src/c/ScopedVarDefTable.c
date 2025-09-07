@@ -6,6 +6,11 @@ ScopeStack createVarTable(){
   return NULL;
 }
 
+void freeScope(VarScope* stack){
+  freeVarDefList(stack->list);
+  free(stack);
+}
+
 void pushScope(ScopeStack* stack){
   if(*stack == NULL){
     *stack = malloc(sizeof(VarScope));
@@ -33,26 +38,30 @@ void popScope(ScopeStack* stack){
   }
 }
 
-void freeScope(VarScope* stack){
-  freeVarDefList(stack->list);
-  free(stack);
+void freeVarTable(ScopeStack stack){
+  if(stack != NULL && stack->next != NULL){
+    freeVarTable(stack->next);
+  }
+  if(stack != NULL){
+    freeScope(stack);
+  }
 }
 
 void addElemToVarTable(ScopeStack* stack, char* name, LLVMValueRef ref){
   addVarDef(&((*stack)->list), name, ref);
 }
 
-LLVMValueRef getElemFromVarTable(ScopeStack* stack, char* name){
-  for(VarScope* iterator = *stack; iterator != NULL; iterator = iterator->next){
-    LLVMValueRef ref = getVarDef(&(iterator->list), name);
+LLVMValueRef getElemFromVarTable(ScopeStack stack, char* name){
+  for(VarScope* iterator = stack; iterator != NULL; iterator = iterator->next){
+    LLVMValueRef ref = getVarDef(iterator->list, name);
     if(ref != NULL)
       return ref;
   }
   return NULL;
 }
 
-LLVMValueRef getElemFromVarScope(ScopeStack* stack, char* name){
-  return getVarDef(&((*stack)->list), name);
+LLVMValueRef getElemFromVarScope(ScopeStack stack, char* name){
+  return getVarDef(stack->list, name);
 }
 
 void varTableToStr(VarScope* scope, int size, char* str){

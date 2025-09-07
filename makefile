@@ -29,10 +29,16 @@ var-def-list-test:
 	clang -c $(TestSrcDir)/VarDefLinkedListTest.c -o $(TestObjDir)/VarDefLinkedListTest.o -I$(TestIncDir) -I$(IncDir)
 	clang -c $(SrcDir)/VarDefLinkedList.c -o $(ObjDir)/VarDefLinkedList.o -I$(IncDir)
 	clang -o $(TestBinDir)/VarDefLinkedListTest $(TestObjDir)/VarDefLinkedListTest.o $(ObjDir)/VarDefLinkedList.o -L$(LLVMLib) -lLLVM -I$(IncDir)
+scoped-var-stack-test:
+	clang -c $(SrcDir)/VarDefLinkedList.c -o $(ObjDir)/VarDefLinkedList.o -I$(IncDir)
+	clang -c $(SrcDir)/ScopedVarDefTable.c -o $(ObjDir)/ScopedVarDefTable.o -I$(IncDir)
+	clang -c $(TestSrcDir)/ScopedVarDefTableTest.c -o $(TestObjDir)/ScopedVarDefTableTest.o -I$(TestIncDir) -I$(IncDir)
+	clang -o $(TestBinDir)/ScopedVarDefTableTest $(TestObjDir)/ScopedVarDefTableTest.o $(ObjDir)/ScopedVarDefTable.o $(ObjDir)/VarDefLinkedList.o -L$(LLVMLib) -lLLVM
 
-test: tree-printing-test var-def-list-test
+test: tree-printing-test var-def-list-test scoped-var-stack-test
 	$(TestBinDir)/TreePrintingTest
 	$(TestBinDir)/VarDefLinkedListTest
+	$(TestBinDir)/ScopedVarDefTableTest
 
 clean:
 	cabal clean

@@ -3,6 +3,7 @@
 
 #include "CalcLangAstC.h"
 #include "VarDefLinkedList.h"
+#include <llvm-c/Core.h>
 
 typedef struct VScope{
   VarDefList list;
@@ -14,10 +15,10 @@ typedef VarScope* ScopeStack;
 ScopeStack createVarTable();
 void pushScope(ScopeStack* stack);
 void popScope(ScopeStack* stack);
-void freeScope(VarScope* stack);
+void freeVarTable(ScopeStack stack);
 void addElemToVarTable(ScopeStack* stack, char* name, LLVMValueRef ref);
-LLVMValueRef getElemFromVarTable(ScopeStack* stack, char* name);
-LLVMValueRef getElemFromVarScope(ScopeStack* stack, char* name);
+LLVMValueRef getElemFromVarTable(ScopeStack stack, char* name);
+LLVMValueRef getElemFromVarScope(ScopeStack stack, char* name);
 char* varTableToString(ScopeStack stack);
 
 #endif
