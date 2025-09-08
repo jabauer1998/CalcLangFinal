@@ -35,7 +35,7 @@ void storeArrayToStr(StoreArray* arrayWithLength, int size, char* str){
 
 char* astToString(AstNode* node){
   int size = 500;
-  char* str = (char*)malloc(size);
+  char* str = calloc(size, 1);
   str[0] = '\0';
   astToStr(node, size, str);
   return str;

@@ -1,13 +1,15 @@
 #include "ScopedVarDefTable.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 ScopeStack createVarTable(){
   return NULL;
 }
 
 void freeScope(VarScope* stack){
-  freeVarDefList(stack->list);
+  if(stack->list != NULL)
+    freeVarDefList(stack->list);
   free(stack);
 }
 
@@ -25,16 +27,10 @@ void pushScope(ScopeStack* stack){
 }
 
 void popScope(ScopeStack* stack){
-  if(*stack != NULL){
-    if((*stack)->next != NULL){
-      VarScope* scopeToDelete = (*stack)->next;
-      (*stack) = (*stack)->next;
-      freeScope(scopeToDelete);
-    } else {
-      freeVarDefList((*stack)->list);
-      (*stack)->list = NULL;
-      (*stack)->next = NULL;
-    }
+  if((*stack) != NULL){
+    VarScope* scopeToDelete = *stack;
+    (*stack) = (*stack)->next;
+    freeScope(scopeToDelete);
   }
 }
 
@@ -65,19 +61,18 @@ LLVMValueRef getElemFromVarScope(ScopeStack stack, char* name){
 }
 
 void varTableToStr(VarScope* scope, int size, char* str){
-  if(scope == NULL){
-    strncat(str, "NULL", size);
-  } else {
-    strncat(str, "List: ", size);
-    varDefListToStr(scope->list, size, str);
-    strncat(str, "\n|\nV\n", size);
-    varTableToStr(scope->next, size, str);
+  for(VarScope* myScope = scope; myScope != NULL; myScope=myScope->next){
+      strncat(str, "List: ", size);
+      varDefListToStr(myScope->list, size, str);
+      strncat(str, "\n|\nV\n", size);
   }
+  strncat(str, "NULL", size);
 }
 
 char* varTableToString(ScopeStack stack){
   int size = 10000;
   char* table = malloc(size);
+  table[0] = '\0';
   varTableToStr(stack, size, table);
   return table;
 }
