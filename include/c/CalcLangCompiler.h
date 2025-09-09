@@ -3,6 +3,7 @@
 
 #include "CalcLangAstC.h"
 
-void processAst(AstNode* node);
+void processAST(AstNode* node);
+void processASTList(StoreArray* arr);
 
 #endif

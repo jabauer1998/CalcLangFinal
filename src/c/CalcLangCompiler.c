@@ -14,3 +14,12 @@ void processAST (AstNode* node){
   #endif
   freeTree(node);
 }
+
+void processASTList (StoreArray* storeArray){
+  for(int i = 0; i < storeArray->length; i++){
+    char* str = astToString(storeArray->firstElem[i]);
+    printf("%s\n", str);
+    free(str);
+  }
+  freeStoreArray(storeArray);
+}

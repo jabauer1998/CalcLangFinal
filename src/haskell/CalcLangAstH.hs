@@ -84,6 +84,7 @@ data Token = Ident Char SourcePos
            | Dol String SourcePos
            | Perc String SourcePos
            | Dot SourcePos
+           | NewLine SourcePos
            deriving (Show, Eq)
 
 --Below are all the regular AstNodes

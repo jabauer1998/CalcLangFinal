@@ -1,4 +1,4 @@
-module CalcLangMarshall (marshallAstNode) where
+module CalcLangMarshall (marshallAstNode, marshallStorageArray) where
 
 import CalcLangAstH
 import Foreign.Ptr

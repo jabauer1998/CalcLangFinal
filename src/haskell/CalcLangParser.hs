@@ -1,4 +1,4 @@
-module CalcLangParser(runCalcLangLexer, runCalcLangParser, runCalcLangParserC) where
+module CalcLangParser(runCalcLangLexer, runCalcLangParser, runCalcLangParserC, runCalcLangProgramParserC) where
 
 import Text.Parsec
 import Text.Parsec.String
@@ -17,6 +17,20 @@ type CalcLangLexer a = ParsecT String () IO a
 
 parseLexeme :: (CalcLangLexer a) -> (CalcLangLexer a)
 parseLexeme a = a <* spaces
+
+parseWindowsNewLine :: CalcLangLexer Token
+parseWindowsNewLine = do
+                      start <- getPosition
+                      (char '\r') >> (char '\n') >> return (NewLine start)
+
+parseLinuxNewLine :: CalcLangLexer Token
+parseLinuxNewLine = do
+                    start <- getPosition
+                    (char '\n') >> return (NewLine start)
+                      
+
+parseNewLine :: CalcLangLexer Token
+parseNewLine = (try parseWindowsNewLine) <|> parseLinuxNewLine
 
 parseIdent :: CalcLangLexer Token
 parseIdent = do
@@ -180,7 +194,7 @@ parsePerc = do
             
 
 parseToken :: CalcLangLexer Token
-parseToken = try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent
+parseToken = try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent <|> try parseNewLine
 
 parseTokens :: CalcLangLexer [Token]
 parseTokens = spaces *> many parseToken
@@ -444,6 +458,11 @@ parseMacroAssignment = do
 parseAstNode :: CalcLangParser AstNode
 parseAstNode = spaces *> (try parseFunctionDefinition <|> try parseMacroAssignment <|> try parseExpression)
 
+parseAstNodeLines :: CalcLangParser SA
+parseAstNodeLines = do
+                    x <- (sepBy parseAstNode parseNewLine)
+                    return (StoreArray (length x) (reverse x))
+
 runCalcLangParser :: String -> IO AstNode
 runCalcLangParser i = do
                       parseResult <- (runParserT parseAstNode () "" i)
@@ -465,6 +484,22 @@ runCalcLangParserC i = do
                                      poke ptr c
                                      return ptr
                          Right t -> marshallAstNode t
+
+readMyFile :: FilePath -> IO String
+readMyFile filePath = readFile filePath
+
+
+runCalcLangProgramParserC :: CString -> IO (Ptr CSA)
+runCalcLangProgramParserC cPath = do
+                                  path <- peekCString cPath
+                                  contents <- readMyFile path
+                                  parseResult <- (runParserT parseAstNodeLines () path contents)
+                                  case parseResult of
+                                    Left err -> do
+                                                print err
+                                                let sA = StoreArray 1 [ErrorNode (show err)]
+                                                marshallStorageArray sA
+                                    Right t -> marshallStorageArray t
                 
 
 runCalcLangLexer :: String -> IO [Token]
