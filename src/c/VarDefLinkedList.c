@@ -3,13 +3,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "StringUtils.h"
 
 VarDefList createVarDefList(){
   return NULL;
 }
 
 void freeVarDefData(VarDefNode* node){
-  free(node->name);
   free(node);
 }
 
@@ -23,11 +23,9 @@ void freeVarDefList(VarDefList l){
   }
 }
 
-void addVarDef(VarDefList* l, char* name, LLVMValueRef ref){
+void addVarDef(VarDefList* l, char name, LLVMValueRef ref){
   VarDefNode* node = malloc(sizeof(VarDefNode));
-  int len = strlen(name);
-  node->name = malloc(sizeof(char) * (len + 1));
-  memcpy(node->name, name, len + 1);
+  node->name = name;
   node->ref = ref;
   if((*l) == NULL){
     (*l) = malloc(sizeof(VarDefListElem));
@@ -42,10 +40,10 @@ void addVarDef(VarDefList* l, char* name, LLVMValueRef ref){
   }
 }
 
-LLVMValueRef getVarDef(VarDefList l, char* name){
+LLVMValueRef getVarDef(VarDefList l, char name){
   VarDefListElem* elem = NULL;
   for(elem = l; elem != NULL; elem=elem->next){
-    if(elem->data != NULL && strcmp(elem->data->name, name) == 0){
+    if(elem->data != NULL && (elem->data->name == name)){
       return elem->data->ref;
     }
   }
@@ -54,7 +52,7 @@ LLVMValueRef getVarDef(VarDefList l, char* name){
 
 void varDefDataToStr(VarDefNode* d, int size, char* str){
   strncat(str, "{Name: ", size);
-  strncat(str, d->name, size);
+  appendStrChr(d->name, size, str);
   strncat(str, "}", size);
 }
 

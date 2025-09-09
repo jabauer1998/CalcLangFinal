@@ -43,11 +43,11 @@ void freeVarTable(ScopeStack stack){
   }
 }
 
-void addElemToVarTable(ScopeStack* stack, char* name, LLVMValueRef ref){
+void addElemToVarTable(ScopeStack* stack, char name, LLVMValueRef ref){
   addVarDef(&((*stack)->list), name, ref);
 }
 
-LLVMValueRef getElemFromVarTable(ScopeStack stack, char* name){
+LLVMValueRef getElemFromVarTable(ScopeStack stack, char name){
   for(VarScope* iterator = stack; iterator != NULL; iterator = iterator->next){
     LLVMValueRef ref = getVarDef(iterator->list, name);
     if(ref != NULL)
@@ -56,7 +56,7 @@ LLVMValueRef getElemFromVarTable(ScopeStack stack, char* name){
   return NULL;
 }
 
-LLVMValueRef getElemFromVarScope(ScopeStack stack, char* name){
+LLVMValueRef getElemFromVarScope(ScopeStack stack, char name){
   return getVarDef(stack->list, name);
 }
 

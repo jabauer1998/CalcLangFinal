@@ -4,7 +4,7 @@
 #include <llvm-c/Core.h>
 
 typedef struct{
-  char* name;
+  char name;
   LLVMValueRef ref;
 }VarDefNode;
 
@@ -17,8 +17,8 @@ typedef VarDefListElem* VarDefList;
 
 VarDefList createVarDefList();
 void freeVarDefList(VarDefList l);
-void addVarDef(VarDefList* l, char* name, LLVMValueRef ref);
-LLVMValueRef getVarDef(VarDefList l, char* name);
+void addVarDef(VarDefList* l, char name, LLVMValueRef ref);
+LLVMValueRef getVarDef(VarDefList l, char name);
 char* varDefListToString(VarDefList l);
 void varDefListToStr(VarDefListElem* elem, int size, char* str);
 

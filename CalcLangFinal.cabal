@@ -65,12 +65,14 @@ executable CCalcLang
                       CalcLangCompiler.h,
                       VarDefLinkedList.h,
                       ScopedVarDefTable.h,
-                      CalcLangIrGen.h
+                      CalcLangIrGen.h,
+                      StringUtils.h
     includes: CalcLangAstC.h,
               CalcLangCompiler.h,
               VarDefLinkedList.h,
               ScopedVarDefTable.h,
-              CalcLangIrGen.h
+              CalcLangIrGen.h,
+              StringUtils.h
 
     build-depends:    base ^>=4.18.3.0,
                       parsec >= 3.1.11 && < 4,
@@ -80,7 +82,8 @@ executable CCalcLang
                    CalcLangMarshall,
                    CalcLangParser
                   
-    c-sources:     src/c/CalcLangAstC.c,
+    c-sources:     src/c/StringUtils.c,
+                   src/c/CalcLangAstC.c,
                    src/c/CalcLangCompiler.c,
                    src/c/VarDefLinkedList.c,
                    src/c/ScopedVarDefTable.c,

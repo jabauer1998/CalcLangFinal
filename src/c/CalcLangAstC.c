@@ -2,17 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-//Function to append a Character to the givin string
-void appendStrChr(char a, int size, char* str){
-  int actualLength = strlen(str);
-  if(actualLength < (size - 1)){
-    // Append the character
-    str[actualLength] = a;
-    // Add the new null terminator
-    str[actualLength + 1] = '\0';
-  }
-}
+#include "StringUtils.h"
 
 //Function to Convert a StoreArray instance into a String
 void storeArrayToStr(StoreArray* arrayWithLength, int size, char* str){
