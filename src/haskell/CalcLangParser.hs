@@ -3,7 +3,6 @@ module CalcLangParser(runCalcLangLexer, runCalcLangParser, runCalcLangParserC, r
 import Text.Parsec
 import Text.Parsec.String
 import Text.Parsec.Char
-import Data.Text (Text)
 import System.IO
 import Numeric
 import CalcLangAstH
@@ -12,11 +11,36 @@ import Foreign.C.String
 import Foreign.Ptr
 import Foreign.Marshal.Alloc
 import Foreign.Storable
+import Prelude
+import Data.List
 
 type CalcLangLexer a = ParsecT String () IO a
 
 parseLexeme :: (CalcLangLexer a) -> (CalcLangLexer a)
 parseLexeme a = a <* spaces
+
+parseNameComponent :: CalcLangLexer String
+parseNameComponent = many1 (alphaNum <|> char '-' <|> char '_' <|> char '.')
+
+parseSeparator :: CalcLangLexer Char
+parseSeparator = (try (char '/')) <|> (char '\\')
+
+parseAbsolutePath :: CalcLangLexer Token
+parseAbsolutePath = do
+                    start <- getPosition
+                    _ <- parseSeparator
+                    components <- sepBy1 parseNameComponent parseSeparator
+                    return (DestPath (intercalate "/" components) start)
+
+parseRelativePath :: CalcLangLexer Token
+parseRelativePath = do
+                    start <- getPosition
+                    res <- sepBy1 parseNameComponent parseSeparator
+                    return (DestPath (intercalate "/" res) start)
+                    
+
+parsePath :: CalcLangLexer Token
+parsePath = try parseAbsolutePath <|> parseRelativePath
 
 parseWindowsNewLine :: CalcLangLexer Token
 parseWindowsNewLine = do
@@ -190,11 +214,44 @@ parsePerc = do
             delse <- (many1 digit)
             _ <- parseLexeme (char '%')
             return (Perc (d ++ [p] ++ delse) startPosition)
-            
-            
+
+parseShow :: CalcLangLexer Token
+parseShow = do
+            startPosition <- getPosition
+            (parseLexeme (string "show")) >> return (ShowCmd startPosition)
+
+parseFunctions :: CalcLangLexer Token
+parseFunctions = do
+                 startPosition <- getPosition
+                 (parseLexeme (string "functions")) >> return (FunctionsCmd startPosition)
+
+parseVariables :: CalcLangLexer Token
+parseVariables = do
+                 startPosition <- getPosition
+                 (parseLexeme (string "variables")) >> return (VariablesCmd startPosition)
+
+parseQuit :: CalcLangLexer Token
+parseQuit = do
+            startPosition <- getPosition
+            (parseLexeme (string "quit")) >> return (QuitCmd startPosition)
+
+parseCreate :: CalcLangLexer Token
+parseCreate = do
+              startPosition <- getPosition
+              (parseLexeme (string "create")) >> return (CreateCmd startPosition)
+
+parseLesson :: CalcLangLexer Token
+parseLesson = do
+              startPosition <- getPosition
+              (parseLexeme (string "lesson")) >> return (LessonCmd startPosition)
+
+parsePlan :: CalcLangLexer Token
+parsePlan = do
+            startPosition <- getPosition
+            (parseLexeme (string "plan")) >> return (PlanCmd startPosition)
 
 parseToken :: CalcLangLexer Token
-parseToken = try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent <|> try parseNewLine
+parseToken = try parsePath <|> try parseShow <|> try parseVariables <|> try parseFunctions <|> try parseQuit <|> try parseCreate <|> try parseLesson <|> try parsePlan <|> try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent <|> try parseNewLine
 
 parseTokens :: CalcLangLexer [Token]
 parseTokens = spaces *> many parseToken
@@ -455,8 +512,43 @@ parseMacroAssignment = do
                          _ -> return (ErrorNode "identifier didnt parse correctly")
                             
 
+parseShowFunctionsCommand :: CalcLangParser AstNode
+parseShowFunctionsCommand = do
+                            start <- getPosition
+                            _ <- parseShow
+                            _ <- parseFunctions
+                            return (ShowFunctionsCommand start)
+
+parseShowVariablesCommand :: CalcLangParser AstNode
+parseShowVariablesCommand = do
+                            start <- getPosition
+                            _ <- parseShow
+                            _ <- parseVariables
+                            return (ShowVariablesCommand start)
+
+parseQuitCommand :: CalcLangParser AstNode
+parseQuitCommand = do
+                   start <- getPosition
+                   _ <- parseQuit
+                   return (QuitCommand start)
+
+parseLessonPlanCommand :: CalcLangParser AstNode
+parseLessonPlanCommand = do
+                         start <- getPosition
+                         _ <- parseCreate
+                         _ <- parseLesson
+                         _ <- parsePlan
+                         str <- parsePath
+                         case str of
+                           DestPath a _ -> return (CreateLessonPlanCommand start a)
+                           _ -> return (ErrorNode "path not found")
+
+parseCommand :: CalcLangParser AstNode
+parseCommand = try parseShowFunctionsCommand <|> try parseShowVariablesCommand <|> try parseQuitCommand <|> try parseLessonPlanCommand
+
+  
 parseAstNode :: CalcLangParser AstNode
-parseAstNode = spaces *> (try parseFunctionDefinition <|> try parseMacroAssignment <|> try parseExpression)
+parseAstNode = spaces *> (try parseCommand <|> try parseFunctionDefinition <|> try parseMacroAssignment <|> try parseExpression)
 
 parseAstNodeLines :: CalcLangParser SA
 parseAstNodeLines = do

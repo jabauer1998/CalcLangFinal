@@ -85,6 +85,14 @@ data Token = Ident Char SourcePos
            | Perc String SourcePos
            | Dot SourcePos
            | NewLine SourcePos
+           | ShowCmd SourcePos
+           | FunctionsCmd SourcePos
+           | VariablesCmd SourcePos
+           | QuitCmd SourcePos
+           | CreateCmd SourcePos
+           | LessonCmd SourcePos
+           | PlanCmd SourcePos
+           | DestPath String SourcePos
            deriving (Show, Eq)
 
 --Below are all the regular AstNodes
@@ -135,6 +143,10 @@ data AstNode = EqualOperation SourcePos AstNode AstNode
              | Assign SourcePos Char AstNode
              | IfExpr SourcePos AstNode AstNode AstNode
              | ParenExpr SourcePos AstNode
+             | ShowFunctionsCommand SourcePos
+             | ShowVariablesCommand SourcePos
+             | QuitCommand SourcePos
+             | CreateLessonPlanCommand SourcePos String
              | ErrorNode String
              deriving (Eq, Show)
 
