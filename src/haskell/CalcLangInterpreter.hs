@@ -14,6 +14,8 @@ data CalcLangValue = BoolVal Bool
                    | SetVal [CalcLangValue]
                    | DollarVal Double
                    | PercentVal Double
+                   | PrintVal String
+                   | QuitVal
                    | ErrorVal [String]
                    deriving (Show, Eq)
 
@@ -27,6 +29,45 @@ addScopeToEnv a = case a of
                       Environment [] -> Environment [SymbolTable []]
                       Environment [b] -> Environment [SymbolTable [], b]
                       Environment (b:c) -> Environment ([SymbolTable []] ++ [b] ++ c)
+envToStrings :: Env -> [String]
+envToStrings e = case e of
+                   Environment a -> do
+                                    let res = (map varTableToStrings a)
+                                    (concat res)
+                                    
+
+funcTableToStrings :: FunctionTable -> [String]
+funcTableToStrings table = case table of
+                              SymbolTable a -> map (\(b,c) -> case c of
+                                                                (list, node) -> "func " ++ [b] ++ "(" ++ (intercalate ", " (map toString list)) ++ ") = " ++ (toString node)) a
+
+varTableToStrings :: VariableTable -> [String]
+varTableToStrings table = case table of
+                              SymbolTable a -> map (\(b,c) -> "let " ++ [b] ++ " = " ++ (toStr c)) a
+
+funcTableToString :: FunctionTable -> String
+funcTableToString table = do
+                            let x = (funcTableToStrings table)
+                            let longest = (foldl (\b a -> if ((length a) > b) then length a else b) 0 x)
+                            let trans = map (\s -> s ++ (replicate (longest - (length s)) ' ')) x
+                            foldl (\myElem list -> "| " ++ myElem ++ " |" ++ "\n" ++ list) "" trans
+
+envToString :: Env -> String
+envToString table = do
+                    let x = (envToStrings table)
+                    let longest = (foldl (\b a -> if ((length a) > b) then length a else b) 0 x)
+                    let trans = map (\s -> s ++ (replicate (longest - (length s)) ' ')) x
+                    foldl (\myElem myList -> "| " ++ myElem ++ " |" ++ "\n" ++ myList) "" trans
+
+varTableToString :: VariableTable -> String
+varTableToString table = do
+                         let x = (varTableToStrings table)
+                         let longest = (foldl (\b a -> if ((length a) > b) then length a else b) 0 x)
+                         let trans = map (\s -> s ++ (replicate (longest - (length s)) ' ')) x
+                         foldl (\myElem myList -> "| " ++ myElem ++ " |" ++ "\n" ++ myList) "" trans 
+                            
+                            
+
 
 removeScopeFromEnv :: Env -> Env
 removeScopeFromEnv a = case a of
@@ -46,6 +87,7 @@ addEntryToEnv e t = case e of
 addEntryToTable :: STable a b -> (a, b) -> STable a b
 addEntryToTable table entry = case table of
                                 SymbolTable x -> SymbolTable (entry : x)
+
 
 getEntryFromEnv :: Env -> Char -> Maybe CalcLangValue
 getEntryFromEnv e c = case e of
@@ -86,6 +128,7 @@ toStr aval = case aval of
                    DollarVal val -> "$" ++ (showFFloat (Just 2) val "")
                    PercentVal val -> (showFFloat (Just 2) (val*100.0) "") ++ "%"
                    BoolVal val -> if val then "TRUE" else "FALSE"
+                   PrintVal val -> val
                    ErrorVal val -> "<<<~~~ERROR~~~>>>\n\n" ++ (toErrorLog val)
                    _ -> ""
 
@@ -139,7 +182,10 @@ interpret node vT fT = case node of
                                                    StoreArray _ ad -> (VoidVal, vT, (addEntryToTable fT (s, (ad, e)))) 
                           Assign _ s e -> (VoidVal, (addEntryToEnv vT (s, (gV (interpret e vT fT)))),  fT)
                           IfExpr _ cond ifTrue ifFalse -> if (asBool (gV (interpret cond vT fT))) then (interpret ifTrue vT fT) else (interpret ifFalse vT fT)
-                          ParenExpr _ expr -> interpret expr vT fT 
+                          ParenExpr _ expr -> interpret expr vT fT
+                          ShowFunctionsCommand _ -> (PrintVal (funcTableToString fT), vT, fT)
+                          ShowVariablesCommand _ -> (PrintVal (envToString vT), vT, fT)
+                          QuitCommand _ -> (QuitVal, vT, fT)
                           ErrorNode s -> (ErrorVal ["Error at" ++ (show s)], vT, fT)
 
 gV :: (CalcLangValue, Env, FunctionTable) -> CalcLangValue
@@ -410,6 +456,7 @@ runCommandLine vT fT = do
                               let interpreterResult = (interpret t vT fT)
                               case interpreterResult of
                                     (VoidVal, x, y) -> runCommandLine x y
+                                    (QuitVal, _, _) -> return ()
                                     (a, x, y) -> do
                                                  putStrLn (toStr a)
                                                  runCommandLine x y

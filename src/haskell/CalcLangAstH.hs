@@ -157,7 +157,7 @@ toString myA = case myA of
                GreaterThenOrEqualsOperation _ a1 a2 -> (toString a1) ++ "> = " ++ (toString a2)
                LessThenOperation _ a1 a2 -> (toString a1) ++ " < " ++ (toString a2)
                GreaterThenOperation _ a1 a2 -> (toString a1) ++ " > " ++ (toString a2)
-               AdditionOperation _ a1 a2 -> (toString a1) ++ " > " ++ (toString a2)
+               AdditionOperation _ a1 a2 -> (toString a1) ++ " + " ++ (toString a2)
                SubtractionOperation _ a1 a2 -> (toString a1) ++ " - " ++ (toString a2)
                MultiplicationOperation _ a1 a2 -> (toString a1) ++ " * " ++ (toString a2)
                DotProductOperation _ a1 a2 -> (toString a1) ++ " . " ++ (toString a2)
