@@ -92,7 +92,7 @@ data Token = Ident Char SourcePos
            | CreateCmd SourcePos
            | LessonCmd SourcePos
            | PlanCmd SourcePos
-           | DestPath String SourcePos
+           | HistoryCmd SourcePos
            deriving (Show, Eq)
 
 --Below are all the regular AstNodes
@@ -145,8 +145,9 @@ data AstNode = EqualOperation SourcePos AstNode AstNode
              | ParenExpr SourcePos AstNode
              | ShowFunctionsCommand SourcePos
              | ShowVariablesCommand SourcePos
+             | ShowHistoryCommand SourcePos
              | QuitCommand SourcePos
-             | CreateLessonPlanCommand SourcePos String
+             | CreateLessonPlanCommand SourcePos
              | ErrorNode String
              deriving (Eq, Show)
 
@@ -174,7 +175,7 @@ toString myA = case myA of
                FunctionCall _ c l -> [c, '('] ++ (sAToString l) ++ ")"
                NegateOperation _ a -> '-' : (toString a)
                NotOperation _ a -> '\'' : (toString a)
-               FunctionDef _ name param expr -> "func " ++ [name] ++ (sAToString param) ++ " = " ++ (toString expr)
+               FunctionDef _ name param expr -> "func " ++ [name] ++ "(" ++ (sAToString param) ++ ") = " ++ (toString expr)
                Assign _ name expr -> "let " ++ [name] ++ " = " ++ (toString expr)
                IfExpr _ cond ifTrue ifFalse -> "if " ++ (toString cond) ++ " then " ++ (toString ifTrue) ++ " else " ++ (toString ifFalse)
                ParenExpr _ expr -> "(" ++ (toString expr) ++ ")"

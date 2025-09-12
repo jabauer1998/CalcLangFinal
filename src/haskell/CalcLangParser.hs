@@ -19,29 +19,6 @@ type CalcLangLexer a = ParsecT String () IO a
 parseLexeme :: (CalcLangLexer a) -> (CalcLangLexer a)
 parseLexeme a = a <* spaces
 
-parseNameComponent :: CalcLangLexer String
-parseNameComponent = many1 (alphaNum <|> char '-' <|> char '_' <|> char '.')
-
-parseSeparator :: CalcLangLexer Char
-parseSeparator = (try (char '/')) <|> (char '\\')
-
-parseAbsolutePath :: CalcLangLexer Token
-parseAbsolutePath = do
-                    start <- getPosition
-                    _ <- parseSeparator
-                    components <- sepBy1 parseNameComponent parseSeparator
-                    return (DestPath (intercalate "/" components) start)
-
-parseRelativePath :: CalcLangLexer Token
-parseRelativePath = do
-                    start <- getPosition
-                    res <- sepBy1 parseNameComponent parseSeparator
-                    return (DestPath (intercalate "/" res) start)
-                    
-
-parsePath :: CalcLangLexer Token
-parsePath = try parseAbsolutePath <|> parseRelativePath
-
 parseWindowsNewLine :: CalcLangLexer Token
 parseWindowsNewLine = do
                       start <- getPosition
@@ -250,8 +227,13 @@ parsePlan = do
             startPosition <- getPosition
             (parseLexeme (string "plan")) >> return (PlanCmd startPosition)
 
+parseHistory :: CalcLangLexer Token
+parseHistory = do
+               startPosition <- getPosition
+               (parseLexeme (string "history")) >> return (HistoryCmd startPosition)
+
 parseToken :: CalcLangLexer Token
-parseToken = try parsePath <|> try parseShow <|> try parseVariables <|> try parseFunctions <|> try parseQuit <|> try parseCreate <|> try parseLesson <|> try parsePlan <|> try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent <|> try parseNewLine
+parseToken = try parseShow <|> try parseHistory <|> try parseVariables <|> try parseFunctions <|> try parseQuit <|> try parseCreate <|> try parseLesson <|> try parsePlan <|> try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent <|> try parseNewLine
 
 parseTokens :: CalcLangLexer [Token]
 parseTokens = spaces *> many parseToken
@@ -526,6 +508,13 @@ parseShowVariablesCommand = do
                             _ <- parseVariables
                             return (ShowVariablesCommand start)
 
+parseShowHistoryCommand :: CalcLangParser AstNode
+parseShowHistoryCommand = do
+                          start <- getPosition
+                          _ <- parseShow
+                          _ <- parseHistory
+                          return (ShowHistoryCommand start)
+
 parseQuitCommand :: CalcLangParser AstNode
 parseQuitCommand = do
                    start <- getPosition
@@ -538,13 +527,10 @@ parseLessonPlanCommand = do
                          _ <- parseCreate
                          _ <- parseLesson
                          _ <- parsePlan
-                         str <- parsePath
-                         case str of
-                           DestPath a _ -> return (CreateLessonPlanCommand start a)
-                           _ -> return (ErrorNode "path not found")
+                         return (CreateLessonPlanCommand start)
 
 parseCommand :: CalcLangParser AstNode
-parseCommand = try parseShowFunctionsCommand <|> try parseShowVariablesCommand <|> try parseQuitCommand <|> try parseLessonPlanCommand
+parseCommand = try parseShowFunctionsCommand <|> try parseShowHistoryCommand <|> try parseShowVariablesCommand <|> try parseQuitCommand <|> try parseLessonPlanCommand
 
   
 parseAstNode :: CalcLangParser AstNode

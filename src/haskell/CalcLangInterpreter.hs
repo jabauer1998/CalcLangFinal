@@ -5,6 +5,7 @@ import Numeric
 import System.IO
 import CalcLangAstH
 import Data.List
+import Data.Char (isSpace)
 
 data CalcLangValue = BoolVal Bool
                    | IntVal Int
@@ -23,12 +24,19 @@ data STable a b = SymbolTable [(a, b)] deriving (Show, Eq)
 type VariableTable = STable Char CalcLangValue
 type FunctionTable = STable Char ([AstNode], AstNode)
 data Env = Environment [VariableTable]
+type History = [AstNode]
 
 addScopeToEnv :: Env -> Env
 addScopeToEnv a = case a of
                       Environment [] -> Environment [SymbolTable []]
                       Environment [b] -> Environment [SymbolTable [], b]
                       Environment (b:c) -> Environment ([SymbolTable []] ++ [b] ++ c)
+
+historyToString :: History -> String
+historyToString hist = do
+                       let mappedStr = reverse (map toString hist)
+                       intercalate "\n" mappedStr
+                       
 envToStrings :: Env -> [String]
 envToStrings e = case e of
                    Environment a -> do
@@ -137,60 +145,67 @@ generateParam paramLexeme toExpr = case paramLexeme of
                                      IdentAst _ x -> (x, toExpr)
                                      _ -> ('\0', ErrorNode "param does have expression")
 
-interpret :: AstNode -> Env -> FunctionTable -> (CalcLangValue, Env, FunctionTable)
-interpret node vT fT = case node of
-                          EqualOperation _ x y -> (equalVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
-                          LessThenOrEqualsOperation _ x y -> (lessOrEqualVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
-                          GreaterThenOrEqualsOperation _ x y -> (greaterOrEqualVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
-                          LessThenOperation _ x y -> (lessThanVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
-                          GreaterThenOperation _ x y -> (greaterThanVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
-                          AdditionOperation _ x y -> (addVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
-                          SubtractionOperation _ x y -> (subtractVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
-                          MultiplicationOperation _ x y -> (multVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
-                          DivisionOperation _ x y -> (divVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
-                          DotProductOperation _ x y -> (dotProductVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
-                          PowerOperation _ x y -> (powVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
-                          DollarAst _ x -> (DollarVal (read x :: Double), vT, fT)
-                          PercentAst _ x -> (PercentVal ((read x :: Double) / 100.0), vT, fT)
-                          IntNumberAst _ x -> (IntVal (read x :: Int), vT, fT) 
-                          RealNumberAst _ x -> (RealVal (read x :: Double), vT, fT)
-                          BooleanAst _ x -> (BoolVal (if x == "TRUE" then True else False), vT, fT)
-                          SetAst _ x -> case x of
-                                          StoreArray _ arr -> (SetVal (map (\s -> (gV (interpret s vT fT))) arr), vT, fT)
-                          TupleAst _ x -> case x of
-                                            StoreArray _ arr -> (TupleVal (map (\s -> (gV (interpret s vT fT))) arr), vT, fT)
-                          IdentAst _ x -> do
-                                          let entry = (getEntryFromEnv vT x)
-                                          case entry of
-                                            Just y -> (y, vT, fT)
-                                            Nothing -> (ErrorVal [("Variable " ++ [x] ++ " not found")], vT, fT)
-                          FunctionCall _ x y -> case y of
-                                                  StoreArray _ arr -> do
-                                                                      let entry = (getEntryFromTable fT x)
-                                                                      case entry of
-                                                                        Just (params, retExpr) -> do
-                                                                                                  let zippedData = (zipWith generateParam params arr)
-                                                                                                  let finalZippedData = (map (\(zx, zy) -> (zx, (gV (interpret zy vT fT)))) zippedData)
-                                                                                                  let addedScopeEnv = addScopeToEnv vT
-                                                                                                  let vTable = (foldl (\table tuple -> addEntryToEnv table tuple) addedScopeEnv  finalZippedData)
-                                                                                                  let retVal = (gV (interpret retExpr vTable fT))
-                                                                                                  (retVal, removeScopeFromEnv vTable, fT)
-                                                                        Nothing -> (ErrorVal ["Function " ++ [x] ++ " not found"], vT, fT)
-                          NegateOperation _ x -> (negVal (gV (interpret x vT fT)), vT, fT)
-                          NotOperation _ x -> (notVal (gV (interpret x vT fT)), vT, fT)
-                          FunctionDef _ s l e -> case l of
-                                                   StoreArray _ ad -> (VoidVal, vT, (addEntryToTable fT (s, (ad, e)))) 
-                          Assign _ s e -> (VoidVal, (addEntryToEnv vT (s, (gV (interpret e vT fT)))),  fT)
-                          IfExpr _ cond ifTrue ifFalse -> if (asBool (gV (interpret cond vT fT))) then (interpret ifTrue vT fT) else (interpret ifFalse vT fT)
-                          ParenExpr _ expr -> interpret expr vT fT
-                          ShowFunctionsCommand _ -> (PrintVal (funcTableToString fT), vT, fT)
-                          ShowVariablesCommand _ -> (PrintVal (envToString vT), vT, fT)
-                          QuitCommand _ -> (QuitVal, vT, fT)
-                          ErrorNode s -> (ErrorVal ["Error at" ++ (show s)], vT, fT)
+interpret :: AstNode -> Env -> FunctionTable -> History -> (CalcLangValue, Env, FunctionTable, History)
+interpret node vT fT hist = case node of
+                              EqualOperation _ x y -> (equalVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT, hist)
+                              LessThenOrEqualsOperation _ x y -> (lessOrEqualVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT, hist)
+                              GreaterThenOrEqualsOperation _ x y -> (greaterOrEqualVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT, hist)
+                              LessThenOperation _ x y -> (lessThanVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT, hist)
+                              GreaterThenOperation _ x y -> (greaterThanVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT, hist)
+                              AdditionOperation _ x y -> (addVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT, hist)
+                              SubtractionOperation _ x y -> (subtractVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT, hist)
+                              MultiplicationOperation _ x y -> (multVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT, hist)
+                              DivisionOperation _ x y -> (divVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT, hist)
+                              DotProductOperation _ x y -> (dotProductVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT, hist)
+                              PowerOperation _ x y -> (powVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT, hist)
+                              DollarAst _ x -> (DollarVal (read x :: Double), vT, fT, hist)
+                              PercentAst _ x -> (PercentVal ((read x :: Double) / 100.0), vT, fT, hist)
+                              IntNumberAst _ x -> (IntVal (read x :: Int), vT, fT, hist) 
+                              RealNumberAst _ x -> (RealVal (read x :: Double), vT, fT, hist)
+                              BooleanAst _ x -> (BoolVal (if x == "TRUE" then True else False), vT, fT, hist)
+                              SetAst _ x -> case x of
+                                              StoreArray _ arr -> (SetVal (map (\s -> (gV (interpret s vT fT hist))) arr), vT, fT, hist)
+                              TupleAst _ x -> case x of
+                                                StoreArray _ arr -> (TupleVal (map (\s -> (gV (interpret s vT fT hist))) arr), vT, fT, hist)
+                              IdentAst _ x -> do
+                                              let entry = (getEntryFromEnv vT x)
+                                              case entry of
+                                                Just y -> (y, vT, fT, hist)
+                                                Nothing -> (ErrorVal [("Variable " ++ [x] ++ " not found")], vT, fT, hist)
+                              FunctionCall _ x y -> case y of
+                                                      StoreArray _ arr -> do
+                                                                          let entry = (getEntryFromTable fT x)
+                                                                          case entry of
+                                                                            Just (params, retExpr) -> do
+                                                                                                      let zippedData = (zipWith generateParam params arr)
+                                                                                                      let finalZippedData = (map (\(zx, zy) -> (zx, (gV (interpret zy vT fT hist)))) zippedData)
+                                                                                                      let addedScopeEnv = addScopeToEnv vT
+                                                                                                      let vTable = (foldl (\table tuple -> addEntryToEnv table tuple) addedScopeEnv  finalZippedData)
+                                                                                                      let retVal = (gV (interpret retExpr vTable fT hist))
+                                                                                                      (retVal, removeScopeFromEnv vTable, fT, hist)
+                                                                            Nothing -> (ErrorVal ["Function " ++ [x] ++ " not found"], vT, fT, hist)
+                              NegateOperation _ x -> (negVal (gV (interpret x vT fT hist)), vT, fT, hist)
+                              NotOperation _ x -> (notVal (gV (interpret x vT fT hist)), vT, fT, hist)
+                              FunctionDef _ s l e -> case l of
+                                                       StoreArray _ ad -> do
+                                                                          let myFuncResult = (addEntryToTable fT (s, (ad, e)))
+                                                                          let myHist = (node : hist)
+                                                                          (VoidVal, vT, myFuncResult, myHist) 
+                              Assign _ s e -> do
+                                              let myVars = (addEntryToEnv vT (s, (gV (interpret e vT fT hist))))
+                                              let myHist = (node : hist)
+                                              (VoidVal, myVars, fT, myHist)
+                              IfExpr _ cond ifTrue ifFalse -> if (asBool (gV (interpret cond vT fT hist))) then (interpret ifTrue vT fT hist) else (interpret ifFalse vT fT hist)
+                              ParenExpr _ expr -> (interpret expr vT fT hist)
+                              ShowFunctionsCommand _ -> (PrintVal (funcTableToString fT), vT, fT, hist)
+                              ShowVariablesCommand _ -> (PrintVal (envToString vT), vT, fT, hist)
+                              ShowHistoryCommand _ -> (PrintVal (historyToString hist), vT, fT, hist)
+                              QuitCommand _ -> (QuitVal, vT, fT, hist)
+                              ErrorNode s -> (ErrorVal ["Error at" ++ (show s)], vT, fT, hist)
 
-gV :: (CalcLangValue, Env, FunctionTable) -> CalcLangValue
+gV :: (CalcLangValue, Env, FunctionTable, History) -> CalcLangValue
 gV t = case t of
-         (a, _, _) -> a
+         (a, _, _, _) -> a
 
 asBool :: CalcLangValue -> Bool
 asBool aval = case aval of
@@ -442,21 +457,23 @@ runCalcLang :: IO ()
 runCalcLang = do
               let x = (Environment [])
               let y = (SymbolTable [])
-              runCommandLine x y
+              let h = []
+              runCommandLine x y h
 
-runCommandLine :: Env -> FunctionTable -> IO ()
-runCommandLine vT fT = do
-                       putStr ">>CalcLang>> "
-                       hFlush stdout
-                       input <- getLine
-                       parseResult <- (runCalcLangParser input)
-                       case parseResult of
-                         ErrorNode err -> print err
-                         t -> do
-                              let interpreterResult = (interpret t vT fT)
-                              case interpreterResult of
-                                    (VoidVal, x, y) -> runCommandLine x y
-                                    (QuitVal, _, _) -> return ()
-                                    (a, x, y) -> do
-                                                 putStrLn (toStr a)
-                                                 runCommandLine x y
+runCommandLine :: Env -> FunctionTable -> History -> IO ()
+runCommandLine vT fT hist = do
+                            putStr ">>CalcLang>> "
+                            hFlush stdout
+                            input <- getLine
+                            if (all isSpace input) then (runCommandLine vT fT hist) else do
+                                                                                         parseResult <- (runCalcLangParser input)
+                                                                                         case parseResult of
+                                                                                           ErrorNode err -> print err
+                                                                                           t -> do
+                                                                                                let interpreterResult = (interpret t vT fT hist)
+                                                                                                case interpreterResult of
+                                                                                                  (VoidVal, x, y, h) -> runCommandLine x y h
+                                                                                                  (QuitVal, _, _, _) -> return ()
+                                                                                                  (a, x, y, h) -> do
+                                                                                                                  putStrLn (toStr a)
+                                                                                                                  runCommandLine x y h
