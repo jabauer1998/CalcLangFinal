@@ -534,7 +534,7 @@ parseCommand = try parseShowFunctionsCommand <|> try parseShowHistoryCommand <|>
 
   
 parseAstNode :: CalcLangParser AstNode
-parseAstNode = spaces *> (try parseCommand <|> try parseFunctionDefinition <|> try parseMacroAssignment <|> try parseExpression)
+parseAstNode = spaces *> (try parseCommand <|> try parseFunctionDefinition <|> try parseMacroAssignment <|> try parseExpression) <* eof
 
 parseAstNodeLines :: CalcLangParser SA
 parseAstNodeLines = do
