@@ -8,6 +8,8 @@ import Foreign.C.String
 import Foreign.Marshal.Array
 import Foreign.Storable
 import Control.Monad
+import System.Console.Haskeline
+
 
 -- First we need to make the SourcePos into a ctype Source Pos
 
@@ -231,7 +233,6 @@ marshallAstNode a = case a of
                                             let g = (CParenExpr myPos myExpr)
                                             poke ptr g
                                             return ptr
-                      _ -> error "Invalid AstNode type"
                                                      
                        
                                         

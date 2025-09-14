@@ -6,6 +6,8 @@ import System.IO
 import CalcLangAstH
 import Data.List
 import Data.Char (isSpace)
+import System.Console.Haskeline
+import System.Console.Haskeline.History
 
 data CalcLangValue = BoolVal Bool
                    | IntVal Int
@@ -17,6 +19,7 @@ data CalcLangValue = BoolVal Bool
                    | PercentVal Double
                    | PrintVal String
                    | QuitVal
+                   | ReadHistoryCommandVal
                    | ErrorVal [String]
                    deriving (Show, Eq)
 
@@ -31,11 +34,6 @@ addScopeToEnv a = case a of
                       Environment [] -> Environment [SymbolTable []]
                       Environment [b] -> Environment [SymbolTable [], b]
                       Environment (b:c) -> Environment ([SymbolTable []] ++ [b] ++ c)
-
-historyToString :: History -> String
-historyToString hist = do
-                       let mappedStr = reverse (map toString hist)
-                       intercalate "\n" mappedStr
                        
 envToStrings :: Env -> [String]
 envToStrings e = case e of
@@ -157,28 +155,28 @@ generateParam paramLexeme toExpr = case paramLexeme of
                                      IdentAst _ x -> (x, toExpr)
                                      _ -> ('\0', ErrorNode "param does have expression")
 
-interpret :: AstNode -> Env -> FunctionTable -> History -> (CalcLangValue, Env, FunctionTable)
-interpret node vT fT hist = case node of
-                              EqualOperation _ x y -> (equalVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT)
-                              LessThenOrEqualsOperation _ x y -> (lessOrEqualVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT)
-                              GreaterThenOrEqualsOperation _ x y -> (greaterOrEqualVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT)
-                              LessThenOperation _ x y -> (lessThanVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT)
-                              GreaterThenOperation _ x y -> (greaterThanVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT)
-                              AdditionOperation _ x y -> (addVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT)
-                              SubtractionOperation _ x y -> (subtractVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT)
-                              MultiplicationOperation _ x y -> (multVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT)
-                              DivisionOperation _ x y -> (divVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT)
-                              DotProductOperation _ x y -> (dotProductVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT)
-                              PowerOperation _ x y -> (powVals (gV (interpret x vT fT hist)) (gV (interpret y vT fT hist)), vT, fT)
+interpret :: AstNode -> Env -> FunctionTable -> (CalcLangValue, Env, FunctionTable)
+interpret node vT fT = case node of
+                              EqualOperation _ x y -> (equalVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                              LessThenOrEqualsOperation _ x y -> (lessOrEqualVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                              GreaterThenOrEqualsOperation _ x y -> (greaterOrEqualVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                              LessThenOperation _ x y -> (lessThanVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                              GreaterThenOperation _ x y -> (greaterThanVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                              AdditionOperation _ x y -> (addVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                              SubtractionOperation _ x y -> (subtractVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                              MultiplicationOperation _ x y -> (multVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                              DivisionOperation _ x y -> (divVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                              DotProductOperation _ x y -> (dotProductVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
+                              PowerOperation _ x y -> (powVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
                               DollarAst _ x -> (DollarVal (read x :: Double), vT, fT)
                               PercentAst _ x -> (PercentVal ((read x :: Double) / 100.0), vT, fT)
                               IntNumberAst _ x -> (IntVal (read x :: Int), vT, fT) 
                               RealNumberAst _ x -> (RealVal (read x :: Double), vT, fT)
                               BooleanAst _ x -> (BoolVal (if x == "TRUE" then True else False), vT, fT)
                               SetAst _ x -> case x of
-                                              StoreArray _ arr -> (SetVal (map (\s -> (gV (interpret s vT fT hist))) arr), vT, fT)
+                                              StoreArray _ arr -> (SetVal (map (\s -> (gV (interpret s vT fT))) arr), vT, fT)
                               TupleAst _ x -> case x of
-                                                StoreArray _ arr -> (TupleVal (map (\s -> (gV (interpret s vT fT hist))) arr), vT, fT)
+                                                StoreArray _ arr -> (TupleVal (map (\s -> (gV (interpret s vT fT))) arr), vT, fT)
                               IdentAst _ x -> do
                                               let entry = (getEntryFromEnv vT x)
                                               case entry of
@@ -190,26 +188,26 @@ interpret node vT fT hist = case node of
                                                                           case entry of
                                                                             Just (params, retExpr) -> do
                                                                                                       let zippedData = (zipWith generateParam params arr)
-                                                                                                      let finalZippedData = (map (\(zx, zy) -> (zx, (gV (interpret zy vT fT hist)))) zippedData)
+                                                                                                      let finalZippedData = (map (\(zx, zy) -> (zx, (gV (interpret zy vT fT)))) zippedData)
                                                                                                       let addedScopeEnv = addScopeToEnv vT
                                                                                                       let vTable = (foldl (\table tuple -> addEntryToEnv table tuple) addedScopeEnv  finalZippedData)
-                                                                                                      let retVal = (gV (interpret retExpr vTable fT hist))
+                                                                                                      let retVal = (gV (interpret retExpr vTable fT))
                                                                                                       (retVal, removeScopeFromEnv vTable, fT)
                                                                             Nothing -> (ErrorVal ["Function " ++ [x] ++ " not found"], vT, fT)
-                              NegateOperation _ x -> (negVal (gV (interpret x vT fT hist)), vT, fT)
-                              NotOperation _ x -> (notVal (gV (interpret x vT fT hist)), vT, fT)
+                              NegateOperation _ x -> (negVal (gV (interpret x vT fT)), vT, fT)
+                              NotOperation _ x -> (notVal (gV (interpret x vT fT)), vT, fT)
                               FunctionDef _ s l e -> case l of
                                                        StoreArray _ ad -> do
                                                                           let myFuncResult = (addEntryToTable fT (s, (ad, e)))
                                                                           (VoidVal, vT, myFuncResult) 
                               Assign _ s e -> do
-                                              let myVars = (addEntryToEnv vT (s, (gV (interpret e vT fT hist))))
+                                              let myVars = (addEntryToEnv vT (s, (gV (interpret e vT fT))))
                                               (VoidVal, myVars, fT)
-                              IfExpr _ cond ifTrue ifFalse -> if (asBool (gV (interpret cond vT fT hist))) then (interpret ifTrue vT fT hist) else (interpret ifFalse vT fT hist)
-                              ParenExpr _ expr -> (interpret expr vT fT hist)
+                              IfExpr _ cond ifTrue ifFalse -> if (asBool (gV (interpret cond vT fT))) then (interpret ifTrue vT fT) else (interpret ifFalse vT fT)
+                              ParenExpr _ expr -> (interpret expr vT fT)
                               ShowFunctionsCommand _ -> (PrintVal (funcTableToString fT), vT, fT)
                               ShowVariablesCommand _ -> (PrintVal (envToString vT), vT, fT)
-                              ShowHistoryCommand _ -> (PrintVal (historyToString hist), vT, fT)
+                              ShowHistoryCommand _ -> (ReadHistoryCommandVal, vT, fT)
                               QuitCommand _ -> (QuitVal, vT, fT)
                               ErrorNode s -> (ErrorVal ["Error at" ++ (show s)], vT, fT)
 
@@ -467,31 +465,37 @@ runCalcLang :: IO ()
 runCalcLang = do
               let x = (Environment [])
               let y = (SymbolTable [])
-              let h = []
-              runCommandLine x y h
+              runInputT settings (runCommandLine x y) where
+                settings = defaultSettings
+                  { historyFile = Just ".CalcLangHistory.txt" -- Specify a file to store history
+                  , autoAddHistory = True -- Automatically add non-blank lines to history
+                  }
 
-runCommandLine :: Env -> FunctionTable -> History -> IO ()
-runCommandLine vT fT hist = do
-                            putStr ">>CalcLang>> "
-                            hFlush stdout
-                            input <- getLine
-                            if (all isSpace input) then (runCommandLine vT fT hist) else do
-                                                                                         parseResult <- (runCalcLangParser input)
-                                                                                         case parseResult of
-                                                                                           ErrorNode err -> do
-                                                                                                            print err
-                                                                                                            runCommandLine vT fT hist
-                                                                                           t -> do
-                                                                                                let interpreterResult = (interpret t vT fT hist)
-                                                                                                case interpreterResult of
-                                                                                                  (VoidVal, x, y) -> do
-                                                                                                                     let myHist = (t : hist)
-                                                                                                                     runCommandLine x y myHist
-                                                                                                  (QuitVal, _, _) -> return ()
-                                                                                                  (PrintVal j, x, y) -> do
-                                                                                                                        putStrLn (toStr (PrintVal j))
-                                                                                                                        runCommandLine x y hist
-                                                                                                  (a, x, y) -> do
-                                                                                                               putStrLn (toStr a)
-                                                                                                               let myHist = (t : hist)
-                                                                                                               runCommandLine x y myHist
+runCommandLine :: Env -> FunctionTable -> InputT IO ()
+runCommandLine vT fT = do
+                       input <- (getInputLine ">>CalcLang>> ")
+                       case input of
+                         Just myInput -> if (all isSpace myInput) then (runCommandLine vT fT) else do
+                                                                                                   parseResult <- (runCalcLangParser myInput)
+                                                                                                   case parseResult of
+                                                                                                      ErrorNode err -> do
+                                                                                                                       outputStrLn err
+                                                                                                                       runCommandLine vT fT
+                                                                                                      t -> do
+                                                                                                           let interpreterResult = (interpret t vT fT)
+                                                                                                           case interpreterResult of
+                                                                                                                   (VoidVal, x, y) -> runCommandLine x y
+                                                                                                                   (QuitVal, _, _) -> do
+                                                                                                                                      modifyHistory (const emptyHistory)
+                                                                                                                                      return ()
+                                                                                                                   (PrintVal j, x, y) -> do
+                                                                                                                                         outputStrLn (toStr (PrintVal j))
+                                                                                                                                         runCommandLine x y
+                                                                                                                   (ReadHistoryCommandVal, x, y) -> do
+                                                                                                                                                    history <- getHistory
+                                                                                                                                                    let lines = (reverse (historyLines history))
+                                                                                                                                                    mapM_ outputStrLn lines
+                                                                                                                   (a, x, y) -> do
+                                                                                                                                outputStrLn (toStr a)
+                                                                                                                                runCommandLine x y
+                         Nothing -> (runCommandLine vT fT)
