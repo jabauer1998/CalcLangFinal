@@ -8,6 +8,7 @@ import Data.List
 import Data.Char (isSpace)
 import System.Console.Haskeline
 import System.Console.Haskeline.History
+import Control.Monad.IO.Class
 
 data CalcLangValue = BoolVal Bool
                    | IntVal Int
@@ -20,6 +21,7 @@ data CalcLangValue = BoolVal Bool
                    | PrintVal String
                    | QuitVal
                    | ReadHistoryCommandVal
+                   | HelpCommandVal
                    | ErrorVal [String]
                    deriving (Show, Eq)
 
@@ -28,6 +30,7 @@ type VariableTable = STable Char CalcLangValue
 type FunctionTable = STable Char ([AstNode], AstNode)
 data Env = Environment [VariableTable]
 type History = [AstNode]
+  
 
 addScopeToEnv :: Env -> Env
 addScopeToEnv a = case a of
@@ -208,6 +211,7 @@ interpret node vT fT = case node of
                               ShowFunctionsCommand _ -> (PrintVal (funcTableToString fT), vT, fT)
                               ShowVariablesCommand _ -> (PrintVal (envToString vT), vT, fT)
                               ShowHistoryCommand _ -> (ReadHistoryCommandVal, vT, fT)
+                              HelpCommand _ -> (HelpCommandVal, vT, fT)
                               QuitCommand _ -> (QuitVal, vT, fT)
                               ErrorNode s -> (ErrorVal ["Error at" ++ (show s)], vT, fT)
 
@@ -465,6 +469,8 @@ runCalcLang :: IO ()
 runCalcLang = do
               let x = (Environment [])
               let y = (SymbolTable [])
+              contents <- readFile "help/files/Intro.txt"
+              putStrLn contents
               runInputT settings (runCommandLine x y) where
                 settings = defaultSettings
                   { historyFile = Just ".CalcLangHistory.txt" -- Specify a file to store history
@@ -495,6 +501,10 @@ runCommandLine vT fT = do
                                                                                                                                                     history <- getHistory
                                                                                                                                                     let lines = (reverse (historyLines history))
                                                                                                                                                     mapM_ outputStrLn lines
+                                                                                                                   (HelpCommandVal, x, y) -> do
+                                                                                                                                             contents <- liftIO $ readFile "help/files/Help.txt"
+                                                                                                                                             outputStrLn contents
+                                                                                                                                             runCommandLine x y
                                                                                                                    (a, x, y) -> do
                                                                                                                                 outputStrLn (toStr a)
                                                                                                                                 runCommandLine x y

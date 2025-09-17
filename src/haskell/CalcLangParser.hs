@@ -233,8 +233,13 @@ parseHistory = do
                startPosition <- getPosition
                (parseLexeme (string "history")) >> return (HistoryCmd startPosition)
 
+parseHelp :: (Monad a) => CalcLangLexer a Token
+parseHelp = do
+            start <- getPosition
+            (parseLexeme (string "help")) >> return (HelpCmd start)
+
 parseToken :: (Monad a) => CalcLangLexer a Token
-parseToken = try parseShow <|> try parseHistory <|> try parseVariables <|> try parseFunctions <|> try parseQuit <|> try parseCreate <|> try parseLesson <|> try parsePlan <|> try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent <|> try parseNewLine
+parseToken = try parseHelp <|> try parseShow <|> try parseHistory <|> try parseVariables <|> try parseFunctions <|> try parseQuit <|> try parseCreate <|> try parseLesson <|> try parsePlan <|> try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent <|> try parseNewLine
 
 parseTokens :: (Monad a) => CalcLangLexer a [Token]
 parseTokens = spaces *> many parseToken
@@ -530,8 +535,14 @@ parseLessonPlanCommand = do
                          _ <- parsePlan
                          return (CreateLessonPlanCommand start)
 
+parseHelpCommand :: (Monad a) => CalcLangParser a AstNode
+parseHelpCommand = do
+                   start <- getPosition
+                   _ <- parseHelp
+                   return (HelpCommand start)
+
 parseCommand :: (Monad a) => CalcLangParser a AstNode
-parseCommand = try parseShowFunctionsCommand <|> try parseShowHistoryCommand <|> try parseShowVariablesCommand <|> try parseQuitCommand <|> try parseLessonPlanCommand
+parseCommand = try parseHelpCommand <|> try parseShowFunctionsCommand <|> try parseShowHistoryCommand <|> try parseShowVariablesCommand <|> try parseQuitCommand <|> try parseLessonPlanCommand
 
   
 parseAstNode :: (Monad a) => CalcLangParser a AstNode

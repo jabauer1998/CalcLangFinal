@@ -93,6 +93,7 @@ data Token = Ident Char SourcePos
            | LessonCmd SourcePos
            | PlanCmd SourcePos
            | HistoryCmd SourcePos
+           | HelpCmd SourcePos
            deriving (Show, Eq)
 
 --Below are all the regular AstNodes
@@ -147,6 +148,7 @@ data AstNode = EqualOperation SourcePos AstNode AstNode
              | ShowVariablesCommand SourcePos
              | ShowHistoryCommand SourcePos
              | QuitCommand SourcePos
+             | HelpCommand SourcePos
              | CreateLessonPlanCommand SourcePos
              | ErrorNode String
              deriving (Eq, Show)

@@ -1,0 +1,72 @@
+------------------------------
+Help Message
+------------------------------
+  Welcome to using CalcLang. CalcLang is a language developed for teachers to teach the concept of functions within a math class.
+  The language can handle basic arithmetic and variable definitions and function definitions.\n"
+  The language logs history of previous commands within a session and the user can go back and modify previous commands.
+  As a bonus the language can handle recursion with an if else clause to initiate a base expression.
+  It can also handle the generation of Sets, and Vectors(Tuples).
+  The language is not Turing complete however.
+  --------------------------
+  Building CalcLang\n"
+  --------------------------
+  To build CalcLang run the \"cabal build\" and \"cabal install\".
+  The file doesnt set a bin directory so the files get added to the default install directory on the computer.
+  The recomended bin directory is CalcLangFinal/bin.
+  You can set it by passing the --install-dir flag into the \"cabal install\" command.
+  Once the source is compiled there should be two files: 
+  1) ICalcLang -> CalcLang Interpreter
+  2) CCalcLang -> CalcLang Compiler (Still in Beta)
+  --------------------------
+  Running CalcLang
+  --------------------------
+  To run CalcLang the user just needs to run the ICalcLang file.
+  If installed in the bin directory it would be ./bin/ICalcLang.
+  The user will then get a command prompt indicator before every line like so -
+  >>CalcLang>> (Place command or operation here)
+  --------------------------
+  CalcLang Syntax
+  --------------------------
+  Once CalcLang is up and running the user has several options:
+  1. Run a command:
+       1) help -> prints this help dialoge
+       2) show functions -> prints contents of Function Symbol Table
+       3) show variables -> prints contents of Variable Symbol Table
+       4) show history -> prints all the commands ran since launching ICalcLang
+       5) quit -> end the session. It also deletes the history that was saved
+       6) create lesson plan <file name here> -> Saves history into a lesson plan file specified
+       
+  2. Execute an expression-
+    The user can type in expressions and the interpreter will calculate it and print the result.
+    Some examples of expressions are:
+       1) 8 + 9 <prints 17>
+       2) f(y(x))
+       3) g - 90
+       4) (1, 2).(9, 8) <Where . is Dot product>
+       5) 2 + {f(x), 2 - 1} -> <Equals {2 + f(x), 2 + (2 - 1)}>
+       6) if x = 0 then 1 else 0
+
+  3. \Define a variable- 
+    Defining a variable is done using the let keyword. The example syntax is below
+    
+    let <variable name> = <expression>
+    
+    Variable names consist of a single letter
+    Some examples of valid variable definitions are below
+      1) let x = 50
+      2) let y = x
+      3) let f = x^2 + y
+  For expressions please read section 2 of this message pertaining to expressions
+
+  4. Define a function- 
+     Functions are defined with the func keyword.
+     Function declaration syntax is below:
+    
+     func <function name> ( <param list> ) =  <expression>
+    
+     The function name must consist of only a single letter simular to variables
+     Some examples of function definitions are below:
+       1) func f(x) = x
+       2) func d(z) = f(x)
+       3) func g(z) = z + f(z) - y
+       4) func f(x) = if x <= 0 then 0 else (x, f(x - 1)) <Makes recusive list of Numbers>
