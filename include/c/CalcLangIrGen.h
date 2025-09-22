@@ -6,6 +6,6 @@
 #include <llvm-c/BitWriter.h>
 #include "CalcLangAstC.h"
 
-void codeGen(StoreArray* arr);
+LLVMModuleRef codeGen(StoreArray* arr);
 
 #endif

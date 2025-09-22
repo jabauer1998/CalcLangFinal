@@ -52,12 +52,12 @@ CalcLangValue* lessThenOrEqualToCalcLangValue(CalcLangValue* left, int freeLeft,
 CalcLangValue* greaterThenOrEqualToCalcLangValue(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
 CalcLangValue* notCalcLangValue(CalcLangValue* value, int freeRight);
 CalcLangValue* negateCalcLangValue(CalcLangValue* value, int freeRight);
-CalcLangValue* newIntValue(int input);
-CalcLangValue* newRealValue(double input);
-CalcLangValue* newDollarValue(double input);
-CalcLangValue* newPercentValue(double percent);
-CalcLangValue* newTupleValue(CalcLangValue**values, int size);
-CalcLangValue* newSetValue(CalcLangValue**values, int size);
+CalcLangValue* integerCalcLangValue(int input);
+CalcLangValue* realCalcLangValue(double input);
+CalcLangValue* dollarCalcLangValue(double input);
+CalcLangValue* percentCalcLangValue(double percent);
+CalcLangValue* tupleCalcLangValue(CalcLangValue**values, int size);
+CalcLangValue* setCalcLangValue(CalcLangValue**values, int size);
 void printValue(CalcLangValue* calcLang);
 
 #endif

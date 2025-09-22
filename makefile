@@ -11,13 +11,12 @@ AbsInstallDir:="/home/jabauer/source/repos/CalcLangFinal/bin"
 LLVMLib:="/usr/lib/llvm-18/lib"
 
 
-all: clean build-haskell install-haskell
+all: clean build-lib build-haskell install-haskell
 
 build-haskell:
-	cabal build --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) -v3
+	cabal build --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH)
 install-haskell:
 	cabal install --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --installdir=$(AbsInstallDir)
-
 build-lib:
 	clang -S -emit-llvm src/c/LinkToCalcLang.c -o ir/c/LinkToCalcLang.ll -I$(IncDir)
 

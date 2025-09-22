@@ -1,5 +1,6 @@
 module CalcLangInterpreter(runCalcLang) where
 
+import CalcLangMarshall
 import CalcLangParser
 import Numeric
 import System.IO
@@ -9,6 +10,10 @@ import Data.Char (isSpace)
 import System.Console.Haskeline
 import System.Console.Haskeline.History
 import Control.Monad.IO.Class
+import Foreign.Ptr
+import Foreign.C.String
+
+foreign import ccall processASTList :: (Ptr CSA) -> CString -> IO ()
 
 data CalcLangValue = BoolVal Bool
                    | IntVal Int
@@ -22,6 +27,7 @@ data CalcLangValue = BoolVal Bool
                    | QuitVal
                    | ReadHistoryCommandVal
                    | HelpCommandVal
+                   | CreateLessonPlanCommandVal String
                    | ErrorVal [String]
                    deriving (Show, Eq)
 
@@ -213,6 +219,7 @@ interpret node vT fT = case node of
                               ShowHistoryCommand _ -> (ReadHistoryCommandVal, vT, fT)
                               HelpCommand _ -> (HelpCommandVal, vT, fT)
                               QuitCommand _ -> (QuitVal, vT, fT)
+                              CreateLessonPlanCommand _ src -> (CreateLessonPlanCommandVal src, vT, fT)
                               ErrorNode s -> (ErrorVal ["Error at" ++ (show s)], vT, fT)
 
 gV :: (CalcLangValue, Env, FunctionTable) -> CalcLangValue
@@ -476,13 +483,30 @@ runCalcLang = do
                   { historyFile = Just ".CalcLangHistory.txt" -- Specify a file to store history
                   , autoAddHistory = True -- Automatically add non-blank lines to history
                   }
+                  
+isNotCommand :: AstNode -> Bool
+isNotCommand node = case node of
+                      ShowFunctionsCommand _ -> False
+                      ShowVariablesCommand _ -> False
+                      ShowHistoryCommand _ -> False
+                      HelpCommand _ -> False
+                      QuitCommand _ -> False
+                      CreateLessonPlanCommand _ _ -> False
+                      ErrorNode _ -> False
+                      _ -> True
+                  
+filterLines :: SA -> SA
+filterLines list = case list of
+                     StoreArray len arrList -> do
+                                               let newList = (filter isNotCommand arrList)
+                                               StoreArray (length newList) newList
 
 runCommandLine :: Env -> FunctionTable -> InputT IO ()
 runCommandLine vT fT = do
                        input <- (getInputLine ">>CalcLang>> ")
                        case input of
                          Just myInput -> if (all isSpace myInput) then (runCommandLine vT fT) else do
-                                                                                                   parseResult <- (runCalcLangParser myInput)
+                                                                                                   parseResult <- liftIO (runCalcLangParser myInput)
                                                                                                    case parseResult of
                                                                                                       ErrorNode err -> do
                                                                                                                        outputStrLn err
@@ -501,10 +525,20 @@ runCommandLine vT fT = do
                                                                                                                                                     history <- getHistory
                                                                                                                                                     let lines = (reverse (historyLines history))
                                                                                                                                                     mapM_ outputStrLn lines
+                                                                                                                                                    runCommandLine x y
                                                                                                                    (HelpCommandVal, x, y) -> do
                                                                                                                                              contents <- liftIO $ readFile "help/files/Help.txt"
                                                                                                                                              outputStrLn contents
                                                                                                                                              runCommandLine x y
+                                                                                                                   (CreateLessonPlanCommandVal str, x, y) -> do
+                                                                                                                                                             history <- getHistory
+                                                                                                                                                             let lines = (reverse (historyLines history))
+                                                                                                                                                             parsedLines <- liftIO ((runCalcLangParserSequence lines))
+                                                                                                                                                             let filteredLines = (filterLines parsedLines)
+                                                                                                                                                             storeArray <- liftIO (marshallStorageArray filteredLines)
+                                                                                                                                                             cStr <- liftIO (newCString str)
+                                                                                                                                                             _ <- liftIO (processASTList storeArray cStr)
+                                                                                                                                                             runCommandLine x y
                                                                                                                    (a, x, y) -> do
                                                                                                                                 outputStrLn (toStr a)
                                                                                                                                 runCommandLine x y

@@ -1,4 +1,4 @@
-module CalcLangParser(runCalcLangLexer, runCalcLangParser, runCalcLangParserC, runCalcLangProgramParserC) where
+module CalcLangParser(runCalcLangLexer, runCalcLangParser, runCalcLangParserSequence) where
 
 import Text.Parsec
 import Text.Parsec.String
@@ -14,6 +14,7 @@ import Foreign.Storable
 import Prelude
 import Data.List
 import System.Console.Haskeline
+import Foreign.Ptr
 
 type CalcLangLexer a b  = ParsecT String () a b
 
@@ -238,8 +239,37 @@ parseHelp = do
             start <- getPosition
             (parseLexeme (string "help")) >> return (HelpCmd start)
 
+parseWindowsSeperator ::  (Monad a) => CalcLangLexer a Token
+parseWindowsSeperator = do
+                        start <- getPosition
+                        char '\\' >> return (PathSeperator '\\' start)
+
+parseLinuxSeperator :: (Monad a) => CalcLangLexer a Token
+parseLinuxSeperator = do
+                      start <- getPosition
+                      char '/' >> return (PathSeperator '/' start)
+
+parseSeparator :: (Monad a) => CalcLangLexer a Token
+parseSeparator = try parseLinuxSeperator <|> parseWindowsSeperator
+
+parseComponent :: (Monad a) => CalcLangLexer a Token
+parseComponent = do
+                 start <- getPosition
+                 toRet <- many1 (noneOf "\\/\"'")
+                 return (PathComponent toRet start)
+
+parseSingleQuote :: (Monad a) => CalcLangLexer a Token
+parseSingleQuote = do
+                   start <- getPosition
+                   char '\'' >> return (SingleQuote start)
+
+parseDoubleQuote :: (Monad a) => CalcLangLexer a Token
+parseDoubleQuote = do
+                   start <- getPosition
+                   char '"' >> return (DoubleQuote start)
+
 parseToken :: (Monad a) => CalcLangLexer a Token
-parseToken = try parseHelp <|> try parseShow <|> try parseHistory <|> try parseVariables <|> try parseFunctions <|> try parseQuit <|> try parseCreate <|> try parseLesson <|> try parsePlan <|> try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent <|> try parseNewLine
+parseToken = try parseSingleQuote <|> try parseDoubleQuote <|> try parseSeparator <|> try parseHelp <|> try parseShow <|> try parseHistory <|> try parseVariables <|> try parseFunctions <|> try parseQuit <|> try parseCreate <|> try parseLesson <|> try parsePlan <|> try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent <|> try parseNewLine
 
 parseTokens :: (Monad a) => CalcLangLexer a [Token]
 parseTokens = spaces *> many parseToken
@@ -526,6 +556,37 @@ parseQuitCommand = do
                    start <- getPosition
                    _ <- parseQuit
                    return (QuitCommand start)
+                   
+parseStringPath :: (Monad a) => CalcLangParser a AstNode
+parseStringPath = do
+                  start <- getPosition
+                  _ <- parseDoubleQuote
+                  list <- sepBy1 parseComponent parseSeparator
+                  let toStrList = (map tokToString list)
+                  let fullPath = (intercalate "/" toStrList)
+                  _ <- parseDoubleQuote
+                  return (FullPath start fullPath)
+                  
+parseCharPath :: (Monad a) => CalcLangParser a AstNode
+parseCharPath = do
+                start <- getPosition
+                _ <- parseSingleQuote
+                list <- sepBy1 parseComponent parseSeparator
+                let toStrList = (map tokToString list)
+                let fullPath = (intercalate "/" toStrList)
+                _ <- parseSingleQuote
+                return (FullPath start fullPath)
+
+parseDefaultPath :: (Monad a) => CalcLangParser a AstNode
+parseDefaultPath = do
+                   start <- getPosition
+                   list <- sepBy1 parseComponent parseSeparator
+                   let toStrList = (map tokToString list)
+                   let fullPath = (intercalate "/" toStrList)
+                   return (FullPath start fullPath)
+
+parsePath :: (Monad a) => CalcLangParser a AstNode
+parsePath = try parseStringPath <|> try parseCharPath <|> parseDefaultPath
 
 parseLessonPlanCommand :: (Monad a) => CalcLangParser a AstNode
 parseLessonPlanCommand = do
@@ -533,7 +594,9 @@ parseLessonPlanCommand = do
                          _ <- parseCreate
                          _ <- parseLesson
                          _ <- parsePlan
-                         return (CreateLessonPlanCommand start)
+                         path <- parsePath
+                         case path of
+                           FullPath _ str -> return (CreateLessonPlanCommand start str)
 
 parseHelpCommand :: (Monad a) => CalcLangParser a AstNode
 parseHelpCommand = do
@@ -548,49 +611,25 @@ parseCommand = try parseHelpCommand <|> try parseShowFunctionsCommand <|> try pa
 parseAstNode :: (Monad a) => CalcLangParser a AstNode
 parseAstNode = spaces *> (try parseCommand <|> try parseFunctionDefinition <|> try parseMacroAssignment <|> try parseExpression) <* eof
 
-parseAstNodeLines :: (Monad a) => CalcLangParser a SA
-parseAstNodeLines = do
-                    x <- (sepBy parseAstNode parseNewLine)
-                    return (StoreArray (length x) (reverse x))
-
-runCalcLangParser :: String -> (InputT IO) AstNode
+runCalcLangParser :: String -> IO AstNode
 runCalcLangParser i = do
                       parseResult <- (runParserT parseAstNode () "" i)
                       case parseResult of
-                         Left err -> do
-                                     return (ErrorNode (show err))
+                         Left err -> return (ErrorNode (show err))
                          Right t -> return t
 
-runCalcLangParserC :: CString -> IO (Ptr CAstNode)
-runCalcLangParserC i = do
-                       realString <- peekCString i
-                       parseResult <- (runParserT parseAstNode () "" realString)
-                       case parseResult of
-                         Left err -> do
-                                     print err
-                                     ptr <- mallocBytes (sizeOf (undefined :: CAstNode))
-                                     let c = (CErrorNode (show err))
-                                     poke ptr c
-                                     return ptr
-                         Right t -> marshallAstNode t
+runCalcLangParserSequence :: [String] -> IO SA
+runCalcLangParserSequence l = do
+                              x <- (mapM runCalcLangParser l)
+                              return (StoreArray (length x) x)
+                              
 
 readMyFile :: FilePath -> IO String
 readMyFile filePath = readFile filePath
 
-
-runCalcLangProgramParserC :: CString -> IO (Ptr CSA)
-runCalcLangProgramParserC cPath = do
-                                  path <- peekCString cPath
-                                  contents <- readMyFile path
-                                  parseResult <- (runParserT parseAstNodeLines () path contents)
-                                  case parseResult of
-                                    Left err -> do
-                                                let sA = StoreArray 1 [ErrorNode (show err)]
-                                                marshallStorageArray sA
-                                    Right t -> marshallStorageArray t
                 
 
-runCalcLangLexer :: String -> (InputT IO) [Token]
+runCalcLangLexer :: String -> IO [Token]
 runCalcLangLexer i = do
                      lexResult <- (runParserT parseTokens () "" i)
                      case lexResult of

@@ -5,44 +5,43 @@
 
 void freeCalcLangValue(CalcLangValue* val);
 
-CalcLangValue* newIntValue(int myInt){
+CalcLangValue* integerCalcLangValue(int myInt){
   CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
   toRet->valType = IS_INT;
   toRet->valData.integer = myInt;
   return toRet;
 }
 
-CalcLangValue* newBoolValue(int val){
+CalcLangValue* booleanCalcLangValue(int val){
   CalcLangValue* toBool = malloc(sizeof(CalcLangValue));
   toBool->valType = IS_BOOL;
   toBool->valData.bool = val;
   return toBool;
 }
 
-CalcLangValue* newRealValue(double myReal){
+CalcLangValue* realCalcLangValue(double myReal){
   CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
   toRet->valType = IS_REAL;
   toRet->valData.real = myReal;
   return toRet;
 }
 
-CalcLangValue* newDollarValue(double myDollar){
+CalcLangValue* dollarCalcLangValue(double myDollar){
   CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
   toRet->valType = IS_DOLLAR;
   toRet->valData.dollar = myDollar;
   return toRet;
 }
 
-CalcLangValue* newPercentValue(double myPercent){
+CalcLangValue* percentCalcLangValue(double myPercent){
   CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
   toRet->valType = IS_PERCENT;
   toRet->valData.dollar = myPercent;
   return toRet;
 }
 
-CalcLangValue* newSetValue(CalcLangValue** value, int size){
-  CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
-  SetValue* set = 
+CalcLangValue* setCalcLangValue(CalcLangValue** value, int size){
+  CalcLangValue* toRet = malloc(sizeof(CalcLangValue)); 
   toRet->valType = IS_SET;
   toRet->valData.set = malloc(sizeof(SetValue));
   toRet->valData.set->size = size;
@@ -50,9 +49,8 @@ CalcLangValue* newSetValue(CalcLangValue** value, int size){
   return toRet;
 }
 
-CalcLangValue* newTupleValue(CalcLangValue** value, int size){
+CalcLangValue* tupleCalcLangValue(CalcLangValue** value, int size){
   CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
-  SetValue* set = 
   toRet->valType = IS_TUPLE;
   toRet->valData.set = malloc(sizeof(TupleValue));
   toRet->valData.set->size = size;
@@ -1261,7 +1259,7 @@ CalcLangValue* dotProductVals(CalcLangValue* left, int freeLeft, CalcLangValue* 
     TupleValue* leftTup = left->valData.tuple;
     TupleValue* rightTup = right->valData.tuple;
     if(leftTup->size == rightTup->size){
-      CalcLangValue* total = newIntValue(0);
+      CalcLangValue* total = integerCalcLangValue(0);
       for(int i = 0; i < leftTup->size; i++){
 	CalcLangValue* leftTupVal = leftTup->list[i];
 	CalcLangValue* rightTupVal = rightTup->list[i];

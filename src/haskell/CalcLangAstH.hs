@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP #-}
 
-module CalcLangAstH(Token(..), AstNode(..), SA(..), CSA(..), CSourcePos(..), CAstNode(..), toString) where
+module CalcLangAstH(Token(..), AstNode(..), SA(..), CSA(..), CSourcePos(..), CAstNode(..), toString, tokToString) where
 --Below are Some of the preprocessor Statements
 
 #define EQUAL_OPERATION 0
@@ -94,7 +94,50 @@ data Token = Ident Char SourcePos
            | PlanCmd SourcePos
            | HistoryCmd SourcePos
            | HelpCmd SourcePos
+           | PathSeperator Char SourcePos
+           | PathComponent String SourcePos
+           | SingleQuote SourcePos
+           | DoubleQuote SourcePos
            deriving (Show, Eq)
+
+tokToString :: Token -> String
+tokToString t = case t of
+                  Ident c _ -> [c]
+                  IntNum str _ -> str
+                  RealNum str _ -> str
+                  TF str _ -> str
+                  Func _ -> "func"
+                  Plus _ -> "+"
+                  Minus _ -> "-"
+                  Times _ -> "*"
+                  Div _ -> "/"
+                  Eq _ -> "="
+                  Pow _ -> "^"
+                  Not _ -> "'"
+                  Comma _ -> ","
+                  LPar _ -> "("
+                  RPar _ -> ")"
+                  LBrack _ -> "["
+                  RBrack _ -> "]"
+                  LessThen _ -> "<"
+                  GreaterThen _ -> ">"
+                  GtOrEq _ -> ">="
+                  LtOrEq _ -> "<="
+                  If _ -> "if"
+                  Then _ -> "then"
+                  Else _ -> "else"
+                  Let _ -> "let"
+                  Dol str _ -> str
+                  Perc str _ -> str
+                  Dot _ -> "."
+                  NewLine _ -> "\n"
+                  PathSeperator c _ -> [c] 
+                  PathComponent str _ -> str
+                  SingleQuote _ -> "'"
+                  DoubleQuote _ -> "\""
+                  _ -> ""
+                  
+                  
 
 --Below are all the regular AstNodes
 data SA = StoreArray Int [AstNode] deriving (Eq, Show)
@@ -149,8 +192,9 @@ data AstNode = EqualOperation SourcePos AstNode AstNode
              | ShowHistoryCommand SourcePos
              | QuitCommand SourcePos
              | HelpCommand SourcePos
-             | CreateLessonPlanCommand SourcePos
+             | CreateLessonPlanCommand SourcePos String
              | ErrorNode String
+             | FullPath SourcePos String
              deriving (Eq, Show)
 
 toString :: AstNode -> String
