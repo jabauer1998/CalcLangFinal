@@ -1,5 +1,0 @@
-show history
-8 + 9
-create lesson plan ./MyLessonPlan.txt
-8 + 9
-help

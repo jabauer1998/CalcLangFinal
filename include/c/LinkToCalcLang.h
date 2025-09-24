@@ -1,9 +1,6 @@
 #ifndef LINK_TO_CALC_LANG
 #define LINK_TO_CALC_LANG
 
-#define TRUE 1
-#define FALSE 0
-
 #define IS_INT 0
 #define IS_REAL 1
 #define IS_DOLLAR 3
@@ -39,25 +36,29 @@ typedef struct CalcLangVal{
   CalcLangValueData valData;
 } CalcLangValue;
 
-CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* dotProductCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* equalsCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* lessThenCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* greaterThenCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* lessThenOrEqualToCalcLangValue(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* greaterThenOrEqualToCalcLangValue(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight);
-CalcLangValue* notCalcLangValue(CalcLangValue* value, int freeRight);
-CalcLangValue* negateCalcLangValue(CalcLangValue* value, int freeRight);
+CalcLangValue* addCalcLangValues(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* subCalcLangValues(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* multCalcLangValues(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* divCalcLangValues(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* powCalcLangValues(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* dotProductCalcLangValues(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* equalsCalcLangValues(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* lessThenCalcLangValues(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* greaterThenCalcLangValues(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* lessThenOrEqualToCalcLangValue(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* greaterThenOrEqualToCalcLangValue(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* notCalcLangValue(CalcLangValue* value);
+CalcLangValue* negateCalcLangValue(CalcLangValue* value);
 CalcLangValue* integerCalcLangValue(int input);
-CalcLangValue* realCalcLangValue(double input);
-CalcLangValue* dollarCalcLangValue(double input);
-CalcLangValue* percentCalcLangValue(double percent);
+CalcLangValue* realCalcLangValue(float input);
+CalcLangValue* dollarCalcLangValue(float input);
+CalcLangValue* percentCalcLangValue(float percent);
 CalcLangValue* tupleCalcLangValue(CalcLangValue**values, int size);
 CalcLangValue* setCalcLangValue(CalcLangValue**values, int size);
 void printValue(CalcLangValue* calcLang);
+void printString(char* str);
+void printHeader();
+void getInput();
+void clearHeader();
 
 #endif

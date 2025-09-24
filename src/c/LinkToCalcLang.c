@@ -2,8 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 void freeCalcLangValue(CalcLangValue* val);
+CalcLangValue* copyValue(CalcLangValue* val);
+const char* header = "Click Enter to view next line of text\n";
 
 CalcLangValue* integerCalcLangValue(int myInt){
   CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
@@ -19,21 +22,21 @@ CalcLangValue* booleanCalcLangValue(int val){
   return toBool;
 }
 
-CalcLangValue* realCalcLangValue(double myReal){
+CalcLangValue* realCalcLangValue(float myReal){
   CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
   toRet->valType = IS_REAL;
-  toRet->valData.real = myReal;
+  toRet->valData.real = (double)myReal;
   return toRet;
 }
 
-CalcLangValue* dollarCalcLangValue(double myDollar){
+CalcLangValue* dollarCalcLangValue(float myDollar){
   CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
   toRet->valType = IS_DOLLAR;
   toRet->valData.dollar = myDollar;
   return toRet;
 }
 
-CalcLangValue* percentCalcLangValue(double myPercent){
+CalcLangValue* percentCalcLangValue(float myPercent){
   CalcLangValue* toRet = malloc(sizeof(CalcLangValue));
   toRet->valType = IS_PERCENT;
   toRet->valData.dollar = myPercent;
@@ -58,7 +61,7 @@ CalcLangValue* tupleCalcLangValue(CalcLangValue** value, int size){
   return toRet;
 }
 
-CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){
+CalcLangValue* addCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   if(left == NULL || right == NULL)
     return NULL;
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
@@ -79,7 +82,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     result->valData.dollar = left->valData.dollar + right->valData.dollar;
   } else if(left->valType == IS_PERCENT && right->valType == IS_PERCENT){
     result->valType = IS_PERCENT;
-    result->valData.percent = left->valData.percent + right->valData.percent; 
+    result->valData.percent = left->valData.percent + right->valData.percent;
   } else if(left->valType == IS_TUPLE && right->valType == IS_TUPLE){
     TupleValue* leftTup = left->valData.tuple;
     TupleValue* rightTup = right->valData.tuple;
@@ -88,7 +91,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
       resultTup->size = leftTup->size;
       resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
       for(int i = 0; i < leftTup->size; i++){
-	resultTup->list[i] = addCalcLangValues(leftTup->list[i], TRUE, rightTup->list[i], FALSE);  
+	resultTup->list[i] = addCalcLangValues(leftTup->list[i], rightTup->list[i]);  
       }
       result->valType = IS_TUPLE;
       result->valData.tuple = resultTup;
@@ -102,17 +105,19 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = addCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = addCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
+    freeCalcLangValue(left);
+    freeCalcLangValue(right);
   } else if(left->valType == IS_INT && right->valType == IS_TUPLE){
     TupleValue* rightTup = right->valData.tuple;
     TupleValue* resultTup = malloc(sizeof(TupleValue));
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = addCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = addCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -122,7 +127,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = addCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = addCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -132,7 +137,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = addCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = addCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -142,7 +147,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = addCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = addCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -152,7 +157,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = addCalcLangValues(left, FALSE,  rightTup->list[i], TRUE);  
+      resultTup->list[i] = addCalcLangValues(copyValue(left),  rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -162,7 +167,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = addCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = addCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -172,7 +177,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = addCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = addCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -184,7 +189,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
       resultSet->size = leftSet->size;
       resultSet->list = malloc(sizeof(SetValue*) * resultSet->size);
       for(int i = 0; i < leftSet->size; i++){
-	resultSet->list[i] = addCalcLangValues(leftSet->list[i], TRUE, rightSet->list[i], TRUE);  
+	resultSet->list[i] = addCalcLangValues(leftSet->list[i], rightSet->list[i]);  
       }
       result->valType = IS_SET;
       result->valData.set = resultSet;
@@ -198,7 +203,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = addCalcLangValues(leftSet->list[i], TRUE, right, FALSE);
+      resultSet->list[i] = addCalcLangValues(leftSet->list[i], copyValue(right));
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -208,7 +213,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = addCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = addCalcLangValues(left, rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -218,7 +223,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = addCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = addCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.set = resultSet;
@@ -228,7 +233,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = addCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = addCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -238,7 +243,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = addCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = addCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -248,7 +253,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = addCalcLangValues(left, FALSE, rightSet->list[i], TRUE);
+      resultSet->list[i] = addCalcLangValues(copyValue(left), rightSet->list[i]);
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -258,7 +263,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = addCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = addCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -268,7 +273,7 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = addCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = addCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -276,15 +281,10 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     perror("Invalid types found for CalcLangAddition Operation");
   }
 
-  if(freeLeft)
-    freeCalcLangValue(left);
-  else if(freeRight)
-    freeCalcLangValue(right);
-
   return result;
 }
 
-CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){
+CalcLangValue* subCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   if(left == NULL || right == NULL)
     return NULL;
   
@@ -315,7 +315,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
       resultTup->size = leftTup->size;
       resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
       for(int i = 0; i < leftTup->size; i++){
-	resultTup->list[i] = subCalcLangValues(leftTup->list[i], TRUE, rightTup->list[i], FALSE);  
+	resultTup->list[i] = subCalcLangValues(leftTup->list[i], rightTup->list[i]);  
       }
       result->valType = IS_TUPLE;
       result->valData.tuple = resultTup;
@@ -329,7 +329,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = subCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = subCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -339,7 +339,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = subCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = subCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -349,7 +349,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = subCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = subCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -359,7 +359,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = subCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = subCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -369,7 +369,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = subCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = subCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -379,7 +379,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = subCalcLangValues(left, FALSE,  rightTup->list[i], TRUE);  
+      resultTup->list[i] = subCalcLangValues(copyValue(left),  rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -389,7 +389,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = subCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = subCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -399,7 +399,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = subCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = subCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -411,7 +411,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
       resultSet->size = leftSet->size;
       resultSet->list = malloc(sizeof(SetValue*) * resultSet->size);
       for(int i = 0; i < leftSet->size; i++){
-	resultSet->list[i] = subCalcLangValues(leftSet->list[i], TRUE, rightSet->list[i], TRUE);  
+	resultSet->list[i] = subCalcLangValues(leftSet->list[i], rightSet->list[i]);  
       }
       result->valType = IS_SET;
       result->valData.set = resultSet;
@@ -425,7 +425,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = subCalcLangValues(leftSet->list[i], TRUE, right, FALSE);
+      resultSet->list[i] = subCalcLangValues(leftSet->list[i], copyValue(right));
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -435,7 +435,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = subCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = subCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -445,7 +445,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = subCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = subCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.set = resultSet;
@@ -455,7 +455,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = subCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = subCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -465,7 +465,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = subCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = subCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -475,7 +475,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = subCalcLangValues(left, FALSE, rightSet->list[i], TRUE);
+      resultSet->list[i] = subCalcLangValues(copyValue(left), rightSet->list[i]);
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -485,7 +485,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = subCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = subCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -495,7 +495,7 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = subCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = subCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -503,15 +503,13 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     perror("Invalid types found for CalcLangAddition Operation");
   }
 
-  if(freeLeft)
-    freeCalcLangValue(left);
-  else if(freeRight)
-    freeCalcLangValue(right);
+  freeCalcLangValue(left);
+  freeCalcLangValue(right);
 
   return result;
 }
 
-CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){
+CalcLangValue* multCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   if(left == NULL || right == NULL)
     return NULL;
   
@@ -563,7 +561,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
       resultTup->size = leftTup->size;
       resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
       for(int i = 0; i < leftTup->size; i++){
-	resultTup->list[i] = multCalcLangValues(leftTup->list[i], TRUE, rightTup->list[i], FALSE);  
+	resultTup->list[i] = multCalcLangValues(leftTup->list[i], rightTup->list[i]);  
       }
       result->valType = IS_TUPLE;
       result->valData.tuple = resultTup;
@@ -577,7 +575,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = multCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = multCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -587,7 +585,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = multCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = multCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -597,7 +595,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = multCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = multCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -607,7 +605,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = multCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = multCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -617,7 +615,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = multCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = multCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -627,7 +625,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = multCalcLangValues(left, FALSE,  rightTup->list[i], TRUE);  
+      resultTup->list[i] = multCalcLangValues(copyValue(left),  rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -637,7 +635,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = multCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = multCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -647,7 +645,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = multCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = multCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -659,7 +657,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
       resultSet->size = leftSet->size;
       resultSet->list = malloc(sizeof(SetValue*) * resultSet->size);
       for(int i = 0; i < leftSet->size; i++){
-	resultSet->list[i] = multCalcLangValues(leftSet->list[i], TRUE, rightSet->list[i], TRUE);  
+	resultSet->list[i] = multCalcLangValues(leftSet->list[i], rightSet->list[i]);  
       }
       result->valType = IS_SET;
       result->valData.set = resultSet;
@@ -673,7 +671,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = multCalcLangValues(leftSet->list[i], TRUE, right, FALSE);
+      resultSet->list[i] = multCalcLangValues(leftSet->list[i], copyValue(right));
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -683,7 +681,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = multCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = multCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -693,7 +691,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = multCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = multCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.set = resultSet;
@@ -703,7 +701,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = multCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = multCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -713,7 +711,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = multCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = multCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -723,7 +721,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = multCalcLangValues(left, FALSE, rightSet->list[i], TRUE);
+      resultSet->list[i] = multCalcLangValues(copyValue(left), rightSet->list[i]);
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -733,7 +731,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = multCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = multCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -743,17 +741,16 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = multCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = multCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
   } else {
     perror("Invalid types found for CalcLangAddition Operation");
   }
-
-  if(freeLeft)
+  
     freeCalcLangValue(left);
-  else if(freeRight)
+  
     freeCalcLangValue(right);
 
   return result;
@@ -761,7 +758,7 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangVal
 
 
 
-CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){
+CalcLangValue* divCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   if(left == NULL || right == NULL)
     return NULL;
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
@@ -809,7 +806,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
       resultTup->size = leftTup->size;
       resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
       for(int i = 0; i < leftTup->size; i++){
-	resultTup->list[i] = divCalcLangValues(leftTup->list[i], TRUE, rightTup->list[i], FALSE);  
+	resultTup->list[i] = divCalcLangValues(leftTup->list[i], rightTup->list[i]);  
       }
       result->valType = IS_TUPLE;
       result->valData.tuple = resultTup;
@@ -823,7 +820,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = divCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = divCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -833,7 +830,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = divCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = divCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -843,7 +840,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = divCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = divCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -853,7 +850,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = divCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = divCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -863,7 +860,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = divCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = divCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -873,7 +870,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = divCalcLangValues(left, FALSE,  rightTup->list[i], TRUE);  
+      resultTup->list[i] = divCalcLangValues(copyValue(left),  rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -883,7 +880,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = divCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = divCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -893,7 +890,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = divCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = divCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -905,7 +902,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
       resultSet->size = leftSet->size;
       resultSet->list = malloc(sizeof(SetValue*) * resultSet->size);
       for(int i = 0; i < leftSet->size; i++){
-	resultSet->list[i] = divCalcLangValues(leftSet->list[i], TRUE, rightSet->list[i], TRUE);  
+	resultSet->list[i] = divCalcLangValues(leftSet->list[i], rightSet->list[i]);  
       }
       result->valType = IS_SET;
       result->valData.set = resultSet;
@@ -919,7 +916,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = divCalcLangValues(leftSet->list[i], TRUE, right, FALSE);
+      resultSet->list[i] = divCalcLangValues(leftSet->list[i], copyValue(right));
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -929,7 +926,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = divCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = divCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -939,7 +936,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = divCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = divCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.set = resultSet;
@@ -949,7 +946,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = divCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = divCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -959,7 +956,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = divCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = divCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -969,7 +966,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = divCalcLangValues(left, FALSE, rightSet->list[i], TRUE);
+      resultSet->list[i] = divCalcLangValues(copyValue(left), rightSet->list[i]);
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -979,7 +976,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = divCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = divCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -989,7 +986,7 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = divCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = divCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -997,15 +994,15 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     perror("Invalid types found for CalcLangAddition Operation");
   }
 
-  if(freeLeft)
+  
     freeCalcLangValue(left);
-  else if(freeRight)
+  
     freeCalcLangValue(right);
 
   return result;
 }
 
-CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){
+CalcLangValue* powCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   if(left == NULL || right == NULL)
     return NULL;
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
@@ -1056,7 +1053,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
       resultTup->size = leftTup->size;
       resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
       for(int i = 0; i < leftTup->size; i++){
-	resultTup->list[i] = multCalcLangValues(leftTup->list[i], TRUE, rightTup->list[i], FALSE);  
+	resultTup->list[i] = multCalcLangValues(leftTup->list[i], rightTup->list[i]);  
       }
       result->valType = IS_TUPLE;
       result->valData.tuple = resultTup;
@@ -1070,7 +1067,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = powCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = powCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -1080,7 +1077,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = powCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = powCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -1090,7 +1087,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = powCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = powCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -1100,7 +1097,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = powCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = powCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -1110,7 +1107,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = powCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = powCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -1120,7 +1117,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = powCalcLangValues(left, FALSE,  rightTup->list[i], TRUE);  
+      resultTup->list[i] = powCalcLangValues(copyValue(left),  rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -1130,7 +1127,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = leftTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
-      resultTup->list[i] = powCalcLangValues(leftTup->list[i], TRUE, right, FALSE);  
+      resultTup->list[i] = powCalcLangValues(leftTup->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -1140,7 +1137,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultTup->size = rightTup->size;
     resultTup->list = malloc(sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
-      resultTup->list[i] = powCalcLangValues(left, FALSE, rightTup->list[i], TRUE);  
+      resultTup->list[i] = powCalcLangValues(copyValue(left), rightTup->list[i]);  
     }
     result->valType = IS_TUPLE;
     result->valData.tuple = resultTup;
@@ -1152,7 +1149,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
       resultSet->size = leftSet->size;
       resultSet->list = malloc(sizeof(SetValue*) * resultSet->size);
       for(int i = 0; i < leftSet->size; i++){
-	resultSet->list[i] = powCalcLangValues(leftSet->list[i], TRUE, rightSet->list[i], TRUE);  
+	resultSet->list[i] = powCalcLangValues(leftSet->list[i], rightSet->list[i]);  
       }
       result->valType = IS_SET;
       result->valData.set = resultSet;
@@ -1166,7 +1163,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = powCalcLangValues(leftSet->list[i], TRUE, right, FALSE);
+      resultSet->list[i] = powCalcLangValues(leftSet->list[i], copyValue(right));
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -1176,7 +1173,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = powCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = powCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -1186,7 +1183,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = powCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = powCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_TUPLE;
     result->valData.set = resultSet;
@@ -1196,7 +1193,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = powCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = powCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -1206,7 +1203,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = powCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = powCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -1216,7 +1213,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = powCalcLangValues(left, FALSE, rightSet->list[i], TRUE);
+      resultSet->list[i] = powCalcLangValues(copyValue(left), rightSet->list[i]);
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -1226,7 +1223,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = leftSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
-      resultSet->list[i] = powCalcLangValues(leftSet->list[i], TRUE, right, FALSE);  
+      resultSet->list[i] = powCalcLangValues(leftSet->list[i], copyValue(right));  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -1236,7 +1233,7 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     resultSet->size = rightSet->size;
     resultSet->list = malloc(sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
-      resultSet->list[i] = powCalcLangValues(left, FALSE, rightSet->list[i], TRUE);  
+      resultSet->list[i] = powCalcLangValues(copyValue(left), rightSet->list[i]);  
     }
     result->valType = IS_SET;
     result->valData.set = resultSet;
@@ -1244,15 +1241,15 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValu
     perror("Invalid types found for CalcLangAddition Operation");
   }
 
-  if(freeLeft)
+  
     freeCalcLangValue(left);
-  else if(freeRight)
+  
     freeCalcLangValue(right);
 
   return result;
 }
 
-CalcLangValue* dotProductVals(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){
+CalcLangValue* dotProductVals(CalcLangValue* left, CalcLangValue* right){
   if(left == NULL || right == NULL)
     return NULL;
   if(left->valType == IS_TUPLE && right->valType == IS_TUPLE){
@@ -1263,8 +1260,8 @@ CalcLangValue* dotProductVals(CalcLangValue* left, int freeLeft, CalcLangValue* 
       for(int i = 0; i < leftTup->size; i++){
 	CalcLangValue* leftTupVal = leftTup->list[i];
 	CalcLangValue* rightTupVal = rightTup->list[i];
-	CalcLangValue* multResult = multCalcLangValues(leftTupVal, FALSE, rightTupVal, FALSE);
-	total = addCalcLangValues(total, TRUE, multResult, TRUE);
+	CalcLangValue* multResult = multCalcLangValues(leftTupVal, rightTupVal);
+	total = addCalcLangValues(total, multResult);
       }
 
       return total;
@@ -1274,10 +1271,14 @@ CalcLangValue* dotProductVals(CalcLangValue* left, int freeLeft, CalcLangValue* 
   } else {
     perror("Invalid type for dot product expected Tuple and Tuple");
   }
+
+  freeCalcLangValue(left);
+  freeCalcLangValue(right);
+  
   return NULL;
 }
 
-CalcLangValue* equalsCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){
+CalcLangValue* equalsCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   if(left == NULL || right == NULL)
     return NULL;
   
@@ -1319,12 +1320,12 @@ CalcLangValue* equalsCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangV
     TupleValue* leftTup = left->valData.tuple;
     TupleValue* rightTup = right->valData.tuple;
     if(rightTup->size == leftTup->size){
-      int boolResult = TRUE;
+      int boolResult = 1;
       for(int i = 0; i < leftTup->size; i++){
-	CalcLangValue* val  = equalsCalcLangValues(leftTup->list[i], TRUE, rightTup->list[i], FALSE);
+	CalcLangValue* val  = equalsCalcLangValues(leftTup->list[i], rightTup->list[i]);
 	if(val->valType == IS_BOOL){
-	  if(val->valData.bool == FALSE){
-	    boolResult = FALSE;
+	  if(val->valData.bool == 0){
+	    boolResult = 0;
 	    break;
 	  }
 	}
@@ -1339,12 +1340,12 @@ CalcLangValue* equalsCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangV
     SetValue* leftSet = left->valData.set;
     SetValue* rightSet = right->valData.set;
     if(rightSet->size == leftSet->size){
-      int boolResult = TRUE;
+      int boolResult = 1;
       for(int i = 0; i < leftSet->size; i++){
-	CalcLangValue* val = equalsCalcLangValues(leftSet->list[i], TRUE, rightSet->list[i], TRUE);
+	CalcLangValue* val = equalsCalcLangValues(leftSet->list[i], rightSet->list[i]);
 	if(val->valType == IS_BOOL){
-	  if(val->valData.bool == FALSE){
-	    boolResult = FALSE;
+	  if(val->valData.bool == 0){
+	    boolResult = 0;
 	    break;
 	  }
 	}
@@ -1360,15 +1361,15 @@ CalcLangValue* equalsCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangV
     return NULL;
   }
 
-  if(freeLeft)
+  
     freeCalcLangValue(left);
-  else if(freeRight)
+  
     freeCalcLangValue(right);
 
   return result;
 }
 
-CalcLangValue* lessThenCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){
+CalcLangValue* lessThenCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   if(left == NULL || right == NULL)
     return NULL;
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
@@ -1395,15 +1396,15 @@ CalcLangValue* lessThenCalcLangValues(CalcLangValue* left, int freeLeft, CalcLan
       return NULL;
   }
 
-  if(freeLeft)
+  
     freeCalcLangValue(left);
-  else if(freeRight)
+  
     freeCalcLangValue(right);
 
   return result;
 }
 
-CalcLangValue* greaterThenCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){
+CalcLangValue* greaterThenCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   if(left == NULL || right == NULL)
     return NULL;
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
@@ -1429,15 +1430,15 @@ CalcLangValue* greaterThenCalcLangValues(CalcLangValue* left, int freeLeft, Calc
     perror("Invalid types found for CalcLangAddition Operation");
   }
 
-  if(freeLeft)
+  
     freeCalcLangValue(left);
-  else if(freeRight)
+  
     freeCalcLangValue(right);
 
   return result;
 }
 
-CalcLangValue* lessThenOrEqualToCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){
+CalcLangValue* lessThenOrEqualToCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   if(left == NULL || right == NULL)
     return NULL;
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
@@ -1463,15 +1464,15 @@ CalcLangValue* lessThenOrEqualToCalcLangValues(CalcLangValue* left, int freeLeft
     perror("Invalid types found for CalcLangAddition Operation");
   }
 
-  if(freeLeft)
+  
     freeCalcLangValue(left);
-  else if(freeRight)
+  
     freeCalcLangValue(right);
 
   return result;
 }
 
-CalcLangValue* greaterThenOrEqualToCalcLangValues(CalcLangValue* left, int freeLeft, CalcLangValue* right, int freeRight){
+CalcLangValue* greaterThenOrEqualToCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   if(left == NULL || right == NULL)
     return NULL;
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
@@ -1498,15 +1499,14 @@ CalcLangValue* greaterThenOrEqualToCalcLangValues(CalcLangValue* left, int freeL
     return NULL;
   }
 
-  if(freeLeft)
     freeCalcLangValue(left);
-  else if(freeRight)
+  
     freeCalcLangValue(right);
 
   return result;
 }
 
-CalcLangValue* notCalcLangValue(CalcLangValue* toNot, int freeToNeg){
+CalcLangValue* notCalcLangValue(CalcLangValue* toNot){
   if(toNot == NULL)
     return NULL;
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
@@ -1525,7 +1525,7 @@ CalcLangValue* notCalcLangValue(CalcLangValue* toNot, int freeToNeg){
     result->valData.tuple->size = toNot->valData.tuple->size;
     result->valData.tuple->list = malloc(sizeof(CalcLangValue*) * result->valData.tuple->size);
     for(int i = 0; i < result->valData.tuple->size; i++){
-      result->valData.tuple->list[i] = notCalcLangValue(toNot->valData.tuple->list[i], TRUE);
+      result->valData.tuple->list[i] = notCalcLangValue(toNot->valData.tuple->list[i]);
     }
     result->valType = IS_TUPLE;
     return result;
@@ -1535,7 +1535,7 @@ CalcLangValue* notCalcLangValue(CalcLangValue* toNot, int freeToNeg){
     result->valData.set->size = toNot->valData.set->size;
     result->valData.set->list = malloc(sizeof(CalcLangValue*) * result->valData.set->size);
     for(int i = 0; i < result->valData.tuple->size; i++){
-      result->valData.set->list[i] = notCalcLangValue(toNot->valData.set->list[i], TRUE);
+      result->valData.set->list[i] = notCalcLangValue(toNot->valData.set->list[i]);
     }
     result->valType = IS_SET;
     return result;
@@ -1543,10 +1543,12 @@ CalcLangValue* notCalcLangValue(CalcLangValue* toNot, int freeToNeg){
     perror("Invalid type for not operation");
   }
 
+  freeCalcLangValue(toNot);
+
   return result;
 }
 
-CalcLangValue* negateCalcLangValue(CalcLangValue* toNot, int free){
+CalcLangValue* negateCalcLangValue(CalcLangValue* toNot){
   if(toNot == NULL)
     return NULL;
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
@@ -1568,7 +1570,7 @@ CalcLangValue* negateCalcLangValue(CalcLangValue* toNot, int free){
     result->valData.tuple->size = toNot->valData.tuple->size;
     result->valData.tuple->list = malloc(sizeof(CalcLangValue*) * result->valData.tuple->size);
     for(int i = 0; i < result->valData.tuple->size; i++){
-      result->valData.tuple->list[i] = negateCalcLangValue(toNot->valData.tuple->list[i], TRUE);
+      result->valData.tuple->list[i] = negateCalcLangValue(toNot->valData.tuple->list[i]);
     }
     result->valType = IS_TUPLE;
     return result;
@@ -1578,13 +1580,15 @@ CalcLangValue* negateCalcLangValue(CalcLangValue* toNot, int free){
     result->valData.set->size = toNot->valData.set->size;
     result->valData.set->list = malloc(sizeof(CalcLangValue*) * result->valData.set->size);
     for(int i = 0; i < result->valData.tuple->size; i++){
-      result->valData.set->list[i] = negateCalcLangValue(toNot->valData.set->list[i], TRUE);
+      result->valData.set->list[i] = negateCalcLangValue(toNot->valData.set->list[i]);
     }
     result->valType = IS_SET;
     return result;
   } else {
     perror("Invalid type for negate operation");
   }
+
+  freeCalcLangValue(toNot);
 
   return result;
 }
@@ -1612,7 +1616,7 @@ void printValue(CalcLangValue* val){
       if(i == 0){
 	printValue(val->valData.tuple->list[i]);
       } else {
-	printf(", ");
+      	printf(", ");
 	printValue(val->valData.tuple->list[i]);
       }
     }
@@ -1630,6 +1634,50 @@ void printValue(CalcLangValue* val){
     printf("}");
   } else {
     perror("Cant print type for specified CalcLangValue!!!");
+  }
+}
+
+CalcLangValue* copyValue(CalcLangValue* val){
+  if(val == NULL)
+    return NULL;
+
+  int size = sizeof(CalcLangValue);
+  CalcLangValue* newVal = malloc(size);
+  memcpy(newVal, val, size);
+
+  return newVal;
+}
+
+void freeCalcLangValue(CalcLangValue* val){
+  if(val != NULL){
+    if(val->valType == IS_TUPLE){
+      TupleValue* tup = val->valData.tuple;
+      for(int i = 0; i < tup->size; i++){
+	freeCalcLangValue(tup->list[i]);
+      }
+      free(tup);
+    } else if(val->valType == IS_SET){
+      SetValue* set = val->valData.set;
+      for(int i = 0; i < set->size; i++){
+	freeCalcLangValue(set->list[i]);
+      }
+      free(set);
+    }
+    free(val);
+  }
+}
+
+void printString(char* str){
+  printf("%s\n", str);
+  fflush(stdout);
+}
+
+void getInput(){
+  while(1){
+    char c = getchar();
+    if(c == '\n'){
+      break;
+    }
   }
 }
 

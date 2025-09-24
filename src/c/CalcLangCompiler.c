@@ -48,7 +48,7 @@ void processASTList(StoreArray* storeArray, char* output){
     }
 
     // Create a target machine
-    LLVMTargetMachineRef targetMachine = LLVMCreateTargetMachine(target, triple, "generic", "output.o", LLVMCodeGenLevelAggressive, LLVMRelocDefault, LLVMCodeModelDefault);
+    LLVMTargetMachineRef targetMachine = LLVMCreateTargetMachine(target, triple, "generic", "", LLVMCodeGenLevelAggressive, LLVMRelocDefault, LLVMCodeModelDefault);
     if (LLVMTargetMachineEmitToFile(targetMachine, mod, "output.o", LLVMObjectFile, &error)) {
       perror(error);
       return;
@@ -56,11 +56,12 @@ void processASTList(StoreArray* storeArray, char* output){
 
     char myData[1000];
     myData[0] = '\0';
-    char* beg = "clang -o ";
+    char* beg = "clang -static -o ";
     strncat(myData, beg, strlen(beg));
     strncat(myData, output, strlen(output));
-    char* end = " output.o";
+    char* end = " output.o  -lm";
     strncat(myData, end, strlen(end));
+    printf("Compiling with %s", myData);
     system(myData); //Generate the exe
 
     //Remove output.o

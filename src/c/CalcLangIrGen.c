@@ -11,7 +11,6 @@
 #define DEBUG
 
 void codeGenNode(AstNode* node, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMTypeRef calcLangPtr, LLVMContextRef ctx, LLVMModuleRef mod);
-
 LLVMValueRef codeGenExpression(AstNode* node, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef func, LLVMModuleRef mod, LLVMContextRef ctx);
 
 void loadCalcLangLinkerFile(LLVMModuleRef module, LLVMContextRef ctx, LLVMBuilderRef builder){
@@ -21,34 +20,37 @@ void loadCalcLangLinkerFile(LLVMModuleRef module, LLVMContextRef ctx, LLVMBuilde
       perror(Message);
     }
     
-    #ifdef DEBUG
-    printf("Created Memory Buffer from File");
-    fflush(stdout);
-    #endif
-    
     LLVMModuleRef ExternalModule;
     if (LLVMParseIRInContext(ctx, MemBuf, &ExternalModule, &Message)) {
       perror(Message);
     }
     
-    #ifndef DEBUG
-    printf("Parsed contents of Buffer");
-    fflush(stdout);
-    #endif
-    
     // Link the external module into your current module
     if(LLVMLinkModules2(module, ExternalModule)) {
       perror("Linking module failed");
     }
-    
-    #ifdef DEBUG
-    printf("Completed loadCalcLangLinkerFile");
-    fflush(stdout);
-    char* module_ir = LLVMPrintModuleToString(module);
-    FILE* fptr = fopen("tmp/LinkedFile.txt", "w"); 
-    fputs(module_ir, fptr);
-    free(module_ir);
-    #endif
+}
+
+void printStringRef(char* string, LLVMBuilderRef builder, LLVMModuleRef mod, LLVMContextRef ctx){
+  LLVMValueRef func = LLVMGetNamedFunction(mod, "printString");
+  int size = strlen(string);
+  LLVMValueRef strGlobal = LLVMBuildGlobalStringPtr(builder, string, "");
+  LLVMTypeRef paramTypes[]= {
+    LLVMPointerType(LLVMInt8Type(), 0)
+  };
+  LLVMValueRef args[] = {
+    strGlobal
+  };
+  LLVMTypeRef funcType = LLVMFunctionType(LLVMVoidTypeInContext(ctx), paramTypes, 1, 0);
+  LLVMBuildCall2(builder, funcType, func, args, 1, "");
+}
+
+void getInputRef(LLVMBuilderRef builder, LLVMModuleRef mod, LLVMContextRef ctx){
+  LLVMValueRef func = LLVMGetNamedFunction(mod, "getInput");
+  LLVMTypeRef paramTypes[]= {};
+  LLVMValueRef args[] = {};
+  LLVMTypeRef funcType = LLVMFunctionType(LLVMVoidTypeInContext(ctx), paramTypes, 0, 0);
+  LLVMBuildCall2(builder, funcType, func, args, 0, "");
 }
 
 LLVMModuleRef codeGen(StoreArray* arr){
@@ -58,32 +60,9 @@ LLVMModuleRef codeGen(StoreArray* arr){
   LLVMContextRef ctx = LLVMGetGlobalContext();
   LLVMBuilderRef builder = LLVMCreateBuilderInContext(ctx);
   loadCalcLangLinkerFile(module, ctx, builder);
-
-  #ifdef DEBUG
-  char* module_ir = LLVMPrintModuleToString(module);
-  FILE* fptr = fopen("tmp/LinkedFileAfter.txt", "w"); 
-  fputs(module_ir, fptr);
-  free(module_ir);
-  #endif
   
   LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-
-  #ifdef DEBUG
-  if(calcLangValueType == NULL){
-    printf("Value is null\n");
-    fflush(stdout);
-  } else {
-    printf("Value is not null\n");
-    fflush(stdout);
-  }
-  #endif
-  
   LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
-
-  #ifdef DEBUG
-  printf("Got ptr Type");
-  fflush(stdout);
-  #endif
   
   //Define main method
   LLVMTypeRef intType = LLVMInt32TypeInContext(ctx);
@@ -96,7 +75,12 @@ LLVMModuleRef codeGen(StoreArray* arr){
   
   for(int i = 0; i < arr->length; i++){
     AstNode* node = arr->firstElem[i];
+    char* str = astToString(node);
+    printStringRef(str, builder, module, ctx);
+    free(str);
+    getInputRef(builder, module, ctx);
     codeGenNode(node, stack, builder, mainFunction, calcLangPtrType, ctx, module);
+    getInputRef(builder, module, ctx);
   }
 
   LLVMValueRef zero = LLVMConstInt(intType, 0, 0); // Create an integer constant 0
@@ -108,146 +92,163 @@ LLVMModuleRef codeGen(StoreArray* arr){
   return module;
 }
 
+LLVMTypeRef createFunctionPointerType(LLVMContextRef ctx, int numArgs, int isVoid){
+  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
+  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
+
+  LLVMTypeRef paramTypes[numArgs];
+  for(int i = 0; i < numArgs; i++){
+    paramTypes[i] = calcLangPtrType;
+  }
+
+  if(!isVoid){
+    return LLVMFunctionType(calcLangPtrType, paramTypes, numArgs, 0);
+  } else {
+    return LLVMFunctionType(LLVMVoidTypeInContext(ctx), paramTypes, numArgs, 0);
+  }
+}
+
 void printValueRef(LLVMValueRef refToPrint, ScopeStack stack, LLVMBuilderRef builder, LLVMTypeRef ptr, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef voidType = LLVMVoidTypeInContext(ctx);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "printValue");
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 1, 1);
   LLVMValueRef args[] = { refToPrint };
-  LLVMBuildCall2(builder, voidType, myFunc, args, 1, "");
+  LLVMBuildCall2(builder, myFuncType, myFunc, args, 1, "");
 }
 
 LLVMValueRef codeGenEqualsOperation(EqualOperation* op, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangValue");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "equalsCalcLangValues");
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
 }
 
 LLVMValueRef codeGenLessThenOrEqualsOperation(LessThenOrEqualsOperation* op, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "lessThenOrEqualsCalcLangValues");
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
 }
 
 LLVMValueRef codeGenGreaterThenOrEqualsOperation(GreaterThenOrEqualsOperation* op, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "greaterThenOrEqualsCalcLangValues");
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
 }
 
 LLVMValueRef codeGenLessThenOperation(LessThenOperation* op, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "lessThenCalcLangValues");
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
 }
 
 LLVMValueRef codeGenGreaterThenOperation(GreaterThenOperation* op, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "greaterThenCalcLangValues");
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
 }
 
 LLVMValueRef codeGenAdditionOperation(AdditionOperation* op, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "addCalcLangValues");
+  LLVMTypeRef funcType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, funcType, myFunc, args, 2, "");
 }
 
 LLVMValueRef codeGenSubtractionOperation(SubtractionOperation* op, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "subtractCalcLangValues");
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
 }
 
 LLVMValueRef codeGenMultiplicationOperation(MultiplicationOperation* op, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "multiplyCalcLangValues");
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
 }
 
 LLVMValueRef codeGenDotProductOperation(DotProductOperation* op, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "dorProductCalcLangValues");
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
 }
 
 LLVMValueRef codeGenDivisionOperation(DivisionOperation* op, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "divideCalcLangValues");
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
 }
 
 LLVMValueRef codeGenPowerOperation(PowerOperation* op, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "powerCalcLangValues");
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
 }
 
 LLVMValueRef codeGenIntegerValue(IntNumberAst* val, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
+  LLVMTypeRef int32Type = LLVMInt32TypeInContext(ctx);
+  int myInt = atoi(val->lexeme);
+  LLVMValueRef myIntRef = LLVMConstInt(int32Type, myInt, 0);
+  LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "integerCalcLangValue");
   LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
   LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
-  LLVMTypeRef int32Type = LLVMInt32TypeInContext(ctx);
-  LLVMValueRef myInt = LLVMConstInt(int32Type, atoi(val->lexeme), 0);
-  LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "integerCalcLangValue");
-  LLVMValueRef args[] = { myInt };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 1, "");
+  LLVMTypeRef params[] = {
+    int32Type
+  };
+  LLVMTypeRef funcType = LLVMFunctionType(calcLangPtrType, params, 1, 0);
+  #ifdef DEBUG
+  LLVMDumpType(funcType);
+  #endif
+  LLVMValueRef args[] = { myIntRef };
+  LLVMValueRef result = LLVMBuildCall2(builder, funcType, myFunc, args, 1, "");
+  return result;
 }
 
 LLVMValueRef codeGenRealValue(RealNumberAst* val, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
+  LLVMTypeRef floatType = LLVMFloatTypeInContext(ctx);
+  double dVal = atof(val->lexeme);
+  LLVMValueRef myReal = LLVMConstReal(floatType, dVal);
+  LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "realCalcLangValue");
   LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
   LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
-  LLVMTypeRef floatType = LLVMFloatTypeInContext(ctx);
-  LLVMValueRef myReal = LLVMConstReal(floatType, atof(val->lexeme));
-  LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "realCalcLangValue");
+  LLVMTypeRef params[] = {
+    floatType
+  };
+  LLVMTypeRef funcType = LLVMFunctionType(calcLangPtrType, params, 1, 0);
   LLVMValueRef args[] = { myReal };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 1, "");
+  return LLVMBuildCall2(builder, funcType, myFunc, args, 1, "");
 }
 
 LLVMValueRef codeGenBooleanValue(BooleanAst* val, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMTypeRef int32Type = LLVMInt32TypeInContext(ctx);
   LLVMValueRef myInt;
   if(strcmp(val->lexeme, "TRUE") == 0){
@@ -256,8 +257,14 @@ LLVMValueRef codeGenBooleanValue(BooleanAst* val, ScopeStack stack, LLVMBuilderR
     myInt = LLVMConstInt(int32Type, 0, 0);
   }
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "booleanCalcLangValue");
+  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
+  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
+  LLVMTypeRef params[] = {
+    int32Type
+  };
+  LLVMTypeRef funcType = LLVMFunctionType(calcLangPtrType, params, 1, 0);
   LLVMValueRef args[] = { myInt };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 1, "");
+  return LLVMBuildCall2(builder, funcType, myFunc, args, 1, "");
 }
 
 LLVMValueRef codeGenSetValue(SetAst* val, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
@@ -281,8 +288,9 @@ LLVMValueRef codeGenSetValue(SetAst* val, ScopeStack stack, LLVMBuilderRef build
 
   LLVMValueRef length = LLVMConstInt(LLVMInt32TypeInContext(ctx), val->arr->length, 0);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "setCalcLangValue");
+  LLVMTypeRef myFuncType = LLVMTypeOf(myFunc);
   LLVMValueRef args[] = { vals, length };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
 }
 
 LLVMValueRef codeGenTupleValue(TupleAst* val, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
@@ -304,8 +312,9 @@ LLVMValueRef codeGenTupleValue(TupleAst* val, ScopeStack stack, LLVMBuilderRef b
 
   LLVMValueRef length = LLVMConstInt(LLVMInt32TypeInContext(ctx), val->arr->length, 0);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "tupleCalcLangValue");
+  LLVMTypeRef myFuncType = LLVMTypeOf(myFunc);
   LLVMValueRef args[] = { vals, length };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 2, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
 }
 
 
@@ -322,56 +331,61 @@ LLVMValueRef codeGenIdentifierValue(IdentAst* ident, ScopeStack stack, LLVMBuild
 }
 
 LLVMValueRef codeGenDollarValue(DollarAst* dollar, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMTypeRef floatType = LLVMFloatTypeInContext(ctx);
   LLVMValueRef myReal = LLVMConstReal(floatType, atof(dollar->lexeme));
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "dollarCalcLangValue");
+  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
+  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
+  LLVMTypeRef params[] = {
+    floatType
+  };
+  LLVMTypeRef funcType = LLVMFunctionType(calcLangPtrType, params, 1, 0);
   LLVMValueRef args[] = { myReal };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 1, "");
+  return LLVMBuildCall2(builder, funcType, myFunc, args, 1, "");
 }
 
 LLVMValueRef codeGenPercentValue(PercentAst* percent, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMTypeRef floatType = LLVMFloatTypeInContext(ctx);
   LLVMValueRef myReal = LLVMConstReal(floatType, atof(percent->lexeme));
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "percentCalcLangValue");
+  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
+  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
+  LLVMTypeRef params[] = {
+    floatType
+  };
+  LLVMTypeRef funcType = LLVMFunctionType(calcLangPtrType, params, 1, 0);
   LLVMValueRef args[] = { myReal };
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, 1, "");
+  return LLVMBuildCall2(builder, funcType, myFunc, args, 1, "");
 }
 
 LLVMValueRef codeGenFunctionCall(FunctionCall* call, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   char funcName[2];
   funcName[0] = call->name;
   funcName[1] = '\0';
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, funcName);
+  LLVMTypeRef myFuncType = LLVMTypeOf(myFunc);
   StoreArray* array = call->params;
   LLVMValueRef args[array->length];
   for(int i = 0; i < array->length; i++){
     args[i] = codeGenExpression(array->firstElem[i], stack, builder, parentFunc, mod, ctx);
   }
-  return LLVMBuildCall2(builder, calcLangPtrType, myFunc, args, array->length, "");
+  return LLVMBuildCall2(builder, myFuncType, myFunc, args, array->length, "");
 }
 
 LLVMValueRef codeGenNegateOperation(NegateOperation* negate, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef ref = codeGenExpression(negate->expr, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef func = LLVMGetNamedFunction(mod, "negateCalcLangValue");
+  LLVMTypeRef funcType = createFunctionPointerType(ctx, 1, 0);
   LLVMValueRef args[] = { ref };
-  return LLVMBuildCall2(builder, calcLangPtrType, func, args, 1, "");
+  return LLVMBuildCall2(builder, funcType, func, args, 1, "");
 }
 
 LLVMValueRef codeGenNotOperation(NotOperation* not, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
-  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
   LLVMValueRef ref = codeGenExpression(not->expr, stack, builder, parentFunc, mod, ctx);
   LLVMValueRef func = LLVMGetNamedFunction(mod, "notCalcLangValue");
+  LLVMTypeRef funcType = createFunctionPointerType(ctx, 1, 0);
   LLVMValueRef args[] = { ref };
-  return LLVMBuildCall2(builder, calcLangPtrType, func, args, 1, "");
+  return LLVMBuildCall2(builder, funcType, func, args, 1, "");
 }
 
 LLVMValueRef codeGenIfExpression(IfExpr* ifStat, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef func, LLVMModuleRef mod, LLVMContextRef ctx){
@@ -413,6 +427,10 @@ char genParamName(AstNode* node){
 
 
 LLVMValueRef codeGenExpression(AstNode* node, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef func, LLVMModuleRef mod, LLVMContextRef ctx){
+  #ifdef DEBUG
+  printf("\nNodeType: %d\n", node->nodeType);
+  fflush(stdout);
+  #endif
   switch(node->nodeType){
   case EQUAL_OPERATION: return codeGenEqualsOperation(&(node->actualNodeData.equalOperation), stack, builder, func, mod, ctx);
   case LESS_THEN_OR_EQUALS_OPERATION: return codeGenLessThenOrEqualsOperation(&(node->actualNodeData.lessOrEqual), stack, builder, func, mod, ctx);
