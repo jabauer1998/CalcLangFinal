@@ -396,15 +396,28 @@ LLVMValueRef codeGenNotOperation(NotOperation* not, ScopeStack stack, LLVMBuilde
   return LLVMBuildCall2(builder, funcType, func, args, 1, "");
 }
 
+LLVMValueRef toBoolVal(LLVMValueRef ref, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef host, LLVMModuleRef mod, LLVMContextRef ctx){
+  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
+  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
+  LLVMValueRef func = LLVMGetNamedFunction(mod, "toBool");
+  LLVMTypeRef params[] = {
+    calcLangPtrType
+  };
+  LLVMTypeRef funcType = LLVMFunctionType(LLVMInt1Type(), params, 1, 0);
+  LLVMValueRef args[] = { ref };
+  return LLVMBuildCall2(builder, funcType, func, args, 1, "");
+}
+
 LLVMValueRef codeGenIfExpression(IfExpr* ifStat, ScopeStack stack, LLVMBuilderRef builder, LLVMValueRef func, LLVMModuleRef mod, LLVMContextRef ctx){
   LLVMTypeRef myType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
   LLVMTypeRef point = LLVMPointerType(myType, 0);
   LLVMValueRef condVal = codeGenExpression(ifStat->cond, stack, builder, func, mod, ctx);
-  LLVMBasicBlockRef thenBlock = LLVMAppendBasicBlock(func, "thenBlock");
-  LLVMBasicBlockRef elseBlock = LLVMAppendBasicBlock(func, "elseBlock");
-  LLVMBasicBlockRef mergeBlock = LLVMAppendBasicBlock(func, "mergeBlock");
+  LLVMValueRef boolVal = toBoolVal(condVal, stack, builder, func, mod, ctx);
+  LLVMBasicBlockRef thenBlock = LLVMAppendBasicBlock(func, "");
+  LLVMBasicBlockRef elseBlock = LLVMAppendBasicBlock(func, "");
+  LLVMBasicBlockRef mergeBlock = LLVMAppendBasicBlock(func, "");
   
-  LLVMBuildCondBr(builder, condVal, thenBlock, elseBlock);
+  LLVMBuildCondBr(builder, boolVal, thenBlock, elseBlock);
 
   LLVMPositionBuilderAtEnd(builder, thenBlock);
   LLVMValueRef thenResult = codeGenExpression(ifStat->ifTrue, stack, builder, func, mod, ctx);
@@ -588,13 +601,13 @@ void codeGenNode(AstNode* node, ScopeStack stack, LLVMBuilderRef builder, LLVMVa
     char name = myNode->name;
     StoreArray* ptr = myNode->param;
     int size = ptr->length;
-    LLVMTypeRef myType = LLVMGetTypeByName(mod, "CalcLangVal");
+    LLVMTypeRef myType = LLVMGetTypeByName(mod, "struct.CalcLangVal");
     LLVMTypeRef point = LLVMPointerType(myType, 0);
     LLVMTypeRef paramTypes[size];
     for(int i = 0; i < size; i++){
       paramTypes[i] = point;
     }
-    LLVMTypeRef funcType = LLVMFunctionType(myType, paramTypes, size, 0);
+    LLVMTypeRef funcType = LLVMFunctionType(point, paramTypes, size, 0);
     char myName[2];
     myName[0] = name;
     myName[1] = '\0';
@@ -618,7 +631,7 @@ void codeGenNode(AstNode* node, ScopeStack stack, LLVMBuilderRef builder, LLVMVa
   }
   case ASSIGN: {
     LLVMValueRef valueToAssign = codeGenExpression(node->actualNodeData.variable.expr, stack, builder, parentFunc, mod, ctx);
-    LLVMTypeRef myType = LLVMGetTypeByName(mod, "CalcLangVal");
+    LLVMTypeRef myType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
     LLVMTypeRef point = LLVMPointerType(myType, 0);
     LLVMValueRef ptrToX = LLVMBuildAlloca(builder, point, "");
     char name = node->actualNodeData.variable.name;

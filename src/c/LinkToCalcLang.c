@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <stdbool.h>
 
 void freeCalcLangValue(CalcLangValue* val);
 CalcLangValue* copyValue(CalcLangValue* val);
@@ -18,7 +19,7 @@ CalcLangValue* integerCalcLangValue(int myInt){
 CalcLangValue* booleanCalcLangValue(int val){
   CalcLangValue* toBool = malloc(sizeof(CalcLangValue));
   toBool->valType = IS_BOOL;
-  toBool->valData.bool = val;
+  toBool->valData.boolean = val;
   return toBool;
 }
 
@@ -59,6 +60,23 @@ CalcLangValue* tupleCalcLangValue(CalcLangValue** value, int size){
   toRet->valData.set->size = size;
   toRet->valData.set->list = value;
   return toRet;
+}
+
+bool toBool(CalcLangValue* val){
+  if(val->valType == IS_INT){
+    return val->valData.integer != 0;
+  } else if(val->valType == IS_REAL){
+    return val->valData.real != 0.0;
+  } else if(val->valType == IS_DOLLAR){
+    return val->valData.dollar != 0.0;
+  } else if(val->valType == IS_BOOL){
+    return val->valData.boolean;
+  } else if(val->valType == IS_PERCENT){
+    return val->valData.percent != 0.0;
+  } else {
+    perror("Invalid type to transofrm into Bool found");
+    return -1;
+  }
 }
 
 CalcLangValue* addCalcLangValues(CalcLangValue* left, CalcLangValue* right){
@@ -1285,37 +1303,37 @@ CalcLangValue* equalsCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
   if(left->valType == IS_BOOL && right->valType == IS_BOOL){
     result->valType = IS_BOOL;
-    result->valData.bool = left->valData.bool == right->valData.bool;
+    result->valData.boolean = left->valData.boolean == right->valData.boolean;
   } else if(left->valType == IS_BOOL && right->valType == IS_INT){
     result->valType = IS_BOOL;
-    result->valData.bool = left->valData.bool == right->valData.integer;
+    result->valData.boolean = left->valData.boolean == right->valData.integer;
   } else if(left->valType == IS_INT && right->valType == IS_BOOL){
     result->valType = IS_BOOL;
-    result->valData.bool = left->valData.integer == right->valData.bool;
+    result->valData.boolean = left->valData.integer == right->valData.boolean;
   } else if(left->valType == IS_BOOL && right->valType == IS_REAL){
     result->valType = IS_BOOL;
-    result->valData.bool = left->valData.bool == right->valData.real;
+    result->valData.boolean = left->valData.boolean == right->valData.real;
   } else if(left->valType == IS_REAL && right->valType == IS_BOOL){
     result->valType = IS_BOOL;
-    result->valData.bool = left->valData.real == right->valData.bool;
+    result->valData.boolean = left->valData.real == right->valData.boolean;
   } else if(left->valType == IS_INT && right->valType == IS_INT){
     result->valType = IS_BOOL;
-    result->valData.bool = left->valData.integer == right->valData.integer;
+    result->valData.boolean = left->valData.integer == right->valData.integer;
   } else if(left->valType == IS_REAL && right->valType == IS_REAL){
     result->valType = IS_BOOL;
-    result->valData.bool = left->valData.real == right->valData.real;
+    result->valData.boolean = left->valData.real == right->valData.real;
   } else if(left->valType == IS_INT && right->valType == IS_REAL){
     result->valType = IS_BOOL;
-    result->valData.bool = ((double)(left->valData.integer)) == right->valData.real;
+    result->valData.boolean = ((double)(left->valData.integer)) == right->valData.real;
   } else if(left->valType == IS_REAL && right->valType == IS_INT){
     result->valType = IS_BOOL;
-    result->valData.bool = left->valData.real == ((double)(right->valData.integer));
+    result->valData.boolean = left->valData.real == ((double)(right->valData.integer));
   } else if(left->valType == IS_DOLLAR && right->valType == IS_DOLLAR){
     result->valType = IS_BOOL;
-    result->valData.bool = left->valData.dollar == right->valData.dollar;
+    result->valData.boolean = left->valData.dollar == right->valData.dollar;
   } else if(left->valType == IS_PERCENT && right->valType == IS_PERCENT){
     result->valType = IS_BOOL;
-    result->valData.bool = left->valData.percent == right->valData.percent; 
+    result->valData.boolean = left->valData.percent == right->valData.percent; 
   } else if(left->valType == IS_TUPLE && right->valType == IS_TUPLE){
     TupleValue* leftTup = left->valData.tuple;
     TupleValue* rightTup = right->valData.tuple;
@@ -1324,14 +1342,14 @@ CalcLangValue* equalsCalcLangValues(CalcLangValue* left, CalcLangValue* right){
       for(int i = 0; i < leftTup->size; i++){
 	CalcLangValue* val  = equalsCalcLangValues(leftTup->list[i], rightTup->list[i]);
 	if(val->valType == IS_BOOL){
-	  if(val->valData.bool == 0){
+	  if(val->valData.boolean == 0){
 	    boolResult = 0;
 	    break;
 	  }
 	}
       }
       result->valType = IS_BOOL;
-      result->valData.bool = boolResult;
+      result->valData.boolean = boolResult;
     } else {
       perror("Error Tuple sizes in expression do not match!!!");
       return NULL;
@@ -1344,14 +1362,14 @@ CalcLangValue* equalsCalcLangValues(CalcLangValue* left, CalcLangValue* right){
       for(int i = 0; i < leftSet->size; i++){
 	CalcLangValue* val = equalsCalcLangValues(leftSet->list[i], rightSet->list[i]);
 	if(val->valType == IS_BOOL){
-	  if(val->valData.bool == 0){
+	  if(val->valData.boolean == 0){
 	    boolResult = 0;
 	    break;
 	  }
 	}
       }
       result->valType = IS_BOOL;
-      result->valData.bool = boolResult;
+      result->valData.boolean = boolResult;
     } else {
       perror("Error Tuple sizes in expression do not match!!!");
       return NULL;
@@ -1375,22 +1393,22 @@ CalcLangValue* lessThenCalcLangValues(CalcLangValue* left, CalcLangValue* right)
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
   if(left->valType == IS_INT && right->valType == IS_INT){
     result->valType = IS_INT;
-    result->valData.bool = left->valData.integer < right->valData.integer;
+    result->valData.boolean = left->valData.integer < right->valData.integer;
   } else if(left->valType == IS_REAL && right->valType == IS_REAL){
     result->valType = IS_REAL;
     result->valData.real = left->valData.real < right->valData.real;
   } else if(left->valType == IS_INT && right->valType == IS_REAL){
     result->valType = IS_REAL;
-    result->valData.bool = ((double)(left->valData.integer)) < right->valData.real;
+    result->valData.boolean = ((double)(left->valData.integer)) < right->valData.real;
   } else if(left->valType == IS_REAL && right->valType == IS_INT){
     result->valType = IS_REAL;
-    result->valData.bool = left->valData.real < ((double)(right->valData.integer));
+    result->valData.boolean = left->valData.real < ((double)(right->valData.integer));
   } else if(left->valType == IS_DOLLAR && right->valType == IS_DOLLAR){
     result->valType = IS_DOLLAR;
-    result->valData.bool = left->valData.dollar < right->valData.dollar;
+    result->valData.boolean = left->valData.dollar < right->valData.dollar;
   } else if(left->valType == IS_PERCENT && right->valType == IS_PERCENT){
     result->valType = IS_PERCENT;
-    result->valData.bool = left->valData.percent < right->valData.percent; 
+    result->valData.boolean = left->valData.percent < right->valData.percent; 
   } else {
       perror("Invalid types found for CalcLangAddition Operation");
       return NULL;
@@ -1410,7 +1428,7 @@ CalcLangValue* greaterThenCalcLangValues(CalcLangValue* left, CalcLangValue* rig
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
   if(left->valType == IS_INT && right->valType == IS_INT){
     result->valType = IS_INT;
-    result->valData.bool = left->valData.integer > right->valData.integer;
+    result->valData.boolean = left->valData.integer > right->valData.integer;
   } else if(left->valType == IS_REAL && right->valType == IS_REAL){
     result->valType = IS_REAL;
     result->valData.real = left->valData.real > right->valData.real;
@@ -1419,7 +1437,7 @@ CalcLangValue* greaterThenCalcLangValues(CalcLangValue* left, CalcLangValue* rig
     result->valData.real = ((double)(left->valData.integer)) > right->valData.real;
   } else if(left->valType == IS_REAL && right->valType == IS_INT){
     result->valType = IS_REAL;
-    result->valData.bool = left->valData.real > ((double)(right->valData.integer));
+    result->valData.boolean = left->valData.real > ((double)(right->valData.integer));
   } else if(left->valType == IS_DOLLAR && right->valType == IS_DOLLAR){
     result->valType = IS_DOLLAR;
     result->valData.dollar = left->valData.dollar > right->valData.dollar;
@@ -1444,7 +1462,7 @@ CalcLangValue* lessThenOrEqualToCalcLangValues(CalcLangValue* left, CalcLangValu
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
   if(left->valType == IS_INT && right->valType == IS_INT){
     result->valType = IS_INT;
-    result->valData.bool = left->valData.integer <= right->valData.integer;
+    result->valData.boolean = left->valData.integer <= right->valData.integer;
   } else if(left->valType == IS_REAL && right->valType == IS_REAL){
     result->valType = IS_REAL;
     result->valData.real = left->valData.real <= right->valData.real;
@@ -1453,7 +1471,7 @@ CalcLangValue* lessThenOrEqualToCalcLangValues(CalcLangValue* left, CalcLangValu
     result->valData.real = ((double)(left->valData.integer)) <= right->valData.real;
   } else if(left->valType == IS_REAL && right->valType == IS_INT){
     result->valType = IS_REAL;
-    result->valData.bool = left->valData.real <= ((double)(right->valData.integer));
+    result->valData.boolean = left->valData.real <= ((double)(right->valData.integer));
   } else if(left->valType == IS_DOLLAR && right->valType == IS_DOLLAR){
     result->valType = IS_DOLLAR;
     result->valData.dollar = left->valData.dollar <= right->valData.dollar;
@@ -1478,7 +1496,7 @@ CalcLangValue* greaterThenOrEqualToCalcLangValues(CalcLangValue* left, CalcLangV
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
   if(left->valType == IS_INT && right->valType == IS_INT){
     result->valType = IS_INT;
-    result->valData.bool = left->valData.integer >= right->valData.integer;
+    result->valData.boolean = left->valData.integer >= right->valData.integer;
   } else if(left->valType == IS_REAL && right->valType == IS_REAL){
     result->valType = IS_REAL;
     result->valData.real = left->valData.real >= right->valData.real;
@@ -1487,7 +1505,7 @@ CalcLangValue* greaterThenOrEqualToCalcLangValues(CalcLangValue* left, CalcLangV
     result->valData.real = ((double)(left->valData.integer)) >= right->valData.real;
   } else if(left->valType == IS_REAL && right->valType == IS_INT){
     result->valType = IS_REAL;
-    result->valData.bool = left->valData.real >= ((double)(right->valData.integer));
+    result->valData.boolean = left->valData.real >= ((double)(right->valData.integer));
   } else if(left->valType == IS_DOLLAR && right->valType == IS_DOLLAR){
     result->valType = IS_DOLLAR;
     result->valData.dollar = left->valData.dollar >= right->valData.dollar;
@@ -1512,13 +1530,13 @@ CalcLangValue* notCalcLangValue(CalcLangValue* toNot){
   CalcLangValue* result = malloc(sizeof(CalcLangValue));
   if(toNot->valType == IS_INT){
     result->valType = IS_BOOL;
-    result->valData.bool = toNot->valData.integer != 0;
+    result->valData.boolean = toNot->valData.integer != 0;
   } else if(toNot->valType == IS_REAL){
     result->valType = IS_BOOL;
-    result->valData.bool = toNot->valData.real != 0;
+    result->valData.boolean = toNot->valData.real != 0;
   } else if(toNot->valType == IS_BOOL){
     result->valType = IS_BOOL;
-    result->valData.bool = !(toNot->valData.bool);
+    result->valData.boolean = !(toNot->valData.boolean);
   } else if(toNot->valType == IS_TUPLE){
     CalcLangValue* result = malloc(sizeof(CalcLangValue));
     result->valData.tuple = malloc(sizeof(TupleValue));
@@ -1597,7 +1615,7 @@ void printValue(CalcLangValue* val){
   if(val == NULL){
     printf("NULL");
   } else if(val->valType == IS_BOOL){
-    if(val->valData.bool){
+    if(val->valData.boolean){
       printf("TRUE");
     } else {
       printf("FALSE");

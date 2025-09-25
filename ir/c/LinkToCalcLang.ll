@@ -10,26 +10,27 @@ target triple = "x86_64-pc-linux-gnu"
 
 @.str = private unnamed_addr constant [39 x i8] c"Click Enter to view next line of text\0A\00", align 1
 @header = dso_local global ptr @.str, align 8
-@.str.1 = private unnamed_addr constant [48 x i8] c"Error Tuple sizes in expression do not match!!!\00", align 1
-@.str.2 = private unnamed_addr constant [51 x i8] c"Invalid types found for CalcLangAddition Operation\00", align 1
-@.str.3 = private unnamed_addr constant [24 x i8] c"Mismatched tup for size\00", align 1
-@.str.4 = private unnamed_addr constant [54 x i8] c"Invalid type for dot product expected Tuple and Tuple\00", align 1
-@.str.5 = private unnamed_addr constant [31 x i8] c"Invalid type for not operation\00", align 1
-@.str.6 = private unnamed_addr constant [34 x i8] c"Invalid type for negate operation\00", align 1
-@.str.7 = private unnamed_addr constant [5 x i8] c"NULL\00", align 1
-@.str.8 = private unnamed_addr constant [5 x i8] c"TRUE\00", align 1
-@.str.9 = private unnamed_addr constant [6 x i8] c"FALSE\00", align 1
-@.str.10 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
-@.str.11 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
-@.str.12 = private unnamed_addr constant [4 x i8] c"$%f\00", align 1
-@.str.13 = private unnamed_addr constant [5 x i8] c"%f%%\00", align 1
-@.str.14 = private unnamed_addr constant [2 x i8] c"(\00", align 1
-@.str.15 = private unnamed_addr constant [3 x i8] c", \00", align 1
-@.str.16 = private unnamed_addr constant [2 x i8] c")\00", align 1
-@.str.17 = private unnamed_addr constant [2 x i8] c"{\00", align 1
-@.str.18 = private unnamed_addr constant [2 x i8] c"}\00", align 1
-@.str.19 = private unnamed_addr constant [47 x i8] c"Cant print type for specified CalcLangValue!!!\00", align 1
-@.str.20 = private unnamed_addr constant [4 x i8] c"%s\0A\00", align 1
+@.str.1 = private unnamed_addr constant [42 x i8] c"Invalid type to transofrm into Bool found\00", align 1
+@.str.2 = private unnamed_addr constant [48 x i8] c"Error Tuple sizes in expression do not match!!!\00", align 1
+@.str.3 = private unnamed_addr constant [51 x i8] c"Invalid types found for CalcLangAddition Operation\00", align 1
+@.str.4 = private unnamed_addr constant [24 x i8] c"Mismatched tup for size\00", align 1
+@.str.5 = private unnamed_addr constant [54 x i8] c"Invalid type for dot product expected Tuple and Tuple\00", align 1
+@.str.6 = private unnamed_addr constant [31 x i8] c"Invalid type for not operation\00", align 1
+@.str.7 = private unnamed_addr constant [34 x i8] c"Invalid type for negate operation\00", align 1
+@.str.8 = private unnamed_addr constant [5 x i8] c"NULL\00", align 1
+@.str.9 = private unnamed_addr constant [5 x i8] c"TRUE\00", align 1
+@.str.10 = private unnamed_addr constant [6 x i8] c"FALSE\00", align 1
+@.str.11 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
+@.str.12 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
+@.str.13 = private unnamed_addr constant [4 x i8] c"$%f\00", align 1
+@.str.14 = private unnamed_addr constant [5 x i8] c"%f%%\00", align 1
+@.str.15 = private unnamed_addr constant [2 x i8] c"(\00", align 1
+@.str.16 = private unnamed_addr constant [3 x i8] c", \00", align 1
+@.str.17 = private unnamed_addr constant [2 x i8] c")\00", align 1
+@.str.18 = private unnamed_addr constant [2 x i8] c"{\00", align 1
+@.str.19 = private unnamed_addr constant [2 x i8] c"}\00", align 1
+@.str.20 = private unnamed_addr constant [47 x i8] c"Cant print type for specified CalcLangValue!!!\00", align 1
+@.str.21 = private unnamed_addr constant [4 x i8] c"%s\0A\00", align 1
 @stdout = external global ptr, align 8
 
 ; Function Attrs: noinline nounwind optnone uwtable
@@ -64,11 +65,13 @@ define dso_local ptr @booleanCalcLangValue(i32 noundef %0) #0 {
   %6 = getelementptr inbounds %struct.CalcLangVal, ptr %5, i32 0, i32 0
   store i32 5, ptr %6, align 8
   %7 = load i32, ptr %2, align 4
-  %8 = load ptr, ptr %3, align 8
-  %9 = getelementptr inbounds %struct.CalcLangVal, ptr %8, i32 0, i32 1
-  store i32 %7, ptr %9, align 8
-  %10 = load ptr, ptr %3, align 8
-  ret ptr %10
+  %8 = icmp ne i32 %7, 0
+  %9 = load ptr, ptr %3, align 8
+  %10 = getelementptr inbounds %struct.CalcLangVal, ptr %9, i32 0, i32 1
+  %11 = zext i1 %8 to i8
+  store i8 %11, ptr %10, align 8
+  %12 = load ptr, ptr %3, align 8
+  ret ptr %12
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable
@@ -191,6 +194,98 @@ define dso_local ptr @tupleCalcLangValue(ptr noundef %0, i32 noundef %1) #0 {
   %22 = load ptr, ptr %5, align 8
   ret ptr %22
 }
+
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local zeroext i1 @toBool(ptr noundef %0) #0 {
+  %2 = alloca i1, align 1
+  %3 = alloca ptr, align 8
+  store ptr %0, ptr %3, align 8
+  %4 = load ptr, ptr %3, align 8
+  %5 = getelementptr inbounds %struct.CalcLangVal, ptr %4, i32 0, i32 0
+  %6 = load i32, ptr %5, align 8
+  %7 = icmp eq i32 %6, 0
+  br i1 %7, label %8, label %13
+
+8:                                                ; preds = %1
+  %9 = load ptr, ptr %3, align 8
+  %10 = getelementptr inbounds %struct.CalcLangVal, ptr %9, i32 0, i32 1
+  %11 = load i32, ptr %10, align 8
+  %12 = icmp ne i32 %11, 0
+  store i1 %12, ptr %2, align 1
+  br label %54
+
+13:                                               ; preds = %1
+  %14 = load ptr, ptr %3, align 8
+  %15 = getelementptr inbounds %struct.CalcLangVal, ptr %14, i32 0, i32 0
+  %16 = load i32, ptr %15, align 8
+  %17 = icmp eq i32 %16, 1
+  br i1 %17, label %18, label %23
+
+18:                                               ; preds = %13
+  %19 = load ptr, ptr %3, align 8
+  %20 = getelementptr inbounds %struct.CalcLangVal, ptr %19, i32 0, i32 1
+  %21 = load double, ptr %20, align 8
+  %22 = fcmp une double %21, 0.000000e+00
+  store i1 %22, ptr %2, align 1
+  br label %54
+
+23:                                               ; preds = %13
+  %24 = load ptr, ptr %3, align 8
+  %25 = getelementptr inbounds %struct.CalcLangVal, ptr %24, i32 0, i32 0
+  %26 = load i32, ptr %25, align 8
+  %27 = icmp eq i32 %26, 3
+  br i1 %27, label %28, label %33
+
+28:                                               ; preds = %23
+  %29 = load ptr, ptr %3, align 8
+  %30 = getelementptr inbounds %struct.CalcLangVal, ptr %29, i32 0, i32 1
+  %31 = load double, ptr %30, align 8
+  %32 = fcmp une double %31, 0.000000e+00
+  store i1 %32, ptr %2, align 1
+  br label %54
+
+33:                                               ; preds = %23
+  %34 = load ptr, ptr %3, align 8
+  %35 = getelementptr inbounds %struct.CalcLangVal, ptr %34, i32 0, i32 0
+  %36 = load i32, ptr %35, align 8
+  %37 = icmp eq i32 %36, 5
+  br i1 %37, label %38, label %43
+
+38:                                               ; preds = %33
+  %39 = load ptr, ptr %3, align 8
+  %40 = getelementptr inbounds %struct.CalcLangVal, ptr %39, i32 0, i32 1
+  %41 = load i8, ptr %40, align 8
+  %42 = trunc i8 %41 to i1
+  store i1 %42, ptr %2, align 1
+  br label %54
+
+43:                                               ; preds = %33
+  %44 = load ptr, ptr %3, align 8
+  %45 = getelementptr inbounds %struct.CalcLangVal, ptr %44, i32 0, i32 0
+  %46 = load i32, ptr %45, align 8
+  %47 = icmp eq i32 %46, 4
+  br i1 %47, label %48, label %53
+
+48:                                               ; preds = %43
+  %49 = load ptr, ptr %3, align 8
+  %50 = getelementptr inbounds %struct.CalcLangVal, ptr %49, i32 0, i32 1
+  %51 = load double, ptr %50, align 8
+  %52 = fcmp une double %51, 0.000000e+00
+  store i1 %52, ptr %2, align 1
+  br label %54
+
+53:                                               ; preds = %43
+  call void @perror(ptr noundef @.str.1) #7
+  store i1 true, ptr %2, align 1
+  br label %54
+
+54:                                               ; preds = %53, %48, %38, %28, %18, %8
+  %55 = load i1, ptr %2, align 1
+  ret i1 %55
+}
+
+; Function Attrs: cold
+declare void @perror(ptr noundef) #2
 
 ; Function Attrs: noinline nounwind optnone uwtable
 define dso_local ptr @addCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
@@ -556,7 +651,7 @@ define dso_local ptr @addCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %281
 
 280:                                              ; preds = %214
-  call void @perror(ptr noundef @.str.1) #7
+  call void @perror(ptr noundef @.str.2) #7
   store ptr null, ptr %3, align 8
   br label %1347
 
@@ -1334,7 +1429,7 @@ define dso_local ptr @addCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %841
 
 840:                                              ; preds = %774
-  call void @perror(ptr noundef @.str.1) #7
+  call void @perror(ptr noundef @.str.2) #7
   store ptr null, ptr %3, align 8
   br label %1347
 
@@ -2005,7 +2100,7 @@ define dso_local ptr @addCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %1322
 
 1321:                                             ; preds = %1266, %1261
-  call void @perror(ptr noundef @.str.2) #7
+  call void @perror(ptr noundef @.str.3) #7
   br label %1322
 
 1322:                                             ; preds = %1321, %1315
@@ -2086,9 +2181,6 @@ define dso_local ptr @addCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   %1348 = load ptr, ptr %3, align 8
   ret ptr %1348
 }
-
-; Function Attrs: cold
-declare void @perror(ptr noundef) #2
 
 ; Function Attrs: noinline nounwind optnone uwtable
 define dso_local ptr @copyValue(ptr noundef %0) #0 {
@@ -2603,7 +2695,7 @@ define dso_local ptr @subCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %281
 
 280:                                              ; preds = %214
-  call void @perror(ptr noundef @.str.1) #7
+  call void @perror(ptr noundef @.str.2) #7
   store ptr null, ptr %3, align 8
   br label %1348
 
@@ -3377,7 +3469,7 @@ define dso_local ptr @subCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %839
 
 838:                                              ; preds = %772
-  call void @perror(ptr noundef @.str.1) #7
+  call void @perror(ptr noundef @.str.2) #7
   store ptr null, ptr %3, align 8
   br label %1348
 
@@ -4049,7 +4141,7 @@ define dso_local ptr @subCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %1321
 
 1320:                                             ; preds = %1265, %1260
-  call void @perror(ptr noundef @.str.2) #7
+  call void @perror(ptr noundef @.str.3) #7
   br label %1321
 
 1321:                                             ; preds = %1320, %1314
@@ -4713,7 +4805,7 @@ define dso_local ptr @multCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %439
 
 438:                                              ; preds = %372
-  call void @perror(ptr noundef @.str.1) #7
+  call void @perror(ptr noundef @.str.2) #7
   store ptr null, ptr %3, align 8
   br label %1513
 
@@ -5487,7 +5579,7 @@ define dso_local ptr @multCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %997
 
 996:                                              ; preds = %930
-  call void @perror(ptr noundef @.str.1) #7
+  call void @perror(ptr noundef @.str.2) #7
   store ptr null, ptr %3, align 8
   br label %1513
 
@@ -6159,7 +6251,7 @@ define dso_local ptr @multCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %1479
 
 1478:                                             ; preds = %1423, %1418
-  call void @perror(ptr noundef @.str.2) #7
+  call void @perror(ptr noundef @.str.3) #7
   br label %1479
 
 1479:                                             ; preds = %1478, %1472
@@ -6815,7 +6907,7 @@ define dso_local ptr @divCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %418
 
 417:                                              ; preds = %351
-  call void @perror(ptr noundef @.str.1) #7
+  call void @perror(ptr noundef @.str.2) #7
   store ptr null, ptr %3, align 8
   br label %1491
 
@@ -7589,7 +7681,7 @@ define dso_local ptr @divCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %976
 
 975:                                              ; preds = %909
-  call void @perror(ptr noundef @.str.1) #7
+  call void @perror(ptr noundef @.str.2) #7
   store ptr null, ptr %3, align 8
   br label %1491
 
@@ -8261,7 +8353,7 @@ define dso_local ptr @divCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %1458
 
 1457:                                             ; preds = %1402, %1397
-  call void @perror(ptr noundef @.str.2) #7
+  call void @perror(ptr noundef @.str.3) #7
   br label %1458
 
 1458:                                             ; preds = %1457, %1451
@@ -8946,7 +9038,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %442
 
 441:                                              ; preds = %375
-  call void @perror(ptr noundef @.str.1) #7
+  call void @perror(ptr noundef @.str.2) #7
   store ptr null, ptr %3, align 8
   br label %1516
 
@@ -9720,7 +9812,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %1000
 
 999:                                              ; preds = %933
-  call void @perror(ptr noundef @.str.1) #7
+  call void @perror(ptr noundef @.str.2) #7
   store ptr null, ptr %3, align 8
   br label %1516
 
@@ -10392,7 +10484,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   br label %1482
 
 1481:                                             ; preds = %1426, %1421
-  call void @perror(ptr noundef @.str.2) #7
+  call void @perror(ptr noundef @.str.3) #7
   br label %1482
 
 1482:                                             ; preds = %1481, %1475
@@ -10614,14 +10706,14 @@ define dso_local ptr @dotProductVals(ptr noundef %0, ptr noundef %1) #0 {
   br label %83
 
 77:                                               ; preds = %29
-  call void @perror(ptr noundef @.str.3) #7
+  call void @perror(ptr noundef @.str.4) #7
   br label %78
 
 78:                                               ; preds = %77
   br label %80
 
 79:                                               ; preds = %24, %19
-  call void @perror(ptr noundef @.str.4) #7
+  call void @perror(ptr noundef @.str.5) #7
   br label %80
 
 80:                                               ; preds = %79, %78
@@ -10666,7 +10758,7 @@ define dso_local ptr @equalsCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
 
 22:                                               ; preds = %19, %2
   store ptr null, ptr %3, align 8
-  br label %438
+  br label %458
 
 23:                                               ; preds = %19
   %24 = call noalias ptr @malloc(i64 noundef 16) #6
@@ -10675,14 +10767,14 @@ define dso_local ptr @equalsCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   %26 = getelementptr inbounds %struct.CalcLangVal, ptr %25, i32 0, i32 0
   %27 = load i32, ptr %26, align 8
   %28 = icmp eq i32 %27, 5
-  br i1 %28, label %29, label %47
+  br i1 %28, label %29, label %51
 
 29:                                               ; preds = %23
   %30 = load ptr, ptr %5, align 8
   %31 = getelementptr inbounds %struct.CalcLangVal, ptr %30, i32 0, i32 0
   %32 = load i32, ptr %31, align 8
   %33 = icmp eq i32 %32, 5
-  br i1 %33, label %34, label %47
+  br i1 %33, label %34, label %51
 
 34:                                               ; preds = %29
   %35 = load ptr, ptr %6, align 8
@@ -10690,602 +10782,622 @@ define dso_local ptr @equalsCalcLangValues(ptr noundef %0, ptr noundef %1) #0 {
   store i32 5, ptr %36, align 8
   %37 = load ptr, ptr %4, align 8
   %38 = getelementptr inbounds %struct.CalcLangVal, ptr %37, i32 0, i32 1
-  %39 = load i32, ptr %38, align 8
-  %40 = load ptr, ptr %5, align 8
-  %41 = getelementptr inbounds %struct.CalcLangVal, ptr %40, i32 0, i32 1
-  %42 = load i32, ptr %41, align 8
-  %43 = icmp eq i32 %39, %42
-  %44 = zext i1 %43 to i32
-  %45 = load ptr, ptr %6, align 8
-  %46 = getelementptr inbounds %struct.CalcLangVal, ptr %45, i32 0, i32 1
-  store i32 %44, ptr %46, align 8
-  br label %434
+  %39 = load i8, ptr %38, align 8
+  %40 = trunc i8 %39 to i1
+  %41 = zext i1 %40 to i32
+  %42 = load ptr, ptr %5, align 8
+  %43 = getelementptr inbounds %struct.CalcLangVal, ptr %42, i32 0, i32 1
+  %44 = load i8, ptr %43, align 8
+  %45 = trunc i8 %44 to i1
+  %46 = zext i1 %45 to i32
+  %47 = icmp eq i32 %41, %46
+  %48 = load ptr, ptr %6, align 8
+  %49 = getelementptr inbounds %struct.CalcLangVal, ptr %48, i32 0, i32 1
+  %50 = zext i1 %47 to i8
+  store i8 %50, ptr %49, align 8
+  br label %454
 
-47:                                               ; preds = %29, %23
-  %48 = load ptr, ptr %4, align 8
-  %49 = getelementptr inbounds %struct.CalcLangVal, ptr %48, i32 0, i32 0
-  %50 = load i32, ptr %49, align 8
-  %51 = icmp eq i32 %50, 5
-  br i1 %51, label %52, label %70
+51:                                               ; preds = %29, %23
+  %52 = load ptr, ptr %4, align 8
+  %53 = getelementptr inbounds %struct.CalcLangVal, ptr %52, i32 0, i32 0
+  %54 = load i32, ptr %53, align 8
+  %55 = icmp eq i32 %54, 5
+  br i1 %55, label %56, label %76
 
-52:                                               ; preds = %47
-  %53 = load ptr, ptr %5, align 8
-  %54 = getelementptr inbounds %struct.CalcLangVal, ptr %53, i32 0, i32 0
-  %55 = load i32, ptr %54, align 8
-  %56 = icmp eq i32 %55, 0
-  br i1 %56, label %57, label %70
+56:                                               ; preds = %51
+  %57 = load ptr, ptr %5, align 8
+  %58 = getelementptr inbounds %struct.CalcLangVal, ptr %57, i32 0, i32 0
+  %59 = load i32, ptr %58, align 8
+  %60 = icmp eq i32 %59, 0
+  br i1 %60, label %61, label %76
 
-57:                                               ; preds = %52
-  %58 = load ptr, ptr %6, align 8
-  %59 = getelementptr inbounds %struct.CalcLangVal, ptr %58, i32 0, i32 0
-  store i32 5, ptr %59, align 8
-  %60 = load ptr, ptr %4, align 8
-  %61 = getelementptr inbounds %struct.CalcLangVal, ptr %60, i32 0, i32 1
-  %62 = load i32, ptr %61, align 8
-  %63 = load ptr, ptr %5, align 8
-  %64 = getelementptr inbounds %struct.CalcLangVal, ptr %63, i32 0, i32 1
-  %65 = load i32, ptr %64, align 8
-  %66 = icmp eq i32 %62, %65
-  %67 = zext i1 %66 to i32
-  %68 = load ptr, ptr %6, align 8
-  %69 = getelementptr inbounds %struct.CalcLangVal, ptr %68, i32 0, i32 1
-  store i32 %67, ptr %69, align 8
-  br label %433
+61:                                               ; preds = %56
+  %62 = load ptr, ptr %6, align 8
+  %63 = getelementptr inbounds %struct.CalcLangVal, ptr %62, i32 0, i32 0
+  store i32 5, ptr %63, align 8
+  %64 = load ptr, ptr %4, align 8
+  %65 = getelementptr inbounds %struct.CalcLangVal, ptr %64, i32 0, i32 1
+  %66 = load i8, ptr %65, align 8
+  %67 = trunc i8 %66 to i1
+  %68 = zext i1 %67 to i32
+  %69 = load ptr, ptr %5, align 8
+  %70 = getelementptr inbounds %struct.CalcLangVal, ptr %69, i32 0, i32 1
+  %71 = load i32, ptr %70, align 8
+  %72 = icmp eq i32 %68, %71
+  %73 = load ptr, ptr %6, align 8
+  %74 = getelementptr inbounds %struct.CalcLangVal, ptr %73, i32 0, i32 1
+  %75 = zext i1 %72 to i8
+  store i8 %75, ptr %74, align 8
+  br label %453
 
-70:                                               ; preds = %52, %47
-  %71 = load ptr, ptr %4, align 8
-  %72 = getelementptr inbounds %struct.CalcLangVal, ptr %71, i32 0, i32 0
-  %73 = load i32, ptr %72, align 8
-  %74 = icmp eq i32 %73, 0
-  br i1 %74, label %75, label %93
+76:                                               ; preds = %56, %51
+  %77 = load ptr, ptr %4, align 8
+  %78 = getelementptr inbounds %struct.CalcLangVal, ptr %77, i32 0, i32 0
+  %79 = load i32, ptr %78, align 8
+  %80 = icmp eq i32 %79, 0
+  br i1 %80, label %81, label %101
 
-75:                                               ; preds = %70
-  %76 = load ptr, ptr %5, align 8
-  %77 = getelementptr inbounds %struct.CalcLangVal, ptr %76, i32 0, i32 0
-  %78 = load i32, ptr %77, align 8
-  %79 = icmp eq i32 %78, 5
-  br i1 %79, label %80, label %93
+81:                                               ; preds = %76
+  %82 = load ptr, ptr %5, align 8
+  %83 = getelementptr inbounds %struct.CalcLangVal, ptr %82, i32 0, i32 0
+  %84 = load i32, ptr %83, align 8
+  %85 = icmp eq i32 %84, 5
+  br i1 %85, label %86, label %101
 
-80:                                               ; preds = %75
-  %81 = load ptr, ptr %6, align 8
-  %82 = getelementptr inbounds %struct.CalcLangVal, ptr %81, i32 0, i32 0
-  store i32 5, ptr %82, align 8
-  %83 = load ptr, ptr %4, align 8
-  %84 = getelementptr inbounds %struct.CalcLangVal, ptr %83, i32 0, i32 1
-  %85 = load i32, ptr %84, align 8
-  %86 = load ptr, ptr %5, align 8
-  %87 = getelementptr inbounds %struct.CalcLangVal, ptr %86, i32 0, i32 1
-  %88 = load i32, ptr %87, align 8
-  %89 = icmp eq i32 %85, %88
-  %90 = zext i1 %89 to i32
-  %91 = load ptr, ptr %6, align 8
-  %92 = getelementptr inbounds %struct.CalcLangVal, ptr %91, i32 0, i32 1
-  store i32 %90, ptr %92, align 8
-  br label %432
+86:                                               ; preds = %81
+  %87 = load ptr, ptr %6, align 8
+  %88 = getelementptr inbounds %struct.CalcLangVal, ptr %87, i32 0, i32 0
+  store i32 5, ptr %88, align 8
+  %89 = load ptr, ptr %4, align 8
+  %90 = getelementptr inbounds %struct.CalcLangVal, ptr %89, i32 0, i32 1
+  %91 = load i32, ptr %90, align 8
+  %92 = load ptr, ptr %5, align 8
+  %93 = getelementptr inbounds %struct.CalcLangVal, ptr %92, i32 0, i32 1
+  %94 = load i8, ptr %93, align 8
+  %95 = trunc i8 %94 to i1
+  %96 = zext i1 %95 to i32
+  %97 = icmp eq i32 %91, %96
+  %98 = load ptr, ptr %6, align 8
+  %99 = getelementptr inbounds %struct.CalcLangVal, ptr %98, i32 0, i32 1
+  %100 = zext i1 %97 to i8
+  store i8 %100, ptr %99, align 8
+  br label %452
 
-93:                                               ; preds = %75, %70
-  %94 = load ptr, ptr %4, align 8
-  %95 = getelementptr inbounds %struct.CalcLangVal, ptr %94, i32 0, i32 0
-  %96 = load i32, ptr %95, align 8
-  %97 = icmp eq i32 %96, 5
-  br i1 %97, label %98, label %117
+101:                                              ; preds = %81, %76
+  %102 = load ptr, ptr %4, align 8
+  %103 = getelementptr inbounds %struct.CalcLangVal, ptr %102, i32 0, i32 0
+  %104 = load i32, ptr %103, align 8
+  %105 = icmp eq i32 %104, 5
+  br i1 %105, label %106, label %127
 
-98:                                               ; preds = %93
-  %99 = load ptr, ptr %5, align 8
-  %100 = getelementptr inbounds %struct.CalcLangVal, ptr %99, i32 0, i32 0
-  %101 = load i32, ptr %100, align 8
-  %102 = icmp eq i32 %101, 1
-  br i1 %102, label %103, label %117
+106:                                              ; preds = %101
+  %107 = load ptr, ptr %5, align 8
+  %108 = getelementptr inbounds %struct.CalcLangVal, ptr %107, i32 0, i32 0
+  %109 = load i32, ptr %108, align 8
+  %110 = icmp eq i32 %109, 1
+  br i1 %110, label %111, label %127
 
-103:                                              ; preds = %98
-  %104 = load ptr, ptr %6, align 8
-  %105 = getelementptr inbounds %struct.CalcLangVal, ptr %104, i32 0, i32 0
-  store i32 5, ptr %105, align 8
-  %106 = load ptr, ptr %4, align 8
-  %107 = getelementptr inbounds %struct.CalcLangVal, ptr %106, i32 0, i32 1
-  %108 = load i32, ptr %107, align 8
-  %109 = sitofp i32 %108 to double
-  %110 = load ptr, ptr %5, align 8
-  %111 = getelementptr inbounds %struct.CalcLangVal, ptr %110, i32 0, i32 1
-  %112 = load double, ptr %111, align 8
-  %113 = fcmp oeq double %109, %112
-  %114 = zext i1 %113 to i32
-  %115 = load ptr, ptr %6, align 8
-  %116 = getelementptr inbounds %struct.CalcLangVal, ptr %115, i32 0, i32 1
-  store i32 %114, ptr %116, align 8
-  br label %431
+111:                                              ; preds = %106
+  %112 = load ptr, ptr %6, align 8
+  %113 = getelementptr inbounds %struct.CalcLangVal, ptr %112, i32 0, i32 0
+  store i32 5, ptr %113, align 8
+  %114 = load ptr, ptr %4, align 8
+  %115 = getelementptr inbounds %struct.CalcLangVal, ptr %114, i32 0, i32 1
+  %116 = load i8, ptr %115, align 8
+  %117 = trunc i8 %116 to i1
+  %118 = zext i1 %117 to i32
+  %119 = sitofp i32 %118 to double
+  %120 = load ptr, ptr %5, align 8
+  %121 = getelementptr inbounds %struct.CalcLangVal, ptr %120, i32 0, i32 1
+  %122 = load double, ptr %121, align 8
+  %123 = fcmp oeq double %119, %122
+  %124 = load ptr, ptr %6, align 8
+  %125 = getelementptr inbounds %struct.CalcLangVal, ptr %124, i32 0, i32 1
+  %126 = zext i1 %123 to i8
+  store i8 %126, ptr %125, align 8
+  br label %451
 
-117:                                              ; preds = %98, %93
-  %118 = load ptr, ptr %4, align 8
-  %119 = getelementptr inbounds %struct.CalcLangVal, ptr %118, i32 0, i32 0
-  %120 = load i32, ptr %119, align 8
-  %121 = icmp eq i32 %120, 1
-  br i1 %121, label %122, label %141
-
-122:                                              ; preds = %117
-  %123 = load ptr, ptr %5, align 8
-  %124 = getelementptr inbounds %struct.CalcLangVal, ptr %123, i32 0, i32 0
-  %125 = load i32, ptr %124, align 8
-  %126 = icmp eq i32 %125, 5
-  br i1 %126, label %127, label %141
-
-127:                                              ; preds = %122
-  %128 = load ptr, ptr %6, align 8
+127:                                              ; preds = %106, %101
+  %128 = load ptr, ptr %4, align 8
   %129 = getelementptr inbounds %struct.CalcLangVal, ptr %128, i32 0, i32 0
-  store i32 5, ptr %129, align 8
-  %130 = load ptr, ptr %4, align 8
-  %131 = getelementptr inbounds %struct.CalcLangVal, ptr %130, i32 0, i32 1
-  %132 = load double, ptr %131, align 8
+  %130 = load i32, ptr %129, align 8
+  %131 = icmp eq i32 %130, 1
+  br i1 %131, label %132, label %153
+
+132:                                              ; preds = %127
   %133 = load ptr, ptr %5, align 8
-  %134 = getelementptr inbounds %struct.CalcLangVal, ptr %133, i32 0, i32 1
+  %134 = getelementptr inbounds %struct.CalcLangVal, ptr %133, i32 0, i32 0
   %135 = load i32, ptr %134, align 8
-  %136 = sitofp i32 %135 to double
-  %137 = fcmp oeq double %132, %136
-  %138 = zext i1 %137 to i32
-  %139 = load ptr, ptr %6, align 8
-  %140 = getelementptr inbounds %struct.CalcLangVal, ptr %139, i32 0, i32 1
-  store i32 %138, ptr %140, align 8
-  br label %430
+  %136 = icmp eq i32 %135, 5
+  br i1 %136, label %137, label %153
 
-141:                                              ; preds = %122, %117
-  %142 = load ptr, ptr %4, align 8
-  %143 = getelementptr inbounds %struct.CalcLangVal, ptr %142, i32 0, i32 0
-  %144 = load i32, ptr %143, align 8
-  %145 = icmp eq i32 %144, 0
-  br i1 %145, label %146, label %164
+137:                                              ; preds = %132
+  %138 = load ptr, ptr %6, align 8
+  %139 = getelementptr inbounds %struct.CalcLangVal, ptr %138, i32 0, i32 0
+  store i32 5, ptr %139, align 8
+  %140 = load ptr, ptr %4, align 8
+  %141 = getelementptr inbounds %struct.CalcLangVal, ptr %140, i32 0, i32 1
+  %142 = load double, ptr %141, align 8
+  %143 = load ptr, ptr %5, align 8
+  %144 = getelementptr inbounds %struct.CalcLangVal, ptr %143, i32 0, i32 1
+  %145 = load i8, ptr %144, align 8
+  %146 = trunc i8 %145 to i1
+  %147 = zext i1 %146 to i32
+  %148 = sitofp i32 %147 to double
+  %149 = fcmp oeq double %142, %148
+  %150 = load ptr, ptr %6, align 8
+  %151 = getelementptr inbounds %struct.CalcLangVal, ptr %150, i32 0, i32 1
+  %152 = zext i1 %149 to i8
+  store i8 %152, ptr %151, align 8
+  br label %450
 
-146:                                              ; preds = %141
-  %147 = load ptr, ptr %5, align 8
-  %148 = getelementptr inbounds %struct.CalcLangVal, ptr %147, i32 0, i32 0
-  %149 = load i32, ptr %148, align 8
-  %150 = icmp eq i32 %149, 0
-  br i1 %150, label %151, label %164
-
-151:                                              ; preds = %146
-  %152 = load ptr, ptr %6, align 8
-  %153 = getelementptr inbounds %struct.CalcLangVal, ptr %152, i32 0, i32 0
-  store i32 5, ptr %153, align 8
+153:                                              ; preds = %132, %127
   %154 = load ptr, ptr %4, align 8
-  %155 = getelementptr inbounds %struct.CalcLangVal, ptr %154, i32 0, i32 1
+  %155 = getelementptr inbounds %struct.CalcLangVal, ptr %154, i32 0, i32 0
   %156 = load i32, ptr %155, align 8
-  %157 = load ptr, ptr %5, align 8
-  %158 = getelementptr inbounds %struct.CalcLangVal, ptr %157, i32 0, i32 1
-  %159 = load i32, ptr %158, align 8
-  %160 = icmp eq i32 %156, %159
-  %161 = zext i1 %160 to i32
-  %162 = load ptr, ptr %6, align 8
-  %163 = getelementptr inbounds %struct.CalcLangVal, ptr %162, i32 0, i32 1
-  store i32 %161, ptr %163, align 8
-  br label %429
+  %157 = icmp eq i32 %156, 0
+  br i1 %157, label %158, label %176
 
-164:                                              ; preds = %146, %141
-  %165 = load ptr, ptr %4, align 8
-  %166 = getelementptr inbounds %struct.CalcLangVal, ptr %165, i32 0, i32 0
-  %167 = load i32, ptr %166, align 8
-  %168 = icmp eq i32 %167, 1
-  br i1 %168, label %169, label %187
+158:                                              ; preds = %153
+  %159 = load ptr, ptr %5, align 8
+  %160 = getelementptr inbounds %struct.CalcLangVal, ptr %159, i32 0, i32 0
+  %161 = load i32, ptr %160, align 8
+  %162 = icmp eq i32 %161, 0
+  br i1 %162, label %163, label %176
 
-169:                                              ; preds = %164
-  %170 = load ptr, ptr %5, align 8
-  %171 = getelementptr inbounds %struct.CalcLangVal, ptr %170, i32 0, i32 0
-  %172 = load i32, ptr %171, align 8
-  %173 = icmp eq i32 %172, 1
-  br i1 %173, label %174, label %187
+163:                                              ; preds = %158
+  %164 = load ptr, ptr %6, align 8
+  %165 = getelementptr inbounds %struct.CalcLangVal, ptr %164, i32 0, i32 0
+  store i32 5, ptr %165, align 8
+  %166 = load ptr, ptr %4, align 8
+  %167 = getelementptr inbounds %struct.CalcLangVal, ptr %166, i32 0, i32 1
+  %168 = load i32, ptr %167, align 8
+  %169 = load ptr, ptr %5, align 8
+  %170 = getelementptr inbounds %struct.CalcLangVal, ptr %169, i32 0, i32 1
+  %171 = load i32, ptr %170, align 8
+  %172 = icmp eq i32 %168, %171
+  %173 = load ptr, ptr %6, align 8
+  %174 = getelementptr inbounds %struct.CalcLangVal, ptr %173, i32 0, i32 1
+  %175 = zext i1 %172 to i8
+  store i8 %175, ptr %174, align 8
+  br label %449
 
-174:                                              ; preds = %169
-  %175 = load ptr, ptr %6, align 8
-  %176 = getelementptr inbounds %struct.CalcLangVal, ptr %175, i32 0, i32 0
-  store i32 5, ptr %176, align 8
+176:                                              ; preds = %158, %153
   %177 = load ptr, ptr %4, align 8
-  %178 = getelementptr inbounds %struct.CalcLangVal, ptr %177, i32 0, i32 1
-  %179 = load double, ptr %178, align 8
-  %180 = load ptr, ptr %5, align 8
-  %181 = getelementptr inbounds %struct.CalcLangVal, ptr %180, i32 0, i32 1
-  %182 = load double, ptr %181, align 8
-  %183 = fcmp oeq double %179, %182
-  %184 = zext i1 %183 to i32
-  %185 = load ptr, ptr %6, align 8
-  %186 = getelementptr inbounds %struct.CalcLangVal, ptr %185, i32 0, i32 1
-  store i32 %184, ptr %186, align 8
-  br label %428
+  %178 = getelementptr inbounds %struct.CalcLangVal, ptr %177, i32 0, i32 0
+  %179 = load i32, ptr %178, align 8
+  %180 = icmp eq i32 %179, 1
+  br i1 %180, label %181, label %199
 
-187:                                              ; preds = %169, %164
-  %188 = load ptr, ptr %4, align 8
-  %189 = getelementptr inbounds %struct.CalcLangVal, ptr %188, i32 0, i32 0
-  %190 = load i32, ptr %189, align 8
-  %191 = icmp eq i32 %190, 0
-  br i1 %191, label %192, label %211
+181:                                              ; preds = %176
+  %182 = load ptr, ptr %5, align 8
+  %183 = getelementptr inbounds %struct.CalcLangVal, ptr %182, i32 0, i32 0
+  %184 = load i32, ptr %183, align 8
+  %185 = icmp eq i32 %184, 1
+  br i1 %185, label %186, label %199
 
-192:                                              ; preds = %187
-  %193 = load ptr, ptr %5, align 8
-  %194 = getelementptr inbounds %struct.CalcLangVal, ptr %193, i32 0, i32 0
-  %195 = load i32, ptr %194, align 8
-  %196 = icmp eq i32 %195, 1
-  br i1 %196, label %197, label %211
+186:                                              ; preds = %181
+  %187 = load ptr, ptr %6, align 8
+  %188 = getelementptr inbounds %struct.CalcLangVal, ptr %187, i32 0, i32 0
+  store i32 5, ptr %188, align 8
+  %189 = load ptr, ptr %4, align 8
+  %190 = getelementptr inbounds %struct.CalcLangVal, ptr %189, i32 0, i32 1
+  %191 = load double, ptr %190, align 8
+  %192 = load ptr, ptr %5, align 8
+  %193 = getelementptr inbounds %struct.CalcLangVal, ptr %192, i32 0, i32 1
+  %194 = load double, ptr %193, align 8
+  %195 = fcmp oeq double %191, %194
+  %196 = load ptr, ptr %6, align 8
+  %197 = getelementptr inbounds %struct.CalcLangVal, ptr %196, i32 0, i32 1
+  %198 = zext i1 %195 to i8
+  store i8 %198, ptr %197, align 8
+  br label %448
 
-197:                                              ; preds = %192
-  %198 = load ptr, ptr %6, align 8
-  %199 = getelementptr inbounds %struct.CalcLangVal, ptr %198, i32 0, i32 0
-  store i32 5, ptr %199, align 8
+199:                                              ; preds = %181, %176
   %200 = load ptr, ptr %4, align 8
-  %201 = getelementptr inbounds %struct.CalcLangVal, ptr %200, i32 0, i32 1
+  %201 = getelementptr inbounds %struct.CalcLangVal, ptr %200, i32 0, i32 0
   %202 = load i32, ptr %201, align 8
-  %203 = sitofp i32 %202 to double
-  %204 = load ptr, ptr %5, align 8
-  %205 = getelementptr inbounds %struct.CalcLangVal, ptr %204, i32 0, i32 1
-  %206 = load double, ptr %205, align 8
-  %207 = fcmp oeq double %203, %206
-  %208 = zext i1 %207 to i32
-  %209 = load ptr, ptr %6, align 8
-  %210 = getelementptr inbounds %struct.CalcLangVal, ptr %209, i32 0, i32 1
-  store i32 %208, ptr %210, align 8
-  br label %427
+  %203 = icmp eq i32 %202, 0
+  br i1 %203, label %204, label %223
 
-211:                                              ; preds = %192, %187
+204:                                              ; preds = %199
+  %205 = load ptr, ptr %5, align 8
+  %206 = getelementptr inbounds %struct.CalcLangVal, ptr %205, i32 0, i32 0
+  %207 = load i32, ptr %206, align 8
+  %208 = icmp eq i32 %207, 1
+  br i1 %208, label %209, label %223
+
+209:                                              ; preds = %204
+  %210 = load ptr, ptr %6, align 8
+  %211 = getelementptr inbounds %struct.CalcLangVal, ptr %210, i32 0, i32 0
+  store i32 5, ptr %211, align 8
   %212 = load ptr, ptr %4, align 8
-  %213 = getelementptr inbounds %struct.CalcLangVal, ptr %212, i32 0, i32 0
+  %213 = getelementptr inbounds %struct.CalcLangVal, ptr %212, i32 0, i32 1
   %214 = load i32, ptr %213, align 8
-  %215 = icmp eq i32 %214, 1
-  br i1 %215, label %216, label %235
+  %215 = sitofp i32 %214 to double
+  %216 = load ptr, ptr %5, align 8
+  %217 = getelementptr inbounds %struct.CalcLangVal, ptr %216, i32 0, i32 1
+  %218 = load double, ptr %217, align 8
+  %219 = fcmp oeq double %215, %218
+  %220 = load ptr, ptr %6, align 8
+  %221 = getelementptr inbounds %struct.CalcLangVal, ptr %220, i32 0, i32 1
+  %222 = zext i1 %219 to i8
+  store i8 %222, ptr %221, align 8
+  br label %447
 
-216:                                              ; preds = %211
-  %217 = load ptr, ptr %5, align 8
-  %218 = getelementptr inbounds %struct.CalcLangVal, ptr %217, i32 0, i32 0
-  %219 = load i32, ptr %218, align 8
-  %220 = icmp eq i32 %219, 0
-  br i1 %220, label %221, label %235
-
-221:                                              ; preds = %216
-  %222 = load ptr, ptr %6, align 8
-  %223 = getelementptr inbounds %struct.CalcLangVal, ptr %222, i32 0, i32 0
-  store i32 5, ptr %223, align 8
+223:                                              ; preds = %204, %199
   %224 = load ptr, ptr %4, align 8
-  %225 = getelementptr inbounds %struct.CalcLangVal, ptr %224, i32 0, i32 1
-  %226 = load double, ptr %225, align 8
-  %227 = load ptr, ptr %5, align 8
-  %228 = getelementptr inbounds %struct.CalcLangVal, ptr %227, i32 0, i32 1
-  %229 = load i32, ptr %228, align 8
-  %230 = sitofp i32 %229 to double
-  %231 = fcmp oeq double %226, %230
-  %232 = zext i1 %231 to i32
-  %233 = load ptr, ptr %6, align 8
-  %234 = getelementptr inbounds %struct.CalcLangVal, ptr %233, i32 0, i32 1
-  store i32 %232, ptr %234, align 8
-  br label %426
+  %225 = getelementptr inbounds %struct.CalcLangVal, ptr %224, i32 0, i32 0
+  %226 = load i32, ptr %225, align 8
+  %227 = icmp eq i32 %226, 1
+  br i1 %227, label %228, label %247
 
-235:                                              ; preds = %216, %211
+228:                                              ; preds = %223
+  %229 = load ptr, ptr %5, align 8
+  %230 = getelementptr inbounds %struct.CalcLangVal, ptr %229, i32 0, i32 0
+  %231 = load i32, ptr %230, align 8
+  %232 = icmp eq i32 %231, 0
+  br i1 %232, label %233, label %247
+
+233:                                              ; preds = %228
+  %234 = load ptr, ptr %6, align 8
+  %235 = getelementptr inbounds %struct.CalcLangVal, ptr %234, i32 0, i32 0
+  store i32 5, ptr %235, align 8
   %236 = load ptr, ptr %4, align 8
-  %237 = getelementptr inbounds %struct.CalcLangVal, ptr %236, i32 0, i32 0
-  %238 = load i32, ptr %237, align 8
-  %239 = icmp eq i32 %238, 3
-  br i1 %239, label %240, label %258
+  %237 = getelementptr inbounds %struct.CalcLangVal, ptr %236, i32 0, i32 1
+  %238 = load double, ptr %237, align 8
+  %239 = load ptr, ptr %5, align 8
+  %240 = getelementptr inbounds %struct.CalcLangVal, ptr %239, i32 0, i32 1
+  %241 = load i32, ptr %240, align 8
+  %242 = sitofp i32 %241 to double
+  %243 = fcmp oeq double %238, %242
+  %244 = load ptr, ptr %6, align 8
+  %245 = getelementptr inbounds %struct.CalcLangVal, ptr %244, i32 0, i32 1
+  %246 = zext i1 %243 to i8
+  store i8 %246, ptr %245, align 8
+  br label %446
 
-240:                                              ; preds = %235
-  %241 = load ptr, ptr %5, align 8
-  %242 = getelementptr inbounds %struct.CalcLangVal, ptr %241, i32 0, i32 0
-  %243 = load i32, ptr %242, align 8
-  %244 = icmp eq i32 %243, 3
-  br i1 %244, label %245, label %258
-
-245:                                              ; preds = %240
-  %246 = load ptr, ptr %6, align 8
-  %247 = getelementptr inbounds %struct.CalcLangVal, ptr %246, i32 0, i32 0
-  store i32 5, ptr %247, align 8
+247:                                              ; preds = %228, %223
   %248 = load ptr, ptr %4, align 8
-  %249 = getelementptr inbounds %struct.CalcLangVal, ptr %248, i32 0, i32 1
-  %250 = load double, ptr %249, align 8
-  %251 = load ptr, ptr %5, align 8
-  %252 = getelementptr inbounds %struct.CalcLangVal, ptr %251, i32 0, i32 1
-  %253 = load double, ptr %252, align 8
-  %254 = fcmp oeq double %250, %253
-  %255 = zext i1 %254 to i32
-  %256 = load ptr, ptr %6, align 8
-  %257 = getelementptr inbounds %struct.CalcLangVal, ptr %256, i32 0, i32 1
-  store i32 %255, ptr %257, align 8
-  br label %425
+  %249 = getelementptr inbounds %struct.CalcLangVal, ptr %248, i32 0, i32 0
+  %250 = load i32, ptr %249, align 8
+  %251 = icmp eq i32 %250, 3
+  br i1 %251, label %252, label %270
 
-258:                                              ; preds = %240, %235
-  %259 = load ptr, ptr %4, align 8
-  %260 = getelementptr inbounds %struct.CalcLangVal, ptr %259, i32 0, i32 0
-  %261 = load i32, ptr %260, align 8
-  %262 = icmp eq i32 %261, 4
-  br i1 %262, label %263, label %281
+252:                                              ; preds = %247
+  %253 = load ptr, ptr %5, align 8
+  %254 = getelementptr inbounds %struct.CalcLangVal, ptr %253, i32 0, i32 0
+  %255 = load i32, ptr %254, align 8
+  %256 = icmp eq i32 %255, 3
+  br i1 %256, label %257, label %270
 
-263:                                              ; preds = %258
-  %264 = load ptr, ptr %5, align 8
-  %265 = getelementptr inbounds %struct.CalcLangVal, ptr %264, i32 0, i32 0
-  %266 = load i32, ptr %265, align 8
-  %267 = icmp eq i32 %266, 4
-  br i1 %267, label %268, label %281
+257:                                              ; preds = %252
+  %258 = load ptr, ptr %6, align 8
+  %259 = getelementptr inbounds %struct.CalcLangVal, ptr %258, i32 0, i32 0
+  store i32 5, ptr %259, align 8
+  %260 = load ptr, ptr %4, align 8
+  %261 = getelementptr inbounds %struct.CalcLangVal, ptr %260, i32 0, i32 1
+  %262 = load double, ptr %261, align 8
+  %263 = load ptr, ptr %5, align 8
+  %264 = getelementptr inbounds %struct.CalcLangVal, ptr %263, i32 0, i32 1
+  %265 = load double, ptr %264, align 8
+  %266 = fcmp oeq double %262, %265
+  %267 = load ptr, ptr %6, align 8
+  %268 = getelementptr inbounds %struct.CalcLangVal, ptr %267, i32 0, i32 1
+  %269 = zext i1 %266 to i8
+  store i8 %269, ptr %268, align 8
+  br label %445
 
-268:                                              ; preds = %263
-  %269 = load ptr, ptr %6, align 8
-  %270 = getelementptr inbounds %struct.CalcLangVal, ptr %269, i32 0, i32 0
-  store i32 5, ptr %270, align 8
+270:                                              ; preds = %252, %247
   %271 = load ptr, ptr %4, align 8
-  %272 = getelementptr inbounds %struct.CalcLangVal, ptr %271, i32 0, i32 1
-  %273 = load double, ptr %272, align 8
-  %274 = load ptr, ptr %5, align 8
-  %275 = getelementptr inbounds %struct.CalcLangVal, ptr %274, i32 0, i32 1
-  %276 = load double, ptr %275, align 8
-  %277 = fcmp oeq double %273, %276
-  %278 = zext i1 %277 to i32
-  %279 = load ptr, ptr %6, align 8
-  %280 = getelementptr inbounds %struct.CalcLangVal, ptr %279, i32 0, i32 1
-  store i32 %278, ptr %280, align 8
-  br label %424
+  %272 = getelementptr inbounds %struct.CalcLangVal, ptr %271, i32 0, i32 0
+  %273 = load i32, ptr %272, align 8
+  %274 = icmp eq i32 %273, 4
+  br i1 %274, label %275, label %293
 
-281:                                              ; preds = %263, %258
-  %282 = load ptr, ptr %4, align 8
-  %283 = getelementptr inbounds %struct.CalcLangVal, ptr %282, i32 0, i32 0
-  %284 = load i32, ptr %283, align 8
-  %285 = icmp eq i32 %284, 7
-  br i1 %285, label %286, label %351
+275:                                              ; preds = %270
+  %276 = load ptr, ptr %5, align 8
+  %277 = getelementptr inbounds %struct.CalcLangVal, ptr %276, i32 0, i32 0
+  %278 = load i32, ptr %277, align 8
+  %279 = icmp eq i32 %278, 4
+  br i1 %279, label %280, label %293
 
-286:                                              ; preds = %281
-  %287 = load ptr, ptr %5, align 8
-  %288 = getelementptr inbounds %struct.CalcLangVal, ptr %287, i32 0, i32 0
-  %289 = load i32, ptr %288, align 8
-  %290 = icmp eq i32 %289, 7
-  br i1 %290, label %291, label %351
+280:                                              ; preds = %275
+  %281 = load ptr, ptr %6, align 8
+  %282 = getelementptr inbounds %struct.CalcLangVal, ptr %281, i32 0, i32 0
+  store i32 5, ptr %282, align 8
+  %283 = load ptr, ptr %4, align 8
+  %284 = getelementptr inbounds %struct.CalcLangVal, ptr %283, i32 0, i32 1
+  %285 = load double, ptr %284, align 8
+  %286 = load ptr, ptr %5, align 8
+  %287 = getelementptr inbounds %struct.CalcLangVal, ptr %286, i32 0, i32 1
+  %288 = load double, ptr %287, align 8
+  %289 = fcmp oeq double %285, %288
+  %290 = load ptr, ptr %6, align 8
+  %291 = getelementptr inbounds %struct.CalcLangVal, ptr %290, i32 0, i32 1
+  %292 = zext i1 %289 to i8
+  store i8 %292, ptr %291, align 8
+  br label %444
 
-291:                                              ; preds = %286
-  %292 = load ptr, ptr %4, align 8
-  %293 = getelementptr inbounds %struct.CalcLangVal, ptr %292, i32 0, i32 1
-  %294 = load ptr, ptr %293, align 8
-  store ptr %294, ptr %7, align 8
-  %295 = load ptr, ptr %5, align 8
-  %296 = getelementptr inbounds %struct.CalcLangVal, ptr %295, i32 0, i32 1
-  %297 = load ptr, ptr %296, align 8
-  store ptr %297, ptr %8, align 8
-  %298 = load ptr, ptr %8, align 8
-  %299 = getelementptr inbounds %struct.TupleValue, ptr %298, i32 0, i32 0
-  %300 = load i32, ptr %299, align 8
-  %301 = load ptr, ptr %7, align 8
-  %302 = getelementptr inbounds %struct.TupleValue, ptr %301, i32 0, i32 0
-  %303 = load i32, ptr %302, align 8
-  %304 = icmp eq i32 %300, %303
-  br i1 %304, label %305, label %349
+293:                                              ; preds = %275, %270
+  %294 = load ptr, ptr %4, align 8
+  %295 = getelementptr inbounds %struct.CalcLangVal, ptr %294, i32 0, i32 0
+  %296 = load i32, ptr %295, align 8
+  %297 = icmp eq i32 %296, 7
+  br i1 %297, label %298, label %367
 
-305:                                              ; preds = %291
+298:                                              ; preds = %293
+  %299 = load ptr, ptr %5, align 8
+  %300 = getelementptr inbounds %struct.CalcLangVal, ptr %299, i32 0, i32 0
+  %301 = load i32, ptr %300, align 8
+  %302 = icmp eq i32 %301, 7
+  br i1 %302, label %303, label %367
+
+303:                                              ; preds = %298
+  %304 = load ptr, ptr %4, align 8
+  %305 = getelementptr inbounds %struct.CalcLangVal, ptr %304, i32 0, i32 1
+  %306 = load ptr, ptr %305, align 8
+  store ptr %306, ptr %7, align 8
+  %307 = load ptr, ptr %5, align 8
+  %308 = getelementptr inbounds %struct.CalcLangVal, ptr %307, i32 0, i32 1
+  %309 = load ptr, ptr %308, align 8
+  store ptr %309, ptr %8, align 8
+  %310 = load ptr, ptr %8, align 8
+  %311 = getelementptr inbounds %struct.TupleValue, ptr %310, i32 0, i32 0
+  %312 = load i32, ptr %311, align 8
+  %313 = load ptr, ptr %7, align 8
+  %314 = getelementptr inbounds %struct.TupleValue, ptr %313, i32 0, i32 0
+  %315 = load i32, ptr %314, align 8
+  %316 = icmp eq i32 %312, %315
+  br i1 %316, label %317, label %365
+
+317:                                              ; preds = %303
   store i32 1, ptr %9, align 4
   store i32 0, ptr %10, align 4
-  br label %306
+  br label %318
 
-306:                                              ; preds = %340, %305
-  %307 = load i32, ptr %10, align 4
-  %308 = load ptr, ptr %7, align 8
-  %309 = getelementptr inbounds %struct.TupleValue, ptr %308, i32 0, i32 0
-  %310 = load i32, ptr %309, align 8
-  %311 = icmp slt i32 %307, %310
-  br i1 %311, label %312, label %343
+318:                                              ; preds = %354, %317
+  %319 = load i32, ptr %10, align 4
+  %320 = load ptr, ptr %7, align 8
+  %321 = getelementptr inbounds %struct.TupleValue, ptr %320, i32 0, i32 0
+  %322 = load i32, ptr %321, align 8
+  %323 = icmp slt i32 %319, %322
+  br i1 %323, label %324, label %357
 
-312:                                              ; preds = %306
-  %313 = load ptr, ptr %7, align 8
-  %314 = getelementptr inbounds %struct.TupleValue, ptr %313, i32 0, i32 1
-  %315 = load ptr, ptr %314, align 8
-  %316 = load i32, ptr %10, align 4
-  %317 = sext i32 %316 to i64
-  %318 = getelementptr inbounds ptr, ptr %315, i64 %317
-  %319 = load ptr, ptr %318, align 8
-  %320 = load ptr, ptr %8, align 8
-  %321 = getelementptr inbounds %struct.TupleValue, ptr %320, i32 0, i32 1
-  %322 = load ptr, ptr %321, align 8
-  %323 = load i32, ptr %10, align 4
-  %324 = sext i32 %323 to i64
-  %325 = getelementptr inbounds ptr, ptr %322, i64 %324
-  %326 = load ptr, ptr %325, align 8
-  %327 = call ptr @equalsCalcLangValues(ptr noundef %319, ptr noundef %326)
-  store ptr %327, ptr %11, align 8
-  %328 = load ptr, ptr %11, align 8
-  %329 = getelementptr inbounds %struct.CalcLangVal, ptr %328, i32 0, i32 0
-  %330 = load i32, ptr %329, align 8
-  %331 = icmp eq i32 %330, 5
-  br i1 %331, label %332, label %339
+324:                                              ; preds = %318
+  %325 = load ptr, ptr %7, align 8
+  %326 = getelementptr inbounds %struct.TupleValue, ptr %325, i32 0, i32 1
+  %327 = load ptr, ptr %326, align 8
+  %328 = load i32, ptr %10, align 4
+  %329 = sext i32 %328 to i64
+  %330 = getelementptr inbounds ptr, ptr %327, i64 %329
+  %331 = load ptr, ptr %330, align 8
+  %332 = load ptr, ptr %8, align 8
+  %333 = getelementptr inbounds %struct.TupleValue, ptr %332, i32 0, i32 1
+  %334 = load ptr, ptr %333, align 8
+  %335 = load i32, ptr %10, align 4
+  %336 = sext i32 %335 to i64
+  %337 = getelementptr inbounds ptr, ptr %334, i64 %336
+  %338 = load ptr, ptr %337, align 8
+  %339 = call ptr @equalsCalcLangValues(ptr noundef %331, ptr noundef %338)
+  store ptr %339, ptr %11, align 8
+  %340 = load ptr, ptr %11, align 8
+  %341 = getelementptr inbounds %struct.CalcLangVal, ptr %340, i32 0, i32 0
+  %342 = load i32, ptr %341, align 8
+  %343 = icmp eq i32 %342, 5
+  br i1 %343, label %344, label %353
 
-332:                                              ; preds = %312
-  %333 = load ptr, ptr %11, align 8
-  %334 = getelementptr inbounds %struct.CalcLangVal, ptr %333, i32 0, i32 1
-  %335 = load i32, ptr %334, align 8
-  %336 = icmp eq i32 %335, 0
-  br i1 %336, label %337, label %338
+344:                                              ; preds = %324
+  %345 = load ptr, ptr %11, align 8
+  %346 = getelementptr inbounds %struct.CalcLangVal, ptr %345, i32 0, i32 1
+  %347 = load i8, ptr %346, align 8
+  %348 = trunc i8 %347 to i1
+  %349 = zext i1 %348 to i32
+  %350 = icmp eq i32 %349, 0
+  br i1 %350, label %351, label %352
 
-337:                                              ; preds = %332
+351:                                              ; preds = %344
   store i32 0, ptr %9, align 4
-  br label %343
+  br label %357
 
-338:                                              ; preds = %332
-  br label %339
+352:                                              ; preds = %344
+  br label %353
 
-339:                                              ; preds = %338, %312
-  br label %340
+353:                                              ; preds = %352, %324
+  br label %354
 
-340:                                              ; preds = %339
-  %341 = load i32, ptr %10, align 4
-  %342 = add nsw i32 %341, 1
-  store i32 %342, ptr %10, align 4
-  br label %306, !llvm.loop !100
+354:                                              ; preds = %353
+  %355 = load i32, ptr %10, align 4
+  %356 = add nsw i32 %355, 1
+  store i32 %356, ptr %10, align 4
+  br label %318, !llvm.loop !100
 
-343:                                              ; preds = %337, %306
-  %344 = load ptr, ptr %6, align 8
-  %345 = getelementptr inbounds %struct.CalcLangVal, ptr %344, i32 0, i32 0
-  store i32 5, ptr %345, align 8
-  %346 = load i32, ptr %9, align 4
-  %347 = load ptr, ptr %6, align 8
-  %348 = getelementptr inbounds %struct.CalcLangVal, ptr %347, i32 0, i32 1
-  store i32 %346, ptr %348, align 8
-  br label %350
-
-349:                                              ; preds = %291
-  call void @perror(ptr noundef @.str.1) #7
-  store ptr null, ptr %3, align 8
-  br label %438
-
-350:                                              ; preds = %343
-  br label %423
-
-351:                                              ; preds = %286, %281
-  %352 = load ptr, ptr %4, align 8
-  %353 = getelementptr inbounds %struct.CalcLangVal, ptr %352, i32 0, i32 0
-  %354 = load i32, ptr %353, align 8
-  %355 = icmp eq i32 %354, 6
-  br i1 %355, label %356, label %421
-
-356:                                              ; preds = %351
-  %357 = load ptr, ptr %5, align 8
-  %358 = getelementptr inbounds %struct.CalcLangVal, ptr %357, i32 0, i32 0
-  %359 = load i32, ptr %358, align 8
-  %360 = icmp eq i32 %359, 6
-  br i1 %360, label %361, label %421
-
-361:                                              ; preds = %356
-  %362 = load ptr, ptr %4, align 8
+357:                                              ; preds = %351, %318
+  %358 = load ptr, ptr %6, align 8
+  %359 = getelementptr inbounds %struct.CalcLangVal, ptr %358, i32 0, i32 0
+  store i32 5, ptr %359, align 8
+  %360 = load i32, ptr %9, align 4
+  %361 = icmp ne i32 %360, 0
+  %362 = load ptr, ptr %6, align 8
   %363 = getelementptr inbounds %struct.CalcLangVal, ptr %362, i32 0, i32 1
-  %364 = load ptr, ptr %363, align 8
-  store ptr %364, ptr %12, align 8
-  %365 = load ptr, ptr %5, align 8
-  %366 = getelementptr inbounds %struct.CalcLangVal, ptr %365, i32 0, i32 1
-  %367 = load ptr, ptr %366, align 8
-  store ptr %367, ptr %13, align 8
-  %368 = load ptr, ptr %13, align 8
-  %369 = getelementptr inbounds %struct.SetValue, ptr %368, i32 0, i32 0
-  %370 = load i32, ptr %369, align 8
-  %371 = load ptr, ptr %12, align 8
-  %372 = getelementptr inbounds %struct.SetValue, ptr %371, i32 0, i32 0
-  %373 = load i32, ptr %372, align 8
-  %374 = icmp eq i32 %370, %373
-  br i1 %374, label %375, label %419
+  %364 = zext i1 %361 to i8
+  store i8 %364, ptr %363, align 8
+  br label %366
 
-375:                                              ; preds = %361
-  store i32 1, ptr %14, align 4
-  store i32 0, ptr %15, align 4
-  br label %376
-
-376:                                              ; preds = %410, %375
-  %377 = load i32, ptr %15, align 4
-  %378 = load ptr, ptr %12, align 8
-  %379 = getelementptr inbounds %struct.SetValue, ptr %378, i32 0, i32 0
-  %380 = load i32, ptr %379, align 8
-  %381 = icmp slt i32 %377, %380
-  br i1 %381, label %382, label %413
-
-382:                                              ; preds = %376
-  %383 = load ptr, ptr %12, align 8
-  %384 = getelementptr inbounds %struct.SetValue, ptr %383, i32 0, i32 1
-  %385 = load ptr, ptr %384, align 8
-  %386 = load i32, ptr %15, align 4
-  %387 = sext i32 %386 to i64
-  %388 = getelementptr inbounds ptr, ptr %385, i64 %387
-  %389 = load ptr, ptr %388, align 8
-  %390 = load ptr, ptr %13, align 8
-  %391 = getelementptr inbounds %struct.SetValue, ptr %390, i32 0, i32 1
-  %392 = load ptr, ptr %391, align 8
-  %393 = load i32, ptr %15, align 4
-  %394 = sext i32 %393 to i64
-  %395 = getelementptr inbounds ptr, ptr %392, i64 %394
-  %396 = load ptr, ptr %395, align 8
-  %397 = call ptr @equalsCalcLangValues(ptr noundef %389, ptr noundef %396)
-  store ptr %397, ptr %16, align 8
-  %398 = load ptr, ptr %16, align 8
-  %399 = getelementptr inbounds %struct.CalcLangVal, ptr %398, i32 0, i32 0
-  %400 = load i32, ptr %399, align 8
-  %401 = icmp eq i32 %400, 5
-  br i1 %401, label %402, label %409
-
-402:                                              ; preds = %382
-  %403 = load ptr, ptr %16, align 8
-  %404 = getelementptr inbounds %struct.CalcLangVal, ptr %403, i32 0, i32 1
-  %405 = load i32, ptr %404, align 8
-  %406 = icmp eq i32 %405, 0
-  br i1 %406, label %407, label %408
-
-407:                                              ; preds = %402
-  store i32 0, ptr %14, align 4
-  br label %413
-
-408:                                              ; preds = %402
-  br label %409
-
-409:                                              ; preds = %408, %382
-  br label %410
-
-410:                                              ; preds = %409
-  %411 = load i32, ptr %15, align 4
-  %412 = add nsw i32 %411, 1
-  store i32 %412, ptr %15, align 4
-  br label %376, !llvm.loop !101
-
-413:                                              ; preds = %407, %376
-  %414 = load ptr, ptr %6, align 8
-  %415 = getelementptr inbounds %struct.CalcLangVal, ptr %414, i32 0, i32 0
-  store i32 5, ptr %415, align 8
-  %416 = load i32, ptr %14, align 4
-  %417 = load ptr, ptr %6, align 8
-  %418 = getelementptr inbounds %struct.CalcLangVal, ptr %417, i32 0, i32 1
-  store i32 %416, ptr %418, align 8
-  br label %420
-
-419:                                              ; preds = %361
-  call void @perror(ptr noundef @.str.1) #7
-  store ptr null, ptr %3, align 8
-  br label %438
-
-420:                                              ; preds = %413
-  br label %422
-
-421:                                              ; preds = %356, %351
+365:                                              ; preds = %303
   call void @perror(ptr noundef @.str.2) #7
   store ptr null, ptr %3, align 8
-  br label %438
+  br label %458
 
-422:                                              ; preds = %420
-  br label %423
+366:                                              ; preds = %357
+  br label %443
 
-423:                                              ; preds = %422, %350
-  br label %424
+367:                                              ; preds = %298, %293
+  %368 = load ptr, ptr %4, align 8
+  %369 = getelementptr inbounds %struct.CalcLangVal, ptr %368, i32 0, i32 0
+  %370 = load i32, ptr %369, align 8
+  %371 = icmp eq i32 %370, 6
+  br i1 %371, label %372, label %441
 
-424:                                              ; preds = %423, %268
-  br label %425
+372:                                              ; preds = %367
+  %373 = load ptr, ptr %5, align 8
+  %374 = getelementptr inbounds %struct.CalcLangVal, ptr %373, i32 0, i32 0
+  %375 = load i32, ptr %374, align 8
+  %376 = icmp eq i32 %375, 6
+  br i1 %376, label %377, label %441
 
-425:                                              ; preds = %424, %245
-  br label %426
+377:                                              ; preds = %372
+  %378 = load ptr, ptr %4, align 8
+  %379 = getelementptr inbounds %struct.CalcLangVal, ptr %378, i32 0, i32 1
+  %380 = load ptr, ptr %379, align 8
+  store ptr %380, ptr %12, align 8
+  %381 = load ptr, ptr %5, align 8
+  %382 = getelementptr inbounds %struct.CalcLangVal, ptr %381, i32 0, i32 1
+  %383 = load ptr, ptr %382, align 8
+  store ptr %383, ptr %13, align 8
+  %384 = load ptr, ptr %13, align 8
+  %385 = getelementptr inbounds %struct.SetValue, ptr %384, i32 0, i32 0
+  %386 = load i32, ptr %385, align 8
+  %387 = load ptr, ptr %12, align 8
+  %388 = getelementptr inbounds %struct.SetValue, ptr %387, i32 0, i32 0
+  %389 = load i32, ptr %388, align 8
+  %390 = icmp eq i32 %386, %389
+  br i1 %390, label %391, label %439
 
-426:                                              ; preds = %425, %221
-  br label %427
+391:                                              ; preds = %377
+  store i32 1, ptr %14, align 4
+  store i32 0, ptr %15, align 4
+  br label %392
 
-427:                                              ; preds = %426, %197
-  br label %428
+392:                                              ; preds = %428, %391
+  %393 = load i32, ptr %15, align 4
+  %394 = load ptr, ptr %12, align 8
+  %395 = getelementptr inbounds %struct.SetValue, ptr %394, i32 0, i32 0
+  %396 = load i32, ptr %395, align 8
+  %397 = icmp slt i32 %393, %396
+  br i1 %397, label %398, label %431
 
-428:                                              ; preds = %427, %174
-  br label %429
+398:                                              ; preds = %392
+  %399 = load ptr, ptr %12, align 8
+  %400 = getelementptr inbounds %struct.SetValue, ptr %399, i32 0, i32 1
+  %401 = load ptr, ptr %400, align 8
+  %402 = load i32, ptr %15, align 4
+  %403 = sext i32 %402 to i64
+  %404 = getelementptr inbounds ptr, ptr %401, i64 %403
+  %405 = load ptr, ptr %404, align 8
+  %406 = load ptr, ptr %13, align 8
+  %407 = getelementptr inbounds %struct.SetValue, ptr %406, i32 0, i32 1
+  %408 = load ptr, ptr %407, align 8
+  %409 = load i32, ptr %15, align 4
+  %410 = sext i32 %409 to i64
+  %411 = getelementptr inbounds ptr, ptr %408, i64 %410
+  %412 = load ptr, ptr %411, align 8
+  %413 = call ptr @equalsCalcLangValues(ptr noundef %405, ptr noundef %412)
+  store ptr %413, ptr %16, align 8
+  %414 = load ptr, ptr %16, align 8
+  %415 = getelementptr inbounds %struct.CalcLangVal, ptr %414, i32 0, i32 0
+  %416 = load i32, ptr %415, align 8
+  %417 = icmp eq i32 %416, 5
+  br i1 %417, label %418, label %427
 
-429:                                              ; preds = %428, %151
-  br label %430
+418:                                              ; preds = %398
+  %419 = load ptr, ptr %16, align 8
+  %420 = getelementptr inbounds %struct.CalcLangVal, ptr %419, i32 0, i32 1
+  %421 = load i8, ptr %420, align 8
+  %422 = trunc i8 %421 to i1
+  %423 = zext i1 %422 to i32
+  %424 = icmp eq i32 %423, 0
+  br i1 %424, label %425, label %426
 
-430:                                              ; preds = %429, %127
+425:                                              ; preds = %418
+  store i32 0, ptr %14, align 4
   br label %431
 
-431:                                              ; preds = %430, %103
-  br label %432
+426:                                              ; preds = %418
+  br label %427
 
-432:                                              ; preds = %431, %80
-  br label %433
+427:                                              ; preds = %426, %398
+  br label %428
 
-433:                                              ; preds = %432, %57
-  br label %434
+428:                                              ; preds = %427
+  %429 = load i32, ptr %15, align 4
+  %430 = add nsw i32 %429, 1
+  store i32 %430, ptr %15, align 4
+  br label %392, !llvm.loop !101
 
-434:                                              ; preds = %433, %34
-  %435 = load ptr, ptr %4, align 8
-  call void @freeCalcLangValue(ptr noundef %435)
-  %436 = load ptr, ptr %5, align 8
-  call void @freeCalcLangValue(ptr noundef %436)
-  %437 = load ptr, ptr %6, align 8
-  store ptr %437, ptr %3, align 8
-  br label %438
+431:                                              ; preds = %425, %392
+  %432 = load ptr, ptr %6, align 8
+  %433 = getelementptr inbounds %struct.CalcLangVal, ptr %432, i32 0, i32 0
+  store i32 5, ptr %433, align 8
+  %434 = load i32, ptr %14, align 4
+  %435 = icmp ne i32 %434, 0
+  %436 = load ptr, ptr %6, align 8
+  %437 = getelementptr inbounds %struct.CalcLangVal, ptr %436, i32 0, i32 1
+  %438 = zext i1 %435 to i8
+  store i8 %438, ptr %437, align 8
+  br label %440
 
-438:                                              ; preds = %434, %421, %419, %349, %22
-  %439 = load ptr, ptr %3, align 8
-  ret ptr %439
+439:                                              ; preds = %377
+  call void @perror(ptr noundef @.str.2) #7
+  store ptr null, ptr %3, align 8
+  br label %458
+
+440:                                              ; preds = %431
+  br label %442
+
+441:                                              ; preds = %372, %367
+  call void @perror(ptr noundef @.str.3) #7
+  store ptr null, ptr %3, align 8
+  br label %458
+
+442:                                              ; preds = %440
+  br label %443
+
+443:                                              ; preds = %442, %366
+  br label %444
+
+444:                                              ; preds = %443, %280
+  br label %445
+
+445:                                              ; preds = %444, %257
+  br label %446
+
+446:                                              ; preds = %445, %233
+  br label %447
+
+447:                                              ; preds = %446, %209
+  br label %448
+
+448:                                              ; preds = %447, %186
+  br label %449
+
+449:                                              ; preds = %448, %163
+  br label %450
+
+450:                                              ; preds = %449, %137
+  br label %451
+
+451:                                              ; preds = %450, %111
+  br label %452
+
+452:                                              ; preds = %451, %86
+  br label %453
+
+453:                                              ; preds = %452, %61
+  br label %454
+
+454:                                              ; preds = %453, %34
+  %455 = load ptr, ptr %4, align 8
+  call void @freeCalcLangValue(ptr noundef %455)
+  %456 = load ptr, ptr %5, align 8
+  call void @freeCalcLangValue(ptr noundef %456)
+  %457 = load ptr, ptr %6, align 8
+  store ptr %457, ptr %3, align 8
+  br label %458
+
+458:                                              ; preds = %454, %441, %439, %365, %22
+  %459 = load ptr, ptr %3, align 8
+  ret ptr %459
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable
@@ -11336,10 +11448,10 @@ define dso_local ptr @lessThenCalcLangValues(ptr noundef %0, ptr noundef %1) #0 
   %31 = getelementptr inbounds %struct.CalcLangVal, ptr %30, i32 0, i32 1
   %32 = load i32, ptr %31, align 8
   %33 = icmp slt i32 %29, %32
-  %34 = zext i1 %33 to i32
-  %35 = load ptr, ptr %6, align 8
-  %36 = getelementptr inbounds %struct.CalcLangVal, ptr %35, i32 0, i32 1
-  store i32 %34, ptr %36, align 8
+  %34 = load ptr, ptr %6, align 8
+  %35 = getelementptr inbounds %struct.CalcLangVal, ptr %34, i32 0, i32 1
+  %36 = zext i1 %33 to i8
+  store i8 %36, ptr %35, align 8
   br label %161
 
 37:                                               ; preds = %19, %13
@@ -11400,10 +11512,10 @@ define dso_local ptr @lessThenCalcLangValues(ptr noundef %0, ptr noundef %1) #0 
   %79 = getelementptr inbounds %struct.CalcLangVal, ptr %78, i32 0, i32 1
   %80 = load double, ptr %79, align 8
   %81 = fcmp olt double %77, %80
-  %82 = zext i1 %81 to i32
-  %83 = load ptr, ptr %6, align 8
-  %84 = getelementptr inbounds %struct.CalcLangVal, ptr %83, i32 0, i32 1
-  store i32 %82, ptr %84, align 8
+  %82 = load ptr, ptr %6, align 8
+  %83 = getelementptr inbounds %struct.CalcLangVal, ptr %82, i32 0, i32 1
+  %84 = zext i1 %81 to i8
+  store i8 %84, ptr %83, align 8
   br label %159
 
 85:                                               ; preds = %66, %61
@@ -11432,10 +11544,10 @@ define dso_local ptr @lessThenCalcLangValues(ptr noundef %0, ptr noundef %1) #0 
   %103 = load i32, ptr %102, align 8
   %104 = sitofp i32 %103 to double
   %105 = fcmp olt double %100, %104
-  %106 = zext i1 %105 to i32
-  %107 = load ptr, ptr %6, align 8
-  %108 = getelementptr inbounds %struct.CalcLangVal, ptr %107, i32 0, i32 1
-  store i32 %106, ptr %108, align 8
+  %106 = load ptr, ptr %6, align 8
+  %107 = getelementptr inbounds %struct.CalcLangVal, ptr %106, i32 0, i32 1
+  %108 = zext i1 %105 to i8
+  store i8 %108, ptr %107, align 8
   br label %158
 
 109:                                              ; preds = %90, %85
@@ -11463,10 +11575,10 @@ define dso_local ptr @lessThenCalcLangValues(ptr noundef %0, ptr noundef %1) #0 
   %126 = getelementptr inbounds %struct.CalcLangVal, ptr %125, i32 0, i32 1
   %127 = load double, ptr %126, align 8
   %128 = fcmp olt double %124, %127
-  %129 = zext i1 %128 to i32
-  %130 = load ptr, ptr %6, align 8
-  %131 = getelementptr inbounds %struct.CalcLangVal, ptr %130, i32 0, i32 1
-  store i32 %129, ptr %131, align 8
+  %129 = load ptr, ptr %6, align 8
+  %130 = getelementptr inbounds %struct.CalcLangVal, ptr %129, i32 0, i32 1
+  %131 = zext i1 %128 to i8
+  store i8 %131, ptr %130, align 8
   br label %157
 
 132:                                              ; preds = %114, %109
@@ -11494,14 +11606,14 @@ define dso_local ptr @lessThenCalcLangValues(ptr noundef %0, ptr noundef %1) #0 
   %149 = getelementptr inbounds %struct.CalcLangVal, ptr %148, i32 0, i32 1
   %150 = load double, ptr %149, align 8
   %151 = fcmp olt double %147, %150
-  %152 = zext i1 %151 to i32
-  %153 = load ptr, ptr %6, align 8
-  %154 = getelementptr inbounds %struct.CalcLangVal, ptr %153, i32 0, i32 1
-  store i32 %152, ptr %154, align 8
+  %152 = load ptr, ptr %6, align 8
+  %153 = getelementptr inbounds %struct.CalcLangVal, ptr %152, i32 0, i32 1
+  %154 = zext i1 %151 to i8
+  store i8 %154, ptr %153, align 8
   br label %156
 
 155:                                              ; preds = %137, %132
-  call void @perror(ptr noundef @.str.2) #7
+  call void @perror(ptr noundef @.str.3) #7
   store ptr null, ptr %3, align 8
   br label %165
 
@@ -11582,10 +11694,10 @@ define dso_local ptr @greaterThenCalcLangValues(ptr noundef %0, ptr noundef %1) 
   %31 = getelementptr inbounds %struct.CalcLangVal, ptr %30, i32 0, i32 1
   %32 = load i32, ptr %31, align 8
   %33 = icmp sgt i32 %29, %32
-  %34 = zext i1 %33 to i32
-  %35 = load ptr, ptr %6, align 8
-  %36 = getelementptr inbounds %struct.CalcLangVal, ptr %35, i32 0, i32 1
-  store i32 %34, ptr %36, align 8
+  %34 = load ptr, ptr %6, align 8
+  %35 = getelementptr inbounds %struct.CalcLangVal, ptr %34, i32 0, i32 1
+  %36 = zext i1 %33 to i8
+  store i8 %36, ptr %35, align 8
   br label %164
 
 37:                                               ; preds = %19, %13
@@ -11679,10 +11791,10 @@ define dso_local ptr @greaterThenCalcLangValues(ptr noundef %0, ptr noundef %1) 
   %104 = load i32, ptr %103, align 8
   %105 = sitofp i32 %104 to double
   %106 = fcmp ogt double %101, %105
-  %107 = zext i1 %106 to i32
-  %108 = load ptr, ptr %6, align 8
-  %109 = getelementptr inbounds %struct.CalcLangVal, ptr %108, i32 0, i32 1
-  store i32 %107, ptr %109, align 8
+  %107 = load ptr, ptr %6, align 8
+  %108 = getelementptr inbounds %struct.CalcLangVal, ptr %107, i32 0, i32 1
+  %109 = zext i1 %106 to i8
+  store i8 %109, ptr %108, align 8
   br label %161
 
 110:                                              ; preds = %91, %86
@@ -11750,7 +11862,7 @@ define dso_local ptr @greaterThenCalcLangValues(ptr noundef %0, ptr noundef %1) 
   br label %159
 
 158:                                              ; preds = %139, %134
-  call void @perror(ptr noundef @.str.2) #7
+  call void @perror(ptr noundef @.str.3) #7
   br label %159
 
 159:                                              ; preds = %158, %144
@@ -11830,10 +11942,10 @@ define dso_local ptr @lessThenOrEqualToCalcLangValues(ptr noundef %0, ptr nounde
   %31 = getelementptr inbounds %struct.CalcLangVal, ptr %30, i32 0, i32 1
   %32 = load i32, ptr %31, align 8
   %33 = icmp sle i32 %29, %32
-  %34 = zext i1 %33 to i32
-  %35 = load ptr, ptr %6, align 8
-  %36 = getelementptr inbounds %struct.CalcLangVal, ptr %35, i32 0, i32 1
-  store i32 %34, ptr %36, align 8
+  %34 = load ptr, ptr %6, align 8
+  %35 = getelementptr inbounds %struct.CalcLangVal, ptr %34, i32 0, i32 1
+  %36 = zext i1 %33 to i8
+  store i8 %36, ptr %35, align 8
   br label %164
 
 37:                                               ; preds = %19, %13
@@ -11927,10 +12039,10 @@ define dso_local ptr @lessThenOrEqualToCalcLangValues(ptr noundef %0, ptr nounde
   %104 = load i32, ptr %103, align 8
   %105 = sitofp i32 %104 to double
   %106 = fcmp ole double %101, %105
-  %107 = zext i1 %106 to i32
-  %108 = load ptr, ptr %6, align 8
-  %109 = getelementptr inbounds %struct.CalcLangVal, ptr %108, i32 0, i32 1
-  store i32 %107, ptr %109, align 8
+  %107 = load ptr, ptr %6, align 8
+  %108 = getelementptr inbounds %struct.CalcLangVal, ptr %107, i32 0, i32 1
+  %109 = zext i1 %106 to i8
+  store i8 %109, ptr %108, align 8
   br label %161
 
 110:                                              ; preds = %91, %86
@@ -11998,7 +12110,7 @@ define dso_local ptr @lessThenOrEqualToCalcLangValues(ptr noundef %0, ptr nounde
   br label %159
 
 158:                                              ; preds = %139, %134
-  call void @perror(ptr noundef @.str.2) #7
+  call void @perror(ptr noundef @.str.3) #7
   br label %159
 
 159:                                              ; preds = %158, %144
@@ -12078,10 +12190,10 @@ define dso_local ptr @greaterThenOrEqualToCalcLangValues(ptr noundef %0, ptr nou
   %31 = getelementptr inbounds %struct.CalcLangVal, ptr %30, i32 0, i32 1
   %32 = load i32, ptr %31, align 8
   %33 = icmp sge i32 %29, %32
-  %34 = zext i1 %33 to i32
-  %35 = load ptr, ptr %6, align 8
-  %36 = getelementptr inbounds %struct.CalcLangVal, ptr %35, i32 0, i32 1
-  store i32 %34, ptr %36, align 8
+  %34 = load ptr, ptr %6, align 8
+  %35 = getelementptr inbounds %struct.CalcLangVal, ptr %34, i32 0, i32 1
+  %36 = zext i1 %33 to i8
+  store i8 %36, ptr %35, align 8
   br label %164
 
 37:                                               ; preds = %19, %13
@@ -12175,10 +12287,10 @@ define dso_local ptr @greaterThenOrEqualToCalcLangValues(ptr noundef %0, ptr nou
   %104 = load i32, ptr %103, align 8
   %105 = sitofp i32 %104 to double
   %106 = fcmp oge double %101, %105
-  %107 = zext i1 %106 to i32
-  %108 = load ptr, ptr %6, align 8
-  %109 = getelementptr inbounds %struct.CalcLangVal, ptr %108, i32 0, i32 1
-  store i32 %107, ptr %109, align 8
+  %107 = load ptr, ptr %6, align 8
+  %108 = getelementptr inbounds %struct.CalcLangVal, ptr %107, i32 0, i32 1
+  %109 = zext i1 %106 to i8
+  store i8 %109, ptr %108, align 8
   br label %161
 
 110:                                              ; preds = %91, %86
@@ -12246,7 +12358,7 @@ define dso_local ptr @greaterThenOrEqualToCalcLangValues(ptr noundef %0, ptr nou
   br label %159
 
 158:                                              ; preds = %139, %134
-  call void @perror(ptr noundef @.str.2) #7
+  call void @perror(ptr noundef @.str.3) #7
   store ptr null, ptr %3, align 8
   br label %168
 
@@ -12314,10 +12426,10 @@ define dso_local ptr @notCalcLangValue(ptr noundef %0) #0 {
   %22 = getelementptr inbounds %struct.CalcLangVal, ptr %21, i32 0, i32 1
   %23 = load i32, ptr %22, align 8
   %24 = icmp ne i32 %23, 0
-  %25 = zext i1 %24 to i32
-  %26 = load ptr, ptr %4, align 8
-  %27 = getelementptr inbounds %struct.CalcLangVal, ptr %26, i32 0, i32 1
-  store i32 %25, ptr %27, align 8
+  %25 = load ptr, ptr %4, align 8
+  %26 = getelementptr inbounds %struct.CalcLangVal, ptr %25, i32 0, i32 1
+  %27 = zext i1 %24 to i8
+  store i8 %27, ptr %26, align 8
   br label %194
 
 28:                                               ; preds = %12
@@ -12335,10 +12447,10 @@ define dso_local ptr @notCalcLangValue(ptr noundef %0) #0 {
   %37 = getelementptr inbounds %struct.CalcLangVal, ptr %36, i32 0, i32 1
   %38 = load double, ptr %37, align 8
   %39 = fcmp une double %38, 0.000000e+00
-  %40 = zext i1 %39 to i32
-  %41 = load ptr, ptr %4, align 8
-  %42 = getelementptr inbounds %struct.CalcLangVal, ptr %41, i32 0, i32 1
-  store i32 %40, ptr %42, align 8
+  %40 = load ptr, ptr %4, align 8
+  %41 = getelementptr inbounds %struct.CalcLangVal, ptr %40, i32 0, i32 1
+  %42 = zext i1 %39 to i8
+  store i8 %42, ptr %41, align 8
   br label %193
 
 43:                                               ; preds = %28
@@ -12354,13 +12466,13 @@ define dso_local ptr @notCalcLangValue(ptr noundef %0) #0 {
   store i32 5, ptr %50, align 8
   %51 = load ptr, ptr %3, align 8
   %52 = getelementptr inbounds %struct.CalcLangVal, ptr %51, i32 0, i32 1
-  %53 = load i32, ptr %52, align 8
-  %54 = icmp ne i32 %53, 0
+  %53 = load i8, ptr %52, align 8
+  %54 = trunc i8 %53 to i1
   %55 = xor i1 %54, true
-  %56 = zext i1 %55 to i32
-  %57 = load ptr, ptr %4, align 8
-  %58 = getelementptr inbounds %struct.CalcLangVal, ptr %57, i32 0, i32 1
-  store i32 %56, ptr %58, align 8
+  %56 = load ptr, ptr %4, align 8
+  %57 = getelementptr inbounds %struct.CalcLangVal, ptr %56, i32 0, i32 1
+  %58 = zext i1 %55 to i8
+  store i8 %58, ptr %57, align 8
   br label %192
 
 59:                                               ; preds = %43
@@ -12536,7 +12648,7 @@ define dso_local ptr @notCalcLangValue(ptr noundef %0) #0 {
   br label %197
 
 189:                                              ; preds = %124
-  call void @perror(ptr noundef @.str.5) #7
+  call void @perror(ptr noundef @.str.6) #7
   br label %190
 
 190:                                              ; preds = %189
@@ -12836,7 +12948,7 @@ define dso_local ptr @negateCalcLangValue(ptr noundef %0) #0 {
   br label %208
 
 199:                                              ; preds = %134
-  call void @perror(ptr noundef @.str.6) #7
+  call void @perror(ptr noundef @.str.7) #7
   br label %200
 
 200:                                              ; preds = %199
@@ -12877,7 +12989,7 @@ define dso_local void @printValue(ptr noundef %0) #0 {
   br i1 %6, label %7, label %9
 
 7:                                                ; preds = %1
-  %8 = call i32 (ptr, ...) @printf(ptr noundef @.str.7)
+  %8 = call i32 (ptr, ...) @printf(ptr noundef @.str.8)
   br label %162
 
 9:                                                ; preds = %1
@@ -12890,16 +13002,16 @@ define dso_local void @printValue(ptr noundef %0) #0 {
 14:                                               ; preds = %9
   %15 = load ptr, ptr %2, align 8
   %16 = getelementptr inbounds %struct.CalcLangVal, ptr %15, i32 0, i32 1
-  %17 = load i32, ptr %16, align 8
-  %18 = icmp ne i32 %17, 0
+  %17 = load i8, ptr %16, align 8
+  %18 = trunc i8 %17 to i1
   br i1 %18, label %19, label %21
 
 19:                                               ; preds = %14
-  %20 = call i32 (ptr, ...) @printf(ptr noundef @.str.8)
+  %20 = call i32 (ptr, ...) @printf(ptr noundef @.str.9)
   br label %23
 
 21:                                               ; preds = %14
-  %22 = call i32 (ptr, ...) @printf(ptr noundef @.str.9)
+  %22 = call i32 (ptr, ...) @printf(ptr noundef @.str.10)
   br label %23
 
 23:                                               ; preds = %21, %19
@@ -12916,7 +13028,7 @@ define dso_local void @printValue(ptr noundef %0) #0 {
   %30 = load ptr, ptr %2, align 8
   %31 = getelementptr inbounds %struct.CalcLangVal, ptr %30, i32 0, i32 1
   %32 = load i32, ptr %31, align 8
-  %33 = call i32 (ptr, ...) @printf(ptr noundef @.str.10, i32 noundef %32)
+  %33 = call i32 (ptr, ...) @printf(ptr noundef @.str.11, i32 noundef %32)
   br label %160
 
 34:                                               ; preds = %24
@@ -12930,7 +13042,7 @@ define dso_local void @printValue(ptr noundef %0) #0 {
   %40 = load ptr, ptr %2, align 8
   %41 = getelementptr inbounds %struct.CalcLangVal, ptr %40, i32 0, i32 1
   %42 = load double, ptr %41, align 8
-  %43 = call i32 (ptr, ...) @printf(ptr noundef @.str.11, double noundef %42)
+  %43 = call i32 (ptr, ...) @printf(ptr noundef @.str.12, double noundef %42)
   br label %159
 
 44:                                               ; preds = %34
@@ -12944,7 +13056,7 @@ define dso_local void @printValue(ptr noundef %0) #0 {
   %50 = load ptr, ptr %2, align 8
   %51 = getelementptr inbounds %struct.CalcLangVal, ptr %50, i32 0, i32 1
   %52 = load double, ptr %51, align 8
-  %53 = call i32 (ptr, ...) @printf(ptr noundef @.str.12, double noundef %52)
+  %53 = call i32 (ptr, ...) @printf(ptr noundef @.str.13, double noundef %52)
   br label %158
 
 54:                                               ; preds = %44
@@ -12958,7 +13070,7 @@ define dso_local void @printValue(ptr noundef %0) #0 {
   %60 = load ptr, ptr %2, align 8
   %61 = getelementptr inbounds %struct.CalcLangVal, ptr %60, i32 0, i32 1
   %62 = load double, ptr %61, align 8
-  %63 = call i32 (ptr, ...) @printf(ptr noundef @.str.13, double noundef %62)
+  %63 = call i32 (ptr, ...) @printf(ptr noundef @.str.14, double noundef %62)
   br label %157
 
 64:                                               ; preds = %54
@@ -12969,7 +13081,7 @@ define dso_local void @printValue(ptr noundef %0) #0 {
   br i1 %68, label %69, label %109
 
 69:                                               ; preds = %64
-  %70 = call i32 (ptr, ...) @printf(ptr noundef @.str.14)
+  %70 = call i32 (ptr, ...) @printf(ptr noundef @.str.15)
   store i32 0, ptr %3, align 4
   br label %71
 
@@ -13002,7 +13114,7 @@ define dso_local void @printValue(ptr noundef %0) #0 {
   br label %103
 
 92:                                               ; preds = %79
-  %93 = call i32 (ptr, ...) @printf(ptr noundef @.str.15)
+  %93 = call i32 (ptr, ...) @printf(ptr noundef @.str.16)
   %94 = load ptr, ptr %2, align 8
   %95 = getelementptr inbounds %struct.CalcLangVal, ptr %94, i32 0, i32 1
   %96 = load ptr, ptr %95, align 8
@@ -13025,7 +13137,7 @@ define dso_local void @printValue(ptr noundef %0) #0 {
   br label %71, !llvm.loop !106
 
 107:                                              ; preds = %71
-  %108 = call i32 (ptr, ...) @printf(ptr noundef @.str.16)
+  %108 = call i32 (ptr, ...) @printf(ptr noundef @.str.17)
   br label %156
 
 109:                                              ; preds = %64
@@ -13036,7 +13148,7 @@ define dso_local void @printValue(ptr noundef %0) #0 {
   br i1 %113, label %114, label %154
 
 114:                                              ; preds = %109
-  %115 = call i32 (ptr, ...) @printf(ptr noundef @.str.17)
+  %115 = call i32 (ptr, ...) @printf(ptr noundef @.str.18)
   store i32 0, ptr %4, align 4
   br label %116
 
@@ -13069,7 +13181,7 @@ define dso_local void @printValue(ptr noundef %0) #0 {
   br label %148
 
 137:                                              ; preds = %124
-  %138 = call i32 (ptr, ...) @printf(ptr noundef @.str.15)
+  %138 = call i32 (ptr, ...) @printf(ptr noundef @.str.16)
   %139 = load ptr, ptr %2, align 8
   %140 = getelementptr inbounds %struct.CalcLangVal, ptr %139, i32 0, i32 1
   %141 = load ptr, ptr %140, align 8
@@ -13092,11 +13204,11 @@ define dso_local void @printValue(ptr noundef %0) #0 {
   br label %116, !llvm.loop !107
 
 152:                                              ; preds = %116
-  %153 = call i32 (ptr, ...) @printf(ptr noundef @.str.18)
+  %153 = call i32 (ptr, ...) @printf(ptr noundef @.str.19)
   br label %155
 
 154:                                              ; preds = %109
-  call void @perror(ptr noundef @.str.19) #7
+  call void @perror(ptr noundef @.str.20) #7
   br label %155
 
 155:                                              ; preds = %154, %152
@@ -13137,7 +13249,7 @@ define dso_local void @printString(ptr noundef %0) #0 {
   %2 = alloca ptr, align 8
   store ptr %0, ptr %2, align 8
   %3 = load ptr, ptr %2, align 8
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.20, ptr noundef %3)
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.21, ptr noundef %3)
   %5 = load ptr, ptr @stdout, align 8
   %6 = call i32 @fflush(ptr noundef %5)
   ret void

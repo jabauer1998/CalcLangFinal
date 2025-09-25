@@ -1,6 +1,8 @@
 #ifndef LINK_TO_CALC_LANG
 #define LINK_TO_CALC_LANG
 
+#include <stdbool.h>
+
 #define IS_INT 0
 #define IS_REAL 1
 #define IS_DOLLAR 3
@@ -28,7 +30,7 @@ typedef union CalcLangValData{
   double real;
   double dollar;
   double percent;
-  int bool;
+  bool boolean;
 } CalcLangValueData;
 
 typedef struct CalcLangVal{
@@ -55,10 +57,9 @@ CalcLangValue* dollarCalcLangValue(float input);
 CalcLangValue* percentCalcLangValue(float percent);
 CalcLangValue* tupleCalcLangValue(CalcLangValue**values, int size);
 CalcLangValue* setCalcLangValue(CalcLangValue**values, int size);
-void printValue(CalcLangValue* calcLang);
+bool toBool(CalcLangValue* val);
+void printValue(CalcLangValue* val);
 void printString(char* str);
-void printHeader();
 void getInput();
-void clearHeader();
 
 #endif
