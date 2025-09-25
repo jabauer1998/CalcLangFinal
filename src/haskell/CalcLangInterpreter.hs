@@ -150,8 +150,8 @@ toStr :: CalcLangValue -> String
 toStr aval = case aval of
                    IntVal val -> show val
                    RealVal val -> show val
-                   TupleVal val -> "(" ++ (intercalate ", " (map toStr val)) ++ ")"
-                   SetVal val -> "{" ++ (intercalate ", " (map toStr val)) ++ "}"
+                   TupleVal val -> "(" ++ (intercalate ", " (reverse (map toStr val))) ++ ")"
+                   SetVal val -> "{" ++ (intercalate ", " (reverse (map toStr val))) ++ "}"
                    DollarVal val -> "$" ++ (showFFloat (Just 2) val "")
                    PercentVal val -> (showFFloat (Just 2) (val*100.0) "") ++ "%"
                    BoolVal val -> if val then "TRUE" else "FALSE"
@@ -499,7 +499,7 @@ filterLines :: SA -> SA
 filterLines list = case list of
                      StoreArray len arrList -> do
                                                let newList = (filter isNotCommand arrList)
-                                               StoreArray (length newList) newList
+                                               StoreArray (length newList) (reverse newList)
 
 runCommandLine :: Env -> FunctionTable -> InputT IO ()
 runCommandLine vT fT = do
