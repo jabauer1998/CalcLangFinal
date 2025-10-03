@@ -1,36 +1,36 @@
-TestSrcDir:=./test/src/c
-TestIncDir:=./test/include/c
-TestObjDir:=./test/obj/c
-IncDir:=./include/c
-SrcDir:=./src/c
-ObjDir:=./obj/c
-TestBinDir:=./test/bin
-AbsIncDirC:="/home/jabauer/source/repos/CalcLangFinal/include/c"
-AbsIncDirH:="/home/jabauer/source/repos/CalcLangFinal/include/haskell"
-AbsInstallDir:="/home/jabauer/source/repos/CalcLangFinal/bin"
+TestSrcDir:="$(shell pwd)/test/src/c"
+TestIncDir:="$(shell pwd)/test/include/c"
+TestObjDir:="$(shell pwd)/test/obj/c"
+ObjDir:="$(shell pwd)/obj/c"
+TestBinDir:="$(shell pwd)/test/bin"
+AbsIncDirC:="$(shell pwd)/include/c"
+AbsIncDirH:="$(shell pwd)/include/haskell"
+AbsInstallDir:="$(shell pwd)/bin"
+SrcDir:="$(shell pwd)/src"
 LLVMLib:="/usr/lib/llvm-18/lib"
+LLVMInclude:="/usr/lib/llvm-18/include"
 
 
-all: clean build-lib build-haskell install-haskell
+all: build-lib build-haskell install-haskell
 
 build-haskell:
-	cabal build --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH)
+	cabal build --allow-newer --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --extra-include-dirs=$(LLVMInclude)
 install-haskell:
-	cabal install --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --installdir=$(AbsInstallDir)
+	cabal install --overwrite-policy=always --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --extra-include-dirs=$(LLVMInclude) --installdir=$(AbsInstallDir)
 build-lib:
-	clang -S -emit-llvm src/c/LinkToCalcLang.c -o ir/c/LinkToCalcLang.ll -I$(IncDir)
+	clang -S -emit-llvm src/c/LinkToCalcLang.c -o ir/c/LinkToCalcLang.ll -I$(AbsIncDirC)
 
 tree-printing-test:
 	clang -c $(TestSrcDir)/TreePrintingTest.c -o $(TestObjDir)/TreePrintingTest.o -I$(TestIncDir) -I$(IncDir)
-	clang -c $(SrcDir)/CalcLangAstC.c -o $(ObjDir)/CalcLangAstC.o -I$(IncDir)
+	clang -c $(SrcDir)/c/CalcLangAstC.c -o $(ObjDir)/CalcLangAstC.o -I$(IncDir)
 	clang -o $(TestBinDir)/TreePrintingTest $(TestObjDir)/TreePrintingTest.o $(ObjDir)/CalcLangAstC.o -I$(IncDir)
 var-def-list-test:
 	clang -c $(TestSrcDir)/VarDefLinkedListTest.c -o $(TestObjDir)/VarDefLinkedListTest.o -I$(TestIncDir) -I$(IncDir)
-	clang -c $(SrcDir)/VarDefLinkedList.c -o $(ObjDir)/VarDefLinkedList.o -I$(IncDir)
+	clang -c $(SrcDir)/c/VarDefLinkedList.c -o $(ObjDir)/VarDefLinkedList.o -I$(IncDir)
 	clang -o $(TestBinDir)/VarDefLinkedListTest $(TestObjDir)/VarDefLinkedListTest.o $(ObjDir)/VarDefLinkedList.o -L$(LLVMLib) -lLLVM -I$(IncDir)
 scoped-var-stack-test:
-	clang -c $(SrcDir)/VarDefLinkedList.c -o $(ObjDir)/VarDefLinkedList.o -I$(IncDir)
-	clang -c $(SrcDir)/ScopedVarDefTable.c -o $(ObjDir)/ScopedVarDefTable.o -I$(IncDir)
+	clang -c $(SrcDir)/c/VarDefLinkedList.c -o $(ObjDir)/VarDefLinkedList.o -I$(IncDir)
+	clang -c $(SrcDir)/c/ScopedVarDefTable.c -o $(ObjDir)/ScopedVarDefTable.o -I$(IncDir)
 	clang -c $(TestSrcDir)/ScopedVarDefTableTest.c -o $(TestObjDir)/ScopedVarDefTableTest.o -I$(TestIncDir) -I$(IncDir)
 	clang -o $(TestBinDir)/ScopedVarDefTableTest $(TestObjDir)/ScopedVarDefTableTest.o $(ObjDir)/ScopedVarDefTable.o $(ObjDir)/VarDefLinkedList.o -L$(LLVMLib) -lLLVM
 

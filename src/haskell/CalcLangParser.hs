@@ -6,50 +6,48 @@ import Text.Parsec.Char
 import System.IO
 import Numeric
 import CalcLangAstH
-import CalcLangMarshall
 import Foreign.C.String
 import Foreign.Ptr
 import Foreign.Marshal.Alloc
 import Foreign.Storable
 import Prelude
 import Data.List
-import System.Console.Haskeline
 import Foreign.Ptr
 
-type CalcLangLexer a b  = ParsecT String () a b
+type CalcLangLexer b  = ParsecT String () IO b
 
-parseLexeme :: (Monad a) => (CalcLangLexer a b) -> (CalcLangLexer a b)
+parseLexeme :: (CalcLangLexer b) -> (CalcLangLexer b)
 parseLexeme a = a <* spaces
 
-parseWindowsNewLine :: (Monad a) => CalcLangLexer a Token
+parseWindowsNewLine :: CalcLangLexer Token
 parseWindowsNewLine = do
                       start <- getPosition
                       (char '\r') >> (char '\n') >> return (NewLine start)
 
-parseLinuxNewLine :: (Monad a) => CalcLangLexer a Token
+parseLinuxNewLine :: CalcLangLexer Token
 parseLinuxNewLine = do
                     start <- getPosition
                     (char '\n') >> return (NewLine start)
                       
 
-parseNewLine :: (Monad a) => CalcLangLexer a Token
+parseNewLine :: CalcLangLexer Token
 parseNewLine = (try parseWindowsNewLine) <|> parseLinuxNewLine
 
-parseIdent :: (Monad a) => CalcLangLexer a Token
+parseIdent :: CalcLangLexer Token
 parseIdent = do
              startPos <- getPosition
              restChars <- parseLexeme letter
              return (Ident restChars startPos)
 
-parsePeriod :: (Monad a) => CalcLangLexer a Token
+parsePeriod :: CalcLangLexer Token
 parsePeriod = do
               start <- getPosition
               parseLexeme (char '.')  >> return (Dot start)
 
-parseNum :: (Monad a) => CalcLangLexer a Token
+parseNum :: CalcLangLexer Token
 parseNum = (try parseRealNum) <|> try parseIntNum
 
-parseRealNum :: (Monad a) => CalcLangLexer a Token
+parseRealNum :: CalcLangLexer Token
 parseRealNum = do
                start <- getPosition
                result <- many1 digit
@@ -58,124 +56,124 @@ parseRealNum = do
                return (RealNum (result ++ ['.'] ++ resultRest) start)
 
 
-parseIntNum :: (Monad a) => CalcLangLexer a Token
+parseIntNum :: CalcLangLexer Token
 parseIntNum = do
               startPos <- getPosition
               result <- parseLexeme (many1 digit)
               return (IntNum  result startPos)
 
-parseBool :: (Monad a) => CalcLangLexer a Token
+parseBool :: CalcLangLexer Token
 parseBool = do
             startPos <- getPosition
             res <- parseLexeme (string "TRUE" <|> string "FALSE")
             return (TF res startPos)
 
-parseComma :: (Monad a) => CalcLangLexer a Token
+parseComma :: CalcLangLexer Token
 parseComma = do
              start <- getPosition
              parseLexeme (char ',') >> return (Comma start)
 
-parsePlus :: (Monad a) => CalcLangLexer a Token
+parsePlus :: CalcLangLexer Token
 parsePlus = do
             startPosition <- getPosition
             parseLexeme (char '+') >> return (Plus startPosition)
 
-parseMinus :: (Monad a) => CalcLangLexer a Token
+parseMinus :: CalcLangLexer Token
 parseMinus = do
              startPosition <- getPosition
              parseLexeme (char '-') >> return (Minus startPosition)
 
-parseTimes :: (Monad a) => CalcLangLexer a Token
+parseTimes :: CalcLangLexer Token
 parseTimes = do
              startPosition <- getPosition
              parseLexeme (char '*') >> return (Minus startPosition)
 
-parseNot :: (Monad a) => CalcLangLexer a Token
+parseNot :: CalcLangLexer Token
 parseNot = do
            startPosition <- getPosition
            parseLexeme (char '\'') >> return (Not startPosition)
            
-parseDiv :: (Monad a) => CalcLangLexer a Token
+parseDiv :: CalcLangLexer Token
 parseDiv = do
            startPosition <- getPosition
            parseLexeme (char '/') >> return (Div startPosition)
 
-parseEq :: (Monad a) => CalcLangLexer a Token
+parseEq :: CalcLangLexer Token
 parseEq = do
            startPosition <- getPosition
            parseLexeme (char '=') >> return (Eq startPosition)
 
-parsePow :: (Monad a) => CalcLangLexer a Token
+parsePow :: CalcLangLexer Token
 parsePow = do
            startPosition <- getPosition
            parseLexeme (char '^') >> return (Pow startPosition)
 
-parseLPar :: (Monad a) => CalcLangLexer a Token
+parseLPar :: CalcLangLexer Token
 parseLPar = do
             start <- getPosition
             parseLexeme (char '(') >> return (LPar start)
 
-parseRPar :: (Monad a) => CalcLangLexer a Token
+parseRPar :: CalcLangLexer Token
 parseRPar = do
             start <- getPosition
             parseLexeme (char ')') >> return (RPar start)
 
-parseLBrack :: (Monad a) => CalcLangLexer a Token
+parseLBrack :: CalcLangLexer Token
 parseLBrack = do
               start <- getPosition
               parseLexeme (char '{') >> return (LBrack start)
 
-parseRBrack :: (Monad a) => CalcLangLexer a Token
+parseRBrack :: CalcLangLexer Token
 parseRBrack = do
               start <- getPosition
               parseLexeme (char '}') >> return (RBrack start)
 
-parseLT :: (Monad a) => CalcLangLexer a Token
+parseLT :: CalcLangLexer Token
 parseLT = do
           startPosition <- getPosition
           parseLexeme (char '<') >> return (LessThen startPosition)
 
-parseGT :: (Monad a) => CalcLangLexer a Token
+parseGT :: CalcLangLexer Token
 parseGT = do
           startPosition <- getPosition
           parseLexeme (char '>') >> return (GreaterThen startPosition)
 
-parseLtOrEq :: (Monad a) => CalcLangLexer a Token
+parseLtOrEq :: CalcLangLexer Token
 parseLtOrEq = do
               startPosition <- getPosition
               parseLexeme (string "<=") >> return (LtOrEq startPosition)
 
-parseGtOrEq :: (Monad a) => CalcLangLexer a Token
+parseGtOrEq :: CalcLangLexer Token
 parseGtOrEq = do
               startPosition <- getPosition
               parseLexeme (string ">=") >> return (GtOrEq startPosition)
 
-parseIf :: (Monad a) => CalcLangLexer a Token
+parseIf :: CalcLangLexer Token
 parseIf = do
           startPosition <- getPosition
           (parseLexeme (string "if")) >> return (If startPosition)
 
-parseThen :: (Monad a) => CalcLangLexer a Token
+parseThen :: CalcLangLexer Token
 parseThen = do
             startPosition <- getPosition
             (parseLexeme (string "then")) >> return (Then startPosition)
 
-parseElse :: (Monad a) => CalcLangLexer a Token
+parseElse :: CalcLangLexer Token
 parseElse = do
             startPosition <- getPosition
             (parseLexeme (string "else")) >> return (Else startPosition)
 
-parseFunc :: (Monad a) => CalcLangLexer a Token
+parseFunc :: CalcLangLexer Token
 parseFunc = do
             startPosition <- getPosition
             (parseLexeme (string "func")) >> return (Func startPosition)
 
-parseLet :: (Monad a) => CalcLangLexer a Token
+parseLet :: CalcLangLexer Token
 parseLet = do
            startPosition <- getPosition
            (parseLexeme (string "let")) >> return (Let startPosition)
 
-parseDol :: (Monad a) => CalcLangLexer a Token
+parseDol :: CalcLangLexer Token
 parseDol = do
            startPosition <- getPosition
            _ <- (char '$')
@@ -185,7 +183,7 @@ parseDol = do
            d2 <- parseLexeme digit
            return (Dol (d ++ [p, d1, d2]) startPosition)
 
-parsePerc :: (Monad a) => CalcLangLexer a Token
+parsePerc :: CalcLangLexer Token
 parsePerc = do
             startPosition <- getPosition
             d <- many1 digit
@@ -194,92 +192,92 @@ parsePerc = do
             _ <- parseLexeme (char '%')
             return (Perc (d ++ [p] ++ delse) startPosition)
 
-parseShow :: (Monad a) => CalcLangLexer a Token
+parseShow :: CalcLangLexer Token
 parseShow = do
             startPosition <- getPosition
             (parseLexeme (string "show")) >> return (ShowCmd startPosition)
 
-parseFunctions :: (Monad a) => CalcLangLexer a Token
+parseFunctions :: CalcLangLexer Token
 parseFunctions = do
                  startPosition <- getPosition
                  (parseLexeme (string "functions")) >> return (FunctionsCmd startPosition)
 
-parseVariables :: (Monad a) => CalcLangLexer a Token
+parseVariables :: CalcLangLexer Token
 parseVariables = do
                  startPosition <- getPosition
                  (parseLexeme (string "variables")) >> return (VariablesCmd startPosition)
 
-parseQuit :: (Monad a) => CalcLangLexer a Token
+parseQuit :: CalcLangLexer Token
 parseQuit = do
             startPosition <- getPosition
             (parseLexeme (string "quit")) >> return (QuitCmd startPosition)
 
-parseCreate :: (Monad a) => CalcLangLexer a Token
+parseCreate :: CalcLangLexer Token
 parseCreate = do
               startPosition <- getPosition
               (parseLexeme (string "create")) >> return (CreateCmd startPosition)
 
-parseLesson :: (Monad a) => CalcLangLexer a Token
+parseLesson :: CalcLangLexer Token
 parseLesson = do
               startPosition <- getPosition
               (parseLexeme (string "lesson")) >> return (LessonCmd startPosition)
 
-parsePlan :: (Monad a) => CalcLangLexer a Token
+parsePlan :: CalcLangLexer Token
 parsePlan = do
             startPosition <- getPosition
             (parseLexeme (string "plan")) >> return (PlanCmd startPosition)
 
-parseHistory :: (Monad a) => CalcLangLexer a Token
+parseHistory :: CalcLangLexer Token
 parseHistory = do
                startPosition <- getPosition
                (parseLexeme (string "history")) >> return (HistoryCmd startPosition)
 
-parseHelp :: (Monad a) => CalcLangLexer a Token
+parseHelp :: CalcLangLexer Token
 parseHelp = do
             start <- getPosition
             (parseLexeme (string "help")) >> return (HelpCmd start)
 
-parseWindowsSeperator ::  (Monad a) => CalcLangLexer a Token
+parseWindowsSeperator ::  CalcLangLexer Token
 parseWindowsSeperator = do
                         start <- getPosition
                         char '\\' >> return (PathSeperator '\\' start)
 
-parseLinuxSeperator :: (Monad a) => CalcLangLexer a Token
+parseLinuxSeperator :: CalcLangLexer Token
 parseLinuxSeperator = do
                       start <- getPosition
                       char '/' >> return (PathSeperator '/' start)
 
-parseSeparator :: (Monad a) => CalcLangLexer a Token
+parseSeparator :: CalcLangLexer Token
 parseSeparator = try parseLinuxSeperator <|> parseWindowsSeperator
 
-parseComponent :: (Monad a) => CalcLangLexer a Token
+parseComponent :: CalcLangLexer Token
 parseComponent = do
                  start <- getPosition
                  toRet <- many1 (noneOf "\\/\"'")
                  return (PathComponent toRet start)
 
-parseSingleQuote :: (Monad a) => CalcLangLexer a Token
+parseSingleQuote :: CalcLangLexer Token
 parseSingleQuote = do
                    start <- getPosition
                    char '\'' >> return (SingleQuote start)
 
-parseDoubleQuote :: (Monad a) => CalcLangLexer a Token
+parseDoubleQuote :: CalcLangLexer Token
 parseDoubleQuote = do
                    start <- getPosition
                    char '"' >> return (DoubleQuote start)
 
-parseToken :: (Monad a) => CalcLangLexer a Token
+parseToken :: CalcLangLexer Token
 parseToken = try parseSingleQuote <|> try parseDoubleQuote <|> try parseSeparator <|> try parseHelp <|> try parseShow <|> try parseHistory <|> try parseVariables <|> try parseFunctions <|> try parseQuit <|> try parseCreate <|> try parseLesson <|> try parsePlan <|> try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent <|> try parseNewLine
 
-parseTokens :: (Monad a) => CalcLangLexer a [Token]
+parseTokens :: CalcLangLexer [Token]
 parseTokens = spaces *> many parseToken
 
 --The Lexer is completed as shown above it is a Parser that parses the program into a flat list of tokens. The rule order is important here because an Ident can also be Then or an if or a true. We need to check the most specific Parser first then go toward the least specific
 
 --Next we need to design the Parser...
-type CalcLangParser a b = ParsecT String () a b
+type CalcLangParser b = ParsecT String () IO b
 
-parseBoolean :: (Monad a) => CalcLangParser a AstNode
+parseBoolean :: CalcLangParser AstNode
 parseBoolean = do
                start <- getPosition
                b <- parseBool
@@ -288,7 +286,7 @@ parseBoolean = do
                  _ -> return (ErrorNode "this is an error")
 
 
-parseSet :: (Monad a) => CalcLangParser a AstNode
+parseSet :: CalcLangParser AstNode
 parseSet = do
            start <- getPosition
            _ <- parseLBrack
@@ -296,7 +294,7 @@ parseSet = do
            _ <- parseRBrack
            return (SetAst start x)
 
-parseTuple :: (Monad a) => CalcLangParser a AstNode
+parseTuple :: CalcLangParser AstNode
 parseTuple = do
              start <- getPosition
              _ <- parseLPar
@@ -304,7 +302,7 @@ parseTuple = do
              _ <- parseRPar
              return (TupleAst start x)
 
-parseIfExpr :: (Monad a) => CalcLangParser a AstNode
+parseIfExpr :: CalcLangParser AstNode
 parseIfExpr = do
               start <- getPosition
               _ <- parseIf
@@ -315,7 +313,7 @@ parseIfExpr = do
               ifFalse <- parseExpression
               return (IfExpr start cond ifTrue ifFalse)
 
-parseDollarAst :: (Monad a) => CalcLangParser a AstNode
+parseDollarAst :: CalcLangParser AstNode
 parseDollarAst = do
                  start <- getPosition
                  x <- parseDol
@@ -323,7 +321,7 @@ parseDollarAst = do
                    Dol a _ -> return (DollarAst start a)
                    _ -> return (ErrorNode "this is an error")
 
-parsePercentAst :: (Monad a) => CalcLangParser a AstNode
+parsePercentAst :: CalcLangParser AstNode
 parsePercentAst = do
                   start <- getPosition
                   x <- parsePerc
@@ -332,7 +330,7 @@ parsePercentAst = do
                     _ -> return (ErrorNode "this is an error")
 
 
-parseIntNumber :: (Monad a) => CalcLangParser a AstNode
+parseIntNumber :: CalcLangParser AstNode
 parseIntNumber = do
                  startPosition <- getPosition
                  x <- parseIntNum
@@ -340,7 +338,7 @@ parseIntNumber = do
                    (IntNum s _) -> return (IntNumberAst startPosition s)
                    _ -> return (ErrorNode "Cant parse error node")
 
-parseRealNumber :: (Monad a) => CalcLangParser a AstNode
+parseRealNumber :: CalcLangParser AstNode
 parseRealNumber = do
                   startPosition <- getPosition
                   x <- parseRealNum
@@ -348,11 +346,11 @@ parseRealNumber = do
                     (RealNum s _) -> return (RealNumberAst startPosition s)
                     _ -> return (ErrorNode "Cant build real Num without real number")
 
-parseNumber :: (Monad a) => CalcLangParser a AstNode
+parseNumber :: CalcLangParser AstNode
 parseNumber = try parseRealNumber <|> try parseIntNumber
               
 
-parseIdentifier :: (Monad a) => CalcLangParser a AstNode
+parseIdentifier :: CalcLangParser AstNode
 parseIdentifier = do
                   startPosition <- getPosition
                   x <- parseIdent
@@ -360,7 +358,7 @@ parseIdentifier = do
                     Ident y _ -> return (IdentAst startPosition y)
                     _ -> return (ErrorNode "Error cant build identifier with no name")
 
-parseFunctionCall :: (Monad a) => CalcLangParser a AstNode
+parseFunctionCall :: CalcLangParser AstNode
 parseFunctionCall = do
                     start <- getPosition
                     name <- parseIdentifier
@@ -372,10 +370,10 @@ parseFunctionCall = do
                           _ -> return (ErrorNode "Error cant build function call with invalid name")
                           
 
-parsePrimaryExpression :: (Monad a) => CalcLangParser a AstNode
+parsePrimaryExpression :: CalcLangParser AstNode
 parsePrimaryExpression = try parseDollarAst <|> try parsePercentAst <|> try parseNumber <|> try parseParenExpression <|> try parseTuple <|> try parseSet <|> try parseBoolean <|> try parseIfExpr <|> try parseFunctionCall <|> try parseIdentifier
 
-parseParenExpression :: (Monad a) => CalcLangParser a AstNode
+parseParenExpression :: CalcLangParser AstNode
 parseParenExpression = do
                        pos <- getPosition
                        _ <- parseLPar
@@ -383,11 +381,11 @@ parseParenExpression = do
                        _ <- parseRPar
                        return (ParenExpr pos x)
 
-parseUnaryOperation :: (Monad a) => CalcLangParser a AstNode
+parseUnaryOperation :: CalcLangParser AstNode
 parseUnaryOperation = try parseNotOperation <|> try parseNegationOperation <|> parsePrimaryExpression
 
 
-parseNegationOperation :: (Monad a) => CalcLangParser a AstNode
+parseNegationOperation :: CalcLangParser AstNode
 parseNegationOperation = do
                          start <- getPosition
                          _ <- parseMinus
@@ -395,59 +393,59 @@ parseNegationOperation = do
                          return (NegateOperation start rightExp)
                          
 
-parseNotOperation :: (Monad a) => CalcLangParser a AstNode
+parseNotOperation :: CalcLangParser AstNode
 parseNotOperation = do
                     start <- getPosition
                     _ <- parseNot
                     leftExp <- parseUnaryOperation
                     return (NotOperation start leftExp)
 
-parsePowerOp :: (Monad a) => CalcLangParser a (AstNode -> AstNode -> AstNode)
+parsePowerOp :: CalcLangParser (AstNode -> AstNode -> AstNode)
 parsePowerOp = do
                start <- getPosition
                parsePow >> return (PowerOperation start)
 
-parsePowerOperation :: (Monad a) => CalcLangParser a AstNode
+parsePowerOperation :: CalcLangParser AstNode
 parsePowerOperation = chainr1 parseUnaryOperation parsePowerOp
 
-parseDivOp :: (Monad a) => CalcLangParser a (AstNode -> AstNode -> AstNode)
+parseDivOp :: CalcLangParser (AstNode -> AstNode -> AstNode)
 parseDivOp = do
              start <- getPosition
              parseDiv >> return (DivisionOperation start)
                     
-parseMultOp :: (Monad a) => CalcLangParser a (AstNode -> AstNode -> AstNode)
+parseMultOp :: CalcLangParser (AstNode -> AstNode -> AstNode)
 parseMultOp = do
               start <- getPosition
               parseTimes >> return (MultiplicationOperation start)
 
-parseDotOp :: (Monad a) => CalcLangParser a (AstNode -> AstNode -> AstNode)
+parseDotOp :: CalcLangParser (AstNode -> AstNode -> AstNode)
 parseDotOp = do
              start <- getPosition
              parsePeriod >> return (DotProductOperation start)
 
-parseMultDivOp :: (Monad a) => CalcLangParser a AstNode
+parseMultDivOp :: CalcLangParser AstNode
 parseMultDivOp = chainl1 parsePowerOperation (try parseMultOp <|> try parseDivOp <|> try parseDotOp)
 
-parseAddOp :: (Monad a) => CalcLangParser a (AstNode -> AstNode -> AstNode)
+parseAddOp :: CalcLangParser (AstNode -> AstNode -> AstNode)
 parseAddOp = do
              start <- getPosition
              parsePlus >> return (AdditionOperation start)
 
-parseSubOp :: (Monad a) => CalcLangParser a (AstNode -> AstNode -> AstNode)
+parseSubOp :: CalcLangParser (AstNode -> AstNode -> AstNode)
 parseSubOp = do
              start <- getPosition
              parseMinus >> return (SubtractionOperation start)
 
-parseAddSubOp :: (Monad a) => CalcLangParser a AstNode
+parseAddSubOp :: CalcLangParser AstNode
 parseAddSubOp = chainl1 parseMultDivOp (parseAddOp <|> parseSubOp)
 
-parseExpression :: (Monad a) => CalcLangParser a  AstNode
+parseExpression :: CalcLangParser  AstNode
 parseExpression = parseBinaryOperation
 
-parseLogicalOperation :: (Monad a) => CalcLangParser a AstNode
+parseLogicalOperation :: CalcLangParser AstNode
 parseLogicalOperation = try parseEqualsOperation <|> try parseLessThenOrEqualsOperation <|> try parseLessThenOperation <|> try parseGreaterThenOperation <|> try parseGreaterThenOrEqualsOperation  
 
-parseEqualsOperation :: (Monad a) => CalcLangParser a AstNode
+parseEqualsOperation :: CalcLangParser AstNode
 parseEqualsOperation = do
                        start <- getPosition
                        x <- parseAddSubOp
@@ -455,7 +453,7 @@ parseEqualsOperation = do
                        y <- parseAddSubOp
                        return (EqualOperation start x y)
 
-parseLessThenOrEqualsOperation :: (Monad a) => CalcLangParser a AstNode
+parseLessThenOrEqualsOperation :: CalcLangParser AstNode
 parseLessThenOrEqualsOperation = do
                                  start <- getPosition
                                  x <- parseAddSubOp
@@ -463,7 +461,7 @@ parseLessThenOrEqualsOperation = do
                                  y <- parseAddSubOp
                                  return (LessThenOrEqualsOperation start x y)
 
-parseLessThenOperation :: (Monad a) => CalcLangParser a AstNode
+parseLessThenOperation :: CalcLangParser AstNode
 parseLessThenOperation = do
                          start <- getPosition
                          x <- parseAddSubOp
@@ -471,7 +469,7 @@ parseLessThenOperation = do
                          y <- parseAddSubOp
                          return (LessThenOperation start x y)
 
-parseGreaterThenOrEqualsOperation :: (Monad a) => CalcLangParser a AstNode
+parseGreaterThenOrEqualsOperation :: CalcLangParser AstNode
 parseGreaterThenOrEqualsOperation = do
                                     start <- getPosition
                                     x <- parseAddSubOp
@@ -479,7 +477,7 @@ parseGreaterThenOrEqualsOperation = do
                                     y <- parseAddSubOp
                                     return (GreaterThenOrEqualsOperation start x y)
 
-parseGreaterThenOperation :: (Monad a) => CalcLangParser a AstNode
+parseGreaterThenOperation :: CalcLangParser AstNode
 parseGreaterThenOperation = do
                             start <- getPosition
                             x <- parseAddSubOp
@@ -490,21 +488,21 @@ parseGreaterThenOperation = do
 
                         
 
-parseBinaryOperation :: (Monad a) => CalcLangParser a AstNode
+parseBinaryOperation :: CalcLangParser AstNode
 parseBinaryOperation = try parseLogicalOperation <|> try parseAddSubOp
 
-parseExpressionList :: (Monad a) => CalcLangParser a SA
+parseExpressionList :: CalcLangParser SA
 parseExpressionList = do
                       x <- (sepBy1 parseExpression parseComma)
                       return (StoreArray (length x) (reverse x))
 
 
-parseParamaters :: (Monad a) => CalcLangParser a SA
+parseParamaters :: CalcLangParser SA
 parseParamaters = do
                   x <- (sepBy parseIdentifier parseComma)
                   return (StoreArray (length x) (reverse x))
 
-parseFunctionDefinition :: (Monad a) => CalcLangParser a AstNode
+parseFunctionDefinition :: CalcLangParser AstNode
 parseFunctionDefinition = do
                           pos <- getPosition
                           _ <- parseFunc
@@ -518,7 +516,7 @@ parseFunctionDefinition = do
                             IdentAst _ s -> return (FunctionDef pos s y z)
                             _ -> return (ErrorNode "Error Ident was not parsed")
 
-parseMacroAssignment :: (Monad a) => CalcLangParser a AstNode
+parseMacroAssignment :: CalcLangParser AstNode
 parseMacroAssignment = do
                        start <- getPosition
                        _ <- parseLet
@@ -530,34 +528,34 @@ parseMacroAssignment = do
                          _ -> return (ErrorNode "identifier didnt parse correctly")
                             
 
-parseShowFunctionsCommand :: (Monad a) => CalcLangParser a AstNode
+parseShowFunctionsCommand :: CalcLangParser AstNode
 parseShowFunctionsCommand = do
                             start <- getPosition
                             _ <- parseShow
                             _ <- parseFunctions
                             return (ShowFunctionsCommand start)
 
-parseShowVariablesCommand :: (Monad a) => CalcLangParser a AstNode
+parseShowVariablesCommand :: CalcLangParser AstNode
 parseShowVariablesCommand = do
                             start <- getPosition
                             _ <- parseShow
                             _ <- parseVariables
                             return (ShowVariablesCommand start)
 
-parseShowHistoryCommand :: (Monad a) => CalcLangParser a AstNode
+parseShowHistoryCommand :: CalcLangParser AstNode
 parseShowHistoryCommand = do
                           start <- getPosition
                           _ <- parseShow
                           _ <- parseHistory
                           return (ShowHistoryCommand start)
 
-parseQuitCommand :: (Monad a) => CalcLangParser a AstNode
+parseQuitCommand :: CalcLangParser AstNode
 parseQuitCommand = do
                    start <- getPosition
                    _ <- parseQuit
                    return (QuitCommand start)
                    
-parseStringPath :: (Monad a) => CalcLangParser a AstNode
+parseStringPath :: CalcLangParser AstNode
 parseStringPath = do
                   start <- getPosition
                   _ <- parseDoubleQuote
@@ -567,7 +565,7 @@ parseStringPath = do
                   _ <- parseDoubleQuote
                   return (FullPath start fullPath)
                   
-parseCharPath :: (Monad a) => CalcLangParser a AstNode
+parseCharPath :: CalcLangParser AstNode
 parseCharPath = do
                 start <- getPosition
                 _ <- parseSingleQuote
@@ -577,7 +575,7 @@ parseCharPath = do
                 _ <- parseSingleQuote
                 return (FullPath start fullPath)
 
-parseDefaultPath :: (Monad a) => CalcLangParser a AstNode
+parseDefaultPath :: CalcLangParser AstNode
 parseDefaultPath = do
                    start <- getPosition
                    list <- sepBy1 parseComponent parseSeparator
@@ -585,10 +583,10 @@ parseDefaultPath = do
                    let fullPath = (intercalate "/" toStrList)
                    return (FullPath start fullPath)
 
-parsePath :: (Monad a) => CalcLangParser a AstNode
+parsePath :: CalcLangParser AstNode
 parsePath = try parseStringPath <|> try parseCharPath <|> parseDefaultPath
 
-parseLessonPlanCommand :: (Monad a) => CalcLangParser a AstNode
+parseLessonPlanCommand :: CalcLangParser AstNode
 parseLessonPlanCommand = do
                          start <- getPosition
                          _ <- parseCreate
@@ -598,17 +596,17 @@ parseLessonPlanCommand = do
                          case path of
                            FullPath _ str -> return (CreateLessonPlanCommand start str)
 
-parseHelpCommand :: (Monad a) => CalcLangParser a AstNode
+parseHelpCommand :: CalcLangParser AstNode
 parseHelpCommand = do
                    start <- getPosition
                    _ <- parseHelp
                    return (HelpCommand start)
 
-parseCommand :: (Monad a) => CalcLangParser a AstNode
+parseCommand :: CalcLangParser AstNode
 parseCommand = try parseHelpCommand <|> try parseShowFunctionsCommand <|> try parseShowHistoryCommand <|> try parseShowVariablesCommand <|> try parseQuitCommand <|> try parseLessonPlanCommand
 
   
-parseAstNode :: (Monad a) => CalcLangParser a AstNode
+parseAstNode :: CalcLangParser AstNode
 parseAstNode = spaces *> (try parseCommand <|> try parseFunctionDefinition <|> try parseMacroAssignment <|> try parseExpression) <* eof
 
 runCalcLangParser :: String -> IO AstNode

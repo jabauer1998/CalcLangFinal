@@ -8,7 +8,6 @@ import Foreign.C.String
 import Foreign.Marshal.Array
 import Foreign.Storable
 import Control.Monad
-import System.Console.Haskeline
 
 
 -- First we need to make the SourcePos into a ctype Source Pos
