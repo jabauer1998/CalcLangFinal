@@ -4,4 +4,4 @@ expertMode = true
 
 [nix]
 channel = "stable-25_05"
-packages = ["llvm_18", "clang_18"]
+packages = ["llvm_18", "clang_18", "cabal-install", "zlib"]
