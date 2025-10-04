@@ -1,0 +1,4 @@
+packages: .
+
+-- Avoid problematic unix-time-0.4.17 version
+constraints: unix-time >=0.4.18
