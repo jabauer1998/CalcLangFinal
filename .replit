@@ -5,3 +5,34 @@ expertMode = true
 [nix]
 channel = "stable-25_05"
 packages = ["llvm_18", "clang_18", "cabal-install", "zlib", "pkg-config"]
+
+[deployment]
+deploymentTarget = "cloudrun"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Web Server"
+
+[[workflows.workflow]]
+name = "Web Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./dist-newstyle/build/x86_64-linux/ghc-9.8.4/CalcLangFinal-0.1.0.0/x/WCalcLang/build/WCalcLang/WCalcLang"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80

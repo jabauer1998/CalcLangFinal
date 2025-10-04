@@ -168,6 +168,8 @@ executable WCalcLang
                    wai-session,
                    wai-session-clientsession,
                    wai-extra,
+                   wai,
+                   warp,
                    data-default,
                    containers,
                    clientsession,
