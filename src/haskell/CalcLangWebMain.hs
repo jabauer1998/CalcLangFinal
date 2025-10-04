@@ -22,6 +22,9 @@ import Text.Blaze.Html.Renderer.Text (renderHtml)
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
 import Data.Text.Lazy(Text)
+import Network.Wai.Handler.Warp (Settings, defaultSettings, setHost, setPort)
+import qualified Network.Wai.Handler.Warp as Warp
+import Network.Wai (Application)
 
 import CalcLangInterpreter
 import CalcLangParser
@@ -58,9 +61,10 @@ main = do
                                   putStrLn ("Command Line port expected but found " ++ arg1 ++ "\n defaulting to port 5000")
                                   return 5000
     
-       putStrLn $ "Starting CalcLang Web Server on port " ++ (show port)
+       putStrLn $ "Starting CalcLang Web Server on 0.0.0.0:" ++ (show port)
 
-       Scott.scotty port $ do 
+       let settings = setHost "0.0.0.0" $ setPort port defaultSettings
+       Scott.scottyOpts (Scott.Options 1 settings) $ do 
                            Scott.get "/" $ do
                                            fileContent <- liftIO $ readFile "./help/files/Intro.txt"
                                            let pageHtml = H.docTypeHtml $ do
