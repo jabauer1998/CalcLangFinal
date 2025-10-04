@@ -8,7 +8,7 @@ packages = ["llvm_18", "clang_18", "cabal-install", "zlib", "pkg-config"]
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["sh", "-c", "./bin/WCalcLang"]
+run = ["cabal", "run", "WCalcLang"]
 build = ["echo", "Using pre-built binary, skipping build"]
 
 [workflows]
@@ -38,3 +38,7 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 34647
+externalPort = 3000

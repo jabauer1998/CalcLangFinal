@@ -60,6 +60,8 @@ executable CCalcLang
     main-is:          CalcLangCompilerMain.hs
 
     hs-source-dirs: src/haskell
+    
+    include-dirs: src/c
                   
     install-includes: CalcLangAstC.h,
                       CalcLangCompiler.h,
@@ -90,7 +92,7 @@ executable CCalcLang
                    src/c/ScopedVarDefTable.c,
                    src/c/CalcLangIrGen.c
 
-    ghc-options: -Wno-type-defaults -Wno-unused-imports -dynamic -g -optc-g -pgmc clang -pgma clang
+    ghc-options: -Wno-type-defaults -Wno-unused-imports -g -optc-g -pgmc clang -pgma clang
     
     extra-libraries: LLVM, m
     
@@ -118,6 +120,8 @@ executable ICalcLang
 
     -- Directories containing source files.
     hs-source-dirs:   src/haskell
+    
+    include-dirs: src/c
     
     install-includes: CalcLangAstC.h,
                       CalcLangCompiler.h,
@@ -148,7 +152,7 @@ executable ICalcLang
     extra-libraries: LLVM, m
     extra-lib-dirs: 
 
-    ghc-options: -Wno-type-defaults -Wno-unused-imports -dynamic -g -optc-g -pgmc clang -pgma clang
+    ghc-options: -Wno-type-defaults -Wno-unused-imports -g -optc-g -pgmc clang -pgma clang
 
     -- Base language which the package is written in.
     default-language: Haskell2010
@@ -184,10 +188,12 @@ executable WCalcLang
                    CalcLangParser
 
     hs-source-dirs:   src/haskell
+    
+    include-dirs: src/c
 
     extra-libraries: LLVM, m
 
-    ghc-options: -j1 -Wno-type-defaults -Wno-unused-imports -dynamic -g -optc-g -pgmc clang -pgma clang
+    ghc-options: -Wno-type-defaults -Wno-unused-imports -g -optc-g -pgmc clang -pgma clang
 
     -- Base language which the package is written in.
     default-language: Haskell2010
