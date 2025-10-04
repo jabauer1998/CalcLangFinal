@@ -8,7 +8,7 @@ packages = ["llvm_18", "clang_18", "cabal-install", "zlib", "pkg-config"]
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["cabal", "run", "WCalcLang"]
+run = ["./bin/WCalcLang"]
 build = ["echo", "Using pre-built binary, skipping build"]
 
 [workflows]
