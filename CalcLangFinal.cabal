@@ -146,6 +146,7 @@ executable ICalcLang
                    src/c/CalcLangIrGen.c
 
     extra-libraries: LLVM, m
+    extra-lib-dirs: 
 
     ghc-options: -Wno-type-defaults -Wno-unused-imports -dynamic -g -optc-g -pgmc clang -pgma clang
 

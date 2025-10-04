@@ -9,14 +9,16 @@ AbsInstallDir:="$(shell pwd)/bin"
 SrcDir:="$(shell pwd)/src"
 LLVMLib:=$(shell llvm-config --libdir)
 LLVMInclude:=$(shell llvm-config --includedir)
+ZLibPath:=$(shell nix-build --no-out-link '<nixpkgs>' -A zlib)
+ZLibDevPath:=$(shell nix-build --no-out-link '<nixpkgs>' -A zlib.dev)
 
 
 all: build-lib build-haskell install-haskell
 
 build-haskell:
-	cabal build --allow-newer --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --extra-include-dirs=$(LLVMInclude)
+	cabal build --allow-newer --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --extra-include-dirs=$(LLVMInclude) --extra-lib-dirs=$(LLVMLib) --extra-lib-dirs=$(ZLibPath)/lib --extra-include-dirs=$(ZLibDevPath)/include
 install-haskell:
-	cabal install --overwrite-policy=always --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --extra-include-dirs=$(LLVMInclude) --installdir=$(AbsInstallDir)
+	cabal install --overwrite-policy=always --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --extra-include-dirs=$(LLVMInclude) --installdir=$(AbsInstallDir) --extra-lib-dirs=$(LLVMLib) --extra-lib-dirs=$(ZLibPath)/lib --extra-include-dirs=$(ZLibDevPath)/include
 build-lib:
 	clang -S -emit-llvm src/c/LinkToCalcLang.c -o ir/c/LinkToCalcLang.ll -I$(AbsIncDirC)
 
