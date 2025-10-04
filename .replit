@@ -1,0 +1,7 @@
+modules = ["c-clang14", "haskell-ghc9.4", "bash", "haskell-ghc9.8"]
+[agent]
+expertMode = true
+
+[nix]
+channel = "stable-25_05"
+packages = ["llvm_18", "clang_18"]
