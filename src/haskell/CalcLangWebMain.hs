@@ -37,7 +37,8 @@ type MySessionMap = IORef.IORef (Map.Map BS.ByteString (IORef.IORef MySession))
 main :: IO ()
 main = do
         -- Initialize session storage
-       myMap <- IORef.newIORef Map.empty
+       vT <- IORef.newIORef (Environment [])
+       fT <- IORef.newIORef (SymbolTable [])
 
        args <- getArgs
        port <- case args of
@@ -59,7 +60,7 @@ main = do
     
        putStrLn $ "Starting CalcLang Web Server on port " ++ (show port)
 
-       Scott.scotty port $ do
+       Scott.scotty port $ do 
                            Scott.get "/" $ do
                                            fileContent <- liftIO $ readFile "./help/files/Intro.txt"
                                            let pageHtml = H.docTypeHtml $ do
@@ -69,13 +70,55 @@ main = do
                                                                                    H.h1 "Intro To CalcLang:"
                                                                                    H.pre $ H.toHtml fileContent -- Display raw content in <pre> tag
                                                                                    H.a ! A.href "/help" $ "Help using CalcLang"
+                                                                                   H.a ! A.href "/eval" $ "Evaluate CalcLang"
                                            Scott.html (renderHtml pageHtml)
+
                            Scott.get "/help" $ do
                                                fileContent <- liftIO $ readFile "./help/files/Help.txt"
                                                let pageHtml = H.docTypeHtml $ do
                                                                               H.head $ do
-                                                                                       H.title "CalcLang Help"
+                                                                                       H.title "Intro To CalcLang"
                                                                               H.body $ do
-                                                                                       H.h1 "CalcLang Help"
-                                                                                       H.pre $ H.toHtml fileContent
+                                                                                       H.h1 "Intro To CalcLang:"
+                                                                                       H.pre $ H.toHtml fileContent -- Display raw content in <pre> tag
+                                                                                       H.a ! A.href "/eval" $ "Evaluate CalcLang"
                                                Scott.html (renderHtml pageHtml)
+                                           
+                                             
+                           Scott.get "/result" $ do
+                                                 param <- Scott.queryParam "userInput"
+                                                 parseResult <- liftIO (runCalcLangParser param)
+                                                 myVTBefore <- liftIO (IORef.readIORef vT)
+                                                 myFTBefore <- liftIO (IORef.readIORef fT)
+                                                 let (res, myVTAfter, myFTAfter) = interpret parseResult myVTBefore myFTBefore
+                                                 _ <- liftIO (IORef.writeIORef vT myVTAfter)
+                                                 _ <- liftIO (IORef.writeIORef fT myFTAfter)
+                                                 let pageHtml = case res of
+                                                                         ErrorVal val -> H.docTypeHtml $ do
+                                                                                                         H.head $ do
+                                                                                                                  H.title "Intro To CalcLang"
+                                                                                                         H.body $ do
+                                                                                                                  H.h1 "Error Detected:"
+                                                                                                                  H.pre $ H.toHtml (CalcLangInterpreter.toStr res)
+                                                                                                                  H.a ! A.href "/help" $ "Help using CalcLang"
+                                                                         VoidVal -> H.docTypeHtml $ do
+                                                                                                    H.head $ do
+                                                                                                             H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ "0;url=" ++ "/eval")
+                                                                           
+                                                                         _ -> H.docTypeHtml $ do
+                                                                                              H.head $ do
+                                                                                                       H.title "Result Of Expression Or Command"
+                                                                                              H.body $ do
+                                                                                                       H.h1 "Expression Result:"
+                                                                                                       H.pre $ H.toHtml (CalcLangInterpreter.toStr res)
+                                                                                                       H.a ! A.href "/help" $ "Help using CalcLang"
+                                                                                                       H.a ! A.href "/eval" $ "Evaluate CalcLang Operation"
+                                                 Scott.html (renderHtml pageHtml)
+                                                               
+                           Scott.get "/eval" $ do
+                                               let myInputForm = H.form ! A.action "/result" ! A.method "get" $ do
+                                                                                                                H.label ! A.for "myInput" $ "Enter Equation"
+                                                                                                                H.input ! A.type_ "text" ! A.id "myInput" ! A.name "userInput"
+                                                                                                                H.input ! A.type_ "submit" ! A.value "Submit"
+                                               Scott.html (renderHtml myInputForm)
+                                                                                           
