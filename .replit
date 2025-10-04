@@ -7,7 +7,7 @@ channel = "stable-25_05"
 packages = ["llvm_18", "clang_18", "cabal-install", "zlib", "pkg-config"]
 
 [deployment]
-deploymentTarget = "cloudrun"
+deploymentTarget = "autoscale"
 build = ["sh", "-c", "make all"]
 run = ["sh", "-c", "./bin/WCalcLang"]
 
@@ -38,3 +38,7 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 33697
+externalPort = 3000
