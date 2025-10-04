@@ -8,6 +8,8 @@ packages = ["llvm_18", "clang_18", "cabal-install", "zlib", "pkg-config"]
 
 [deployment]
 deploymentTarget = "cloudrun"
+build = ["sh", "-c", "make all"]
+run = ["sh", "-c", "./bin/WCalcLang"]
 
 [workflows]
 runButton = "Project"
@@ -27,7 +29,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "./dist-newstyle/build/x86_64-linux/ghc-9.8.4/CalcLangFinal-0.1.0.0/x/WCalcLang/build/WCalcLang/WCalcLang"
+args = "./bin/WCalcLang"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
