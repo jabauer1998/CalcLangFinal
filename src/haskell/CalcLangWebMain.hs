@@ -125,8 +125,8 @@ main = do
                                                                                                                            H.h1 "History Of CalcLang Inputs"
                                                                                                                            H.pre $ H.toHtml (intercalate "\n" newHist)
                                                                          QuitVal -> H.docTypeHtml $ do
-                                                                                                   H.head $ do
-                                                                                                            H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/" :: String))
+                                                                                                    H.head $ do
+                                                                                                             H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/" :: String))
                                                                          VoidVal -> H.docTypeHtml $ do
                                                                                                     H.head $ do
                                                                                                              H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/eval" :: String))
