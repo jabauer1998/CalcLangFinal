@@ -103,6 +103,9 @@ main = do
                                                  let (res, myVTAfter, myFTAfter) = interpret parseResult myVTBefore myFTBefore
                                                  _ <- liftIO (IORef.writeIORef vT myVTAfter)
                                                  _ <- liftIO (IORef.writeIORef fT myFTAfter)
+                                                 _ <- case res of
+                                                        QuitVal -> liftIO (IORef.writeIORef hist [])
+                                                        _ -> return ()
                                                  let pageHtml = case res of
                                                                          ErrorVal val -> H.docTypeHtml $ do
                                                                                                          H.head $ do
@@ -116,17 +119,14 @@ main = do
                                                                                                            H.head $ do
                                                                                                                     H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/help" :: String))
                                                                          ReadHistoryCommandVal -> H.docTypeHtml $ do
-                                                                                                                  myHist <- liftIO (IORef.readIORef hist)
                                                                                                                   H.head $ do
                                                                                                                            H.title "History Of CalcLang Commands"
                                                                                                                   H.body $ do
                                                                                                                            H.h1 "History Of CalcLang Inputs"
                                                                                                                            H.pre $ H.toHtml (intercalate "\n" newHist)
-                                                                         QuitVal -> do
-                                                                                     _ <- liftIO (IORef.writeIORef hist [])
-                                                                                     H.docTypeHtml $ do
-                                                                                                     H.head $ do
-                                                                                                              H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/" :: String))
+                                                                         QuitVal -> H.docTypeHtml $ do
+                                                                                                   H.head $ do
+                                                                                                            H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/" :: String))
                                                                          VoidVal -> H.docTypeHtml $ do
                                                                                                     H.head $ do
                                                                                                              H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/eval" :: String))
