@@ -114,9 +114,9 @@ main = do
                                                                          HelpCommandVal -> H.docTypeHtml $ do
                                                                                                            H.head $ do
                                                                                                                     H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ "0;url=/help")
-                                                                         QuitCommandVal -> do
-                                                                                           _ <- writeIORef hist []
-                                                                                           H.docTypeHtml $ do
+                                                                         QuitVal -> do
+                                                                                     _ <- writeIORef hist []
+                                                                                     H.docTypeHtml $ do
                                                                                                            H.head $ do
                                                                                                                     H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ "0;url=/")
                                                                          VoidVal -> H.docTypeHtml $ do
