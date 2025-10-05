@@ -18,6 +18,7 @@ import Data.Default (def)
 import System.Environment
 import qualified Data.ByteString as BS
 import qualified Data.Map as Map
+import Data.List (intercalate)
 import Text.Blaze.Html.Renderer.Text (renderHtml)
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
@@ -42,7 +43,7 @@ main = do
         -- Initialize session storage
        vT <- IORef.newIORef (Environment [])
        fT <- IORef.newIORef (SymbolTable [])
-       hist <- IORef.newIORef [String]
+       hist <- IORef.newIORef []
 
        args <- getArgs
        port <- case args of
@@ -95,7 +96,7 @@ main = do
                                                  param <- Scott.queryParam "userInput"
                                                  oldHist <- liftIO (IORef.readIORef hist)
                                                  let newHist = oldHist ++ [param]
-                                                 _ <- liftIO (IORef.writeIORef hist)
+                                                 _ <- liftIO (IORef.writeIORef hist newHist)
                                                  parseResult <- liftIO (runCalcLangParser param)
                                                  myVTBefore <- liftIO (IORef.readIORef vT)
                                                  myFTBefore <- liftIO (IORef.readIORef fT)
@@ -113,15 +114,22 @@ main = do
                                                                                                                   H.a ! A.href "/help" $ "Help using CalcLang"
                                                                          HelpCommandVal -> H.docTypeHtml $ do
                                                                                                            H.head $ do
-                                                                                                                    H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ "0;url=/help")
+                                                                                                                    H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ "0;url=/help" :: String)
+                                                                         ReadHistoryCommandVal -> H.docTypeHtml $ do
+                                                                                                                  myHist <- liftIO (IORef.readIORef hist)
+                                                                                                                  H.head $ do
+                                                                                                                           H.title "History Of CalcLang Commands"
+                                                                                                                  H.body $ do
+                                                                                                                           H.h1 "History Of CalcLang Inputs"
+                                                                                                                           H.pre $ H.toHtml (intercalate "\n" newHist)
                                                                          QuitVal -> do
-                                                                                     _ <- writeIORef hist []
+                                                                                     _ <- liftIO (IORef.writeIORef hist [])
                                                                                      H.docTypeHtml $ do
-                                                                                                           H.head $ do
-                                                                                                                    H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ "0;url=/")
+                                                                                                     H.head $ do
+                                                                                                              H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ "0;url=/" :: String)
                                                                          VoidVal -> H.docTypeHtml $ do
                                                                                                     H.head $ do
-                                                                                                             H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ "0;url=/eval")
+                                                                                                             H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ "0;url=/eval" :: String)
                                                                          _ -> H.docTypeHtml $ do
                                                                                               H.head $ do
                                                                                                        H.title "Result Of Expression Or Command"
