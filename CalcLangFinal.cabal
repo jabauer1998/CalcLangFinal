@@ -181,7 +181,8 @@ executable WCalcLang
                    uuid,
                    bytestring,
                    cookie,
-                   blaze-html
+                   blaze-html,
+                   wai-middleware-static
                        
     other-modules: CalcLangAstH,
                    CalcLangInterpreter,

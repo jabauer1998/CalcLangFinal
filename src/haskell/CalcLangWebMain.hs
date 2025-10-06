@@ -26,6 +26,7 @@ import Data.Text.Lazy(Text)
 import Network.Wai.Handler.Warp (Settings, defaultSettings, setHost, setPort)
 import qualified Network.Wai.Handler.Warp as Warp
 import Network.Wai (Application)
+import Network.Wai.Middleware.Static
 
 import CalcLangInterpreter
 import CalcLangParser
@@ -66,12 +67,14 @@ main = do
        putStrLn $ "Starting CalcLang Web Server on 0.0.0.0:" ++ (show port)
 
        let settings = setHost "0.0.0.0" $ setPort port defaultSettings
-       Scott.scottyOpts (Scott.Options 1 settings) $ do 
+       Scott.scottyOpts (Scott.Options 1 settings) $ do
+                           Scott.middleware $ staticPolicy (noDots >-> addBase ".")
                            Scott.get "/" $ do
                                            fileContent <- liftIO $ readFile "./help/files/Intro.txt"
                                            let pageHtml = H.docTypeHtml $ do
                                                                           H.head $ do
                                                                                    H.title "Intro To CalcLang"
+                                                                                   H.link ! A.rel "stylesheet" ! A.href "src/css/StyleSheet.css"
                                                                           H.body $ do
                                                                                    H.h1 "Intro To CalcLang:"
                                                                                    H.pre $ H.toHtml fileContent -- Display raw content in <pre> tag
@@ -84,6 +87,7 @@ main = do
                                                let pageHtml = H.docTypeHtml $ do
                                                                               H.head $ do
                                                                                        H.title "Intro To CalcLang"
+                                                                                       H.link ! A.rel "stylesheet" ! A.href "src/css/StyleSheet.css"
                                                                               H.body $ do
                                                                                        H.h1 "Intro To CalcLang:"
                                                                                        H.pre $ H.toHtml fileContent -- Display raw content in <pre> tag
@@ -110,6 +114,7 @@ main = do
                                                                          ErrorVal val -> H.docTypeHtml $ do
                                                                                                          H.head $ do
                                                                                                                   H.title "Intro To CalcLang"
+                                                                                                                  H.link ! A.rel "stylesheet" ! A.href "src/css/StyleSheet.css"
                                                                                                          H.body $ do
                                                                                                                   H.h1 "Error Detected:"
                                                                                                                   H.pre $ H.toHtml (CalcLangInterpreter.toStr res)
@@ -117,21 +122,29 @@ main = do
                                                                                                                   H.a ! A.href "/help" $ "Help using CalcLang"
                                                                          HelpCommandVal -> H.docTypeHtml $ do
                                                                                                            H.head $ do
+                                                                                                                    H.title "Reloading Page"
+                                                                                                                    H.link ! A.rel "stylesheet" ! A.href "src/css/StyleSheet.css"
                                                                                                                     H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/help" :: Text))
                                                                          ReadHistoryCommandVal -> H.docTypeHtml $ do
                                                                                                                   H.head $ do
+                                                                                                                           H.link ! A.rel "stylesheet" ! A.href "src/css/StyleSheet.css"
                                                                                                                            H.title "History Of CalcLang Commands"
                                                                                                                   H.body $ do
                                                                                                                            H.h1 "History Of CalcLang Inputs"
                                                                                                                            H.pre $ H.toHtml (intercalate "\n" newHist)
                                                                          QuitVal -> H.docTypeHtml $ do
                                                                                                     H.head $ do
+                                                                                                             H.title "Reloading Page"
+                                                                                                             H.link ! A.rel "stylesheet" ! A.href "src/css/StyleSheet.css" 
                                                                                                              H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/" :: Text))
                                                                          VoidVal -> H.docTypeHtml $ do
                                                                                                     H.head $ do
+                                                                                                             H.title "Reloading Page"
+                                                                                                             H.link ! A.rel "stylesheet" ! A.href "src/css/StyleSheet.css"
                                                                                                              H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/eval" :: Text))
                                                                          _ -> H.docTypeHtml $ do
                                                                                               H.head $ do
+                                                                                                       H.link ! A.rel "stylesheet" ! A.href "src/css/StyleSheet.css"
                                                                                                        H.title "Result Of Expression Or Command"
                                                                                               H.body $ do
                                                                                                        H.h1 "Expression Result:"
@@ -141,12 +154,17 @@ main = do
                                                  Scott.html (renderHtml pageHtml)
                                                                
                            Scott.get "/eval" $ do
-                                               let myInputForm = H.form ! A.action "/result" ! A.method "get" $ do
-                                                                                                                H.h1 "Enter CalcLang Expression Or Command"
-                                                                                                                H.label ! A.for "myInput" $ "Enter Equation"
-                                                                                                                H.input ! A.type_ "text" ! A.id "myInput" ! A.name "userInput"
-                                                                                                                H.input ! A.type_ "submit" ! A.value "Submit"
-                                                                                                                H.a ! A.href "/" $ "Back To Intro"
-                                                                                                                H.a ! A.href "/help" $ "Help Page"
+                                               let myInputForm = H.docTypeHtml $ do
+                                                                                 H.head $ do
+                                                                                          H.link ! A.rel "stylesheet" ! A.href "src/css/StyleSheet.css"
+                                                                                          H.title "Enter CalcLang Expression Or Command"
+                                                                                 H.body $ do
+                                                                                          H.h1 "Enter in CalcLang Expression Or Command"
+                                                                                          H.form ! A.action "/result" ! A.method "get" $ do
+                                                                                                                                         H.label ! A.for "myInput" $ "Enter Equation"
+                                                                                                                                         H.input ! A.type_ "text" ! A.id "myInput" ! A.name "userInput"
+                                                                                                                                         H.input ! A.type_ "submit" ! A.value "Submit"
+                                                                                          H.a ! A.href "/" $ "Back To Intro"
+                                                                                          H.a ! A.href "/help" $ "Help Page"
                                                Scott.html (renderHtml myInputForm)
                                                                                            
