@@ -1,7 +1,37 @@
-bin/**
+# Keep pre-built binaries for deployment
+# bin/WCalcLang is tracked for production use
 bin/*
+!bin/WCalcLang
+
 tmp/*
 tmp/**
 obj/*
 obj/**
+
+# Haskell build artifacts
 dist-newstyle/
+dist/
+.stack-work/
+*.hi
+*.o
+*.dyn_hi
+*.dyn_o
+*.prof
+*.aux
+*.hp
+*.eventlog
+.HTF/
+.ghc.environment.*
+cabal.project.local
+cabal.project.local~
+
+# Editor files
+*~
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Logs
+*.log
