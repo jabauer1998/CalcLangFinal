@@ -132,6 +132,9 @@ main = do
                                                                                                                   H.body $ do
                                                                                                                            H.h1 "History Of CalcLang Inputs"
                                                                                                                            H.pre $ H.toHtml (intercalate "\n" newHist)
+                                                                                                                           H.a ! A.href "/" $ "Back To Intro"
+                                                                                                                           H.a ! A.href "/help" $ "Help using CalcLang"
+                                                                                                                           H.a ! A.href "/eval" $ "Evaluate CalcLang Operation"
                                                                          QuitVal -> H.docTypeHtml $ do
                                                                                                     H.head $ do
                                                                                                              H.title "Reloading Page"
