@@ -19,7 +19,10 @@ build-haskell:
 	cabal update
 	cabal build --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --extra-include-dirs=$(LLVMInclude) --extra-lib-dirs=$(LLVMLib) --extra-lib-dirs=$(ZLibPath)/lib --extra-include-dirs=$(ZLibDevPath)/include
 install-haskell:
-	cabal install --overwrite-policy=always --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --extra-include-dirs=$(LLVMInclude) --installdir=$(AbsInstallDir) --extra-lib-dirs=$(LLVMLib) --extra-lib-dirs=$(ZLibPath)/lib --extra-include-dirs=$(ZLibDevPath)/include
+	rm -f $(AbsInstallDir)/WCalcLang $(AbsInstallDir)/ICalcLang $(AbsInstallDir)/CCalcLang
+	find dist-newstyle -name "WCalcLang" -type f -executable -exec cp {} $(AbsInstallDir)/WCalcLang \;
+	find dist-newstyle -name "ICalcLang" -type f -executable -exec cp {} $(AbsInstallDir)/ICalcLang \;
+	find dist-newstyle -name "CCalcLang" -type f -executable -exec cp {} $(AbsInstallDir)/CCalcLang \;
 build-lib:
 	clang -S -emit-llvm src/c/LinkToCalcLang.c -o ir/c/LinkToCalcLang.ll -I$(AbsIncDirC)
 
