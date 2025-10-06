@@ -117,7 +117,7 @@ main = do
                                                                                                                   H.a ! A.href "/help" $ "Help using CalcLang"
                                                                          HelpCommandVal -> H.docTypeHtml $ do
                                                                                                            H.head $ do
-                                                                                                                    H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/help" :: String))
+                                                                                                                    H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/help" :: Text))
                                                                          ReadHistoryCommandVal -> H.docTypeHtml $ do
                                                                                                                   H.head $ do
                                                                                                                            H.title "History Of CalcLang Commands"
@@ -126,10 +126,10 @@ main = do
                                                                                                                            H.pre $ H.toHtml (intercalate "\n" newHist)
                                                                          QuitVal -> H.docTypeHtml $ do
                                                                                                     H.head $ do
-                                                                                                             H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/" :: String))
+                                                                                                             H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/" :: Text))
                                                                          VoidVal -> H.docTypeHtml $ do
                                                                                                     H.head $ do
-                                                                                                             H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/eval" :: String))
+                                                                                                             H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/eval" :: Text))
                                                                          _ -> H.docTypeHtml $ do
                                                                                               H.head $ do
                                                                                                        H.title "Result Of Expression Or Command"
@@ -141,15 +141,12 @@ main = do
                                                  Scott.html (renderHtml pageHtml)
                                                                
                            Scott.get "/eval" $ do
-                                               let myInputForm = H.docTypeHtml $ do 
-                                                                                 H.head $ do
-                                                                                          H.title "Enter CalcLang Expression"
-                                                                                 H.body $ do
-                                                                                          H.form ! A.action "/result" ! A.method "get" $ do
-                                                                                                                                         H.label ! A.for "myInput" $ "Enter Equation"
-                                                                                                                                         H.input ! A.type_ "text" ! A.id "myInput" ! A.name "userInput"
-                                                                                                                                         H.input ! A.type_ "submit" ! A.value "Submit"
-                                                                                          H.a ! A.href "/" $ "Back To Intro"
-                                                                                          H.a ! A.href "/help" $ "Help Page"
+                                               let myInputForm = H.form ! A.action "/result" ! A.method "get" $ do
+                                                                                                                H.h1 "Enter CalcLang Expression Or Command"
+                                                                                                                H.label ! A.for "myInput" $ "Enter Equation"
+                                                                                                                H.input ! A.type_ "text" ! A.id "myInput" ! A.name "userInput"
+                                                                                                                H.input ! A.type_ "submit" ! A.value "Submit"
+                                                                                                                H.a ! A.href "/" $ "Back To Intro"
+                                                                                                                H.a ! A.href "/help" $ "Help Page"
                                                Scott.html (renderHtml myInputForm)
                                                                                            
