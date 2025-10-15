@@ -27,6 +27,7 @@ import Network.Wai.Handler.Warp (Settings, defaultSettings, setHost, setPort)
 import qualified Network.Wai.Handler.Warp as Warp
 import Network.Wai (Application)
 import Network.Wai.Middleware.Static
+import Foreign.C.String (CString)
 
 import CalcLangInterpreter
 import CalcLangParser
@@ -38,6 +39,8 @@ data MySession = MySession { variableTable :: IORef.IORef Env,
                              functionTable :: IORef.IORef FunctionTable }
 
 type MySessionMap = IORef.IORef (Map.Map BS.ByteString (IORef.IORef MySession))
+
+foreign import ccall processASTList :: CSA -> CString -> CString -> IO ()
 
 main :: IO ()
 main = do
@@ -94,7 +97,37 @@ main = do
                                                                                        H.a ! href "/" $ "Back to Intro"
                                                                                        H.a ! A.href "/eval" $ "Evaluate CalcLang"
                                                Scott.html (renderHtml pageHtml)
-                                           
+                           Scott.get "/clp" $ do
+                                              let targetTripleForm = H.docTypeHtml $ do
+                                                                                     H.head $ do
+                                                                                              H.link ! A.rel "stylesheet" ! A.href "css/StyleSheet.css"
+                                                                                              H.title "LLVM Target Triple Selector"
+                                                                                     H.body $ do
+                                                                                              H.h1 "Select LLVM Target Triple"
+                                                                                              H.form ! A.action "/compile" ! A.method "get" $ do
+                                                                                                                                               H.label ! A.for "arch" $ "Architecture:"
+                                                                                                                                               H.select ! A.id "arch" ! A.name "arch" $ do
+                                                                                                                                                                                    H.option ! A.value "x86_64" $ "x86_64"
+                                                                                                                                                                                    H.option ! A.value "i386" $ "i386"
+                                                                                                                                                                                    H.option ! A.value "aarch64" $ "aarch64"
+                                                                                                                                                                                    H.option ! A.value "arm" $ "arm"
+                                                                                                                                                                                    H.option ! A.value "riscv64" $ "riscv64"
+                                                                                                                                               H.label ! A.for "vendor" $ "Vendor:"
+                                                                                                                                               H.select ! A.id "vendor" ! A.name "vendor" $ do
+                                                                                                                                                                                      H.option ! A.value "unknown" $ "unknown"
+                                                                                                                                                                                      H.option ! A.value "pc" $ "pc"
+                                                                                                                                                                                      H.option ! A.value "apple" $ "apple"
+                                                                                                                                                                                      H.option ! A.value "nvidia" $ "nvidia"
+                                                                                                                                               H.label ! A.for "os" $ "Operating System:"
+                                                                                                                                               H.select ! A.id "os" ! A.name "os" $ do
+                                                                                                                                                                                H.option ! A.value "linux" $ "linux-gnu"
+                                                                                                                                                                                H.option ! A.value "darwin" $ "darwin"
+                                                                                                                                                                                H.option ! A.value "windows" $ "windows-msvc"
+                                                                                                                                                                                H.option ! A.value "freebsd" $ "freebsd"
+                                                                                                                                               H.input ! A.type_ "submit" ! A.value "Generate Target Triple"
+                                                                                              H.a ! A.href "/" $ "Back To Intro"
+                                                                                              H.a ! A.href "/eval" $ "Evaluate CalcLang"
+                                              Scott.html (renderHtml targetTripleForm)
                                              
                            Scott.get "/result" $ do
                                                  param <- Scott.queryParam "userInput"
@@ -135,6 +168,11 @@ main = do
                                                                                                                            H.a ! A.href "/" $ "Back To Intro"
                                                                                                                            H.a ! A.href "/help" $ "Help using CalcLang"
                                                                                                                            H.a ! A.href "/eval" $ "Evaluate CalcLang Operation"
+                                                                         CreateLessonPlanCommandVal _ -> H.docTypeHtml $ do
+                                                                                                                   H.head $ do
+                                                                                                                            H.title "Reloading Page"
+                                                                                                                            H.link ! A.rel "stylesheet" ! A.href "css/StyleSheet.css"
+                                                                                                                            H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/clp" :: Text))
                                                                          QuitVal -> H.docTypeHtml $ do
                                                                                                     H.head $ do
                                                                                                              H.title "Reloading Page"
