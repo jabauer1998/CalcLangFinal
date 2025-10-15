@@ -184,7 +184,7 @@ main = do
                                                                                                                            H.title "History Of CalcLang Commands"
                                                                                                                   H.body $ do
                                                                                                                            H.h1 "History Of CalcLang Inputs"
-                                                                                                                           H.pre $ H.toHtml (intercalate "\n" (map toString newHist))
+                                                                                                                           H.pre $ H.toHtml (intercalate "\n" (Prelude.map CalcLangAstH.toString newHist))
                                                                                                                            H.a ! A.href "/" $ "Back To Intro"
                                                                                                                            H.a ! A.href "/help" $ "Help using CalcLang"
                                                                                                                            H.a ! A.href "/eval" $ "Evaluate CalcLang Operation"

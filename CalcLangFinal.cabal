@@ -186,7 +186,8 @@ executable WCalcLang
                        
     other-modules: CalcLangAstH,
                    CalcLangInterpreter,
-                   CalcLangParser
+                   CalcLangParser,
+                   CalcLangMarshall
 
     hs-source-dirs:   src/haskell
     
