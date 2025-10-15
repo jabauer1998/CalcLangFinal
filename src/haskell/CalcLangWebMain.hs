@@ -42,7 +42,7 @@ data MySession = MySession { variableTable :: IORef.IORef Env,
 
 type MySessionMap = IORef.IORef (Map.Map BS.ByteString (IORef.IORef MySession))
 
-foreign import ccall processASTList :: Ptr CSA -> CString -> CString -> IO ()
+foreign import ccall processASTListWithTriple :: Ptr CSA -> CString -> CString -> IO ()
 
 main :: IO ()
 main = do
