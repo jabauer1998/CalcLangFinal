@@ -44,6 +44,16 @@ type MySessionMap = IORef.IORef (Map.Map BS.ByteString (IORef.IORef MySession))
 
 foreign import ccall processASTListWithTriple :: Ptr CSA -> CString -> CString -> IO ()
 
+isCommand :: AstNode -> Bool
+isCommand node = case node of
+                   ShowFunctionsCommand _ -> True
+                   ShowVariablesCommand _ -> True
+                   ShowHistoryCommand _ -> True
+                   QuitCommand _ -> True
+                   HelpCommand _ -> True
+                   CreateLessonPlanCommand _ _ -> True
+                   _ -> False
+
 main :: IO ()
 main = do
         -- Initialize session storage
@@ -140,7 +150,8 @@ main = do
                                                  let targetTriple = TL.unpack $ arch <> "-" <> vendor <> "-" <> os
                                                  let fileName = TL.unpack newFileName
                                                  ioHist <- liftIO $ IORef.readIORef hist
-                                                 let astArray = StoreArray (length ioHist) ioHist
+                                                 let filteredHist = filter (not . isCommand) ioHist
+                                                 let astArray = StoreArray (length filteredHist) filteredHist
                                                  marshalledASTPtr <- liftIO $ marshallStorageArray astArray
                                                  fileNameC <- liftIO $ newCString fileName
                                                  targetTripleC <- liftIO $ newCString targetTriple
