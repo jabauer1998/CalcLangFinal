@@ -27,11 +27,13 @@ import Network.Wai.Handler.Warp (Settings, defaultSettings, setHost, setPort)
 import qualified Network.Wai.Handler.Warp as Warp
 import Network.Wai (Application)
 import Network.Wai.Middleware.Static
-import Foreign.C.String (CString)
+import Foreign.C.String (CString, newCString)
+import Foreign.Ptr (Ptr)
 
 import CalcLangInterpreter
 import CalcLangParser
 import CalcLangAstH
+import CalcLangMarshall
 
 -- Session storage for variables and functions
 
@@ -40,7 +42,7 @@ data MySession = MySession { variableTable :: IORef.IORef Env,
 
 type MySessionMap = IORef.IORef (Map.Map BS.ByteString (IORef.IORef MySession))
 
-foreign import ccall processASTList :: CSA -> CString -> CString -> IO ()
+foreign import ccall processASTList :: Ptr CSA -> CString -> CString -> IO ()
 
 main :: IO ()
 main = do
@@ -101,10 +103,12 @@ main = do
                                               let targetTripleForm = H.docTypeHtml $ do
                                                                                      H.head $ do
                                                                                               H.link ! A.rel "stylesheet" ! A.href "css/StyleSheet.css"
-                                                                                              H.title "LLVM Target Triple Selector"
+                                                                                              H.title "Create Lesson Plan"
                                                                                      H.body $ do
-                                                                                              H.h1 "Select LLVM Target Triple"
+                                                                                              H.h1 "Create Lesson Plan"
                                                                                               H.form ! A.action "/compile" ! A.method "get" $ do
+                                                                                                                                               H.label ! A.for "myInput" $ "Enter File Name"
+                                                                                                                                               H.input ! A.type_ "text" ! A.id "myOtherInput" ! A.name "newFileName"
                                                                                                                                                H.label ! A.for "arch" $ "Architecture:"
                                                                                                                                                H.select ! A.id "arch" ! A.name "arch" $ do
                                                                                                                                                                                     H.option ! A.value "x86_64" $ "x86_64"
@@ -128,13 +132,29 @@ main = do
                                                                                               H.a ! A.href "/" $ "Back To Intro"
                                                                                               H.a ! A.href "/eval" $ "Evaluate CalcLang"
                                               Scott.html (renderHtml targetTripleForm)
-                                             
+                           Scott.get "/compile" $ do
+                                                 newFileName <- Scott.queryParam "newFileName" :: Scott.ActionM TL.Text
+                                                 arch <- Scott.queryParam "arch" :: Scott.ActionM TL.Text
+                                                 vendor <- Scott.queryParam "vendor" :: Scott.ActionM TL.Text
+                                                 os <- Scott.queryParam "os" :: Scott.ActionM TL.Text
+                                                 let targetTriple = TL.unpack $ arch <> "-" <> vendor <> "-" <> os
+                                                 let fileName = TL.unpack newFileName
+                                                 ioHist <- liftIO $ IORef.readIORef hist
+                                                 let astArray = StoreArray (length ioHist) ioHist
+                                                 marshalledASTPtr <- liftIO $ marshallStorageArray astArray
+                                                 fileNameC <- liftIO $ newCString fileName
+                                                 targetTripleC <- liftIO $ newCString targetTriple
+                                                 liftIO $ processASTList marshalledASTPtr fileNameC targetTripleC
+                                                 Scott.setHeader "Content-Disposition" (TL.pack $ "attachment; filename=\"" ++ fileName ++ "\"")
+                                                 Scott.setHeader "Content-Type" "application/octet-stream"
+                                                 Scott.file fileName
+                                                 
                            Scott.get "/result" $ do
                                                  param <- Scott.queryParam "userInput"
-                                                 oldHist <- liftIO (IORef.readIORef hist)
-                                                 let newHist = oldHist ++ [param]
-                                                 _ <- liftIO (IORef.writeIORef hist newHist)
                                                  parseResult <- liftIO (runCalcLangParser param)
+                                                 oldHist <- liftIO (IORef.readIORef hist)
+                                                 let newHist = oldHist ++ [parseResult]
+                                                 _ <- liftIO (IORef.writeIORef hist newHist)
                                                  myVTBefore <- liftIO (IORef.readIORef vT)
                                                  myFTBefore <- liftIO (IORef.readIORef fT)
                                                  let (res, myVTAfter, myFTAfter) = interpret parseResult myVTBefore myFTBefore
@@ -164,7 +184,7 @@ main = do
                                                                                                                            H.title "History Of CalcLang Commands"
                                                                                                                   H.body $ do
                                                                                                                            H.h1 "History Of CalcLang Inputs"
-                                                                                                                           H.pre $ H.toHtml (intercalate "\n" newHist)
+                                                                                                                           H.pre $ H.toHtml (intercalate "\n" (map toString newHist))
                                                                                                                            H.a ! A.href "/" $ "Back To Intro"
                                                                                                                            H.a ! A.href "/help" $ "Help using CalcLang"
                                                                                                                            H.a ! A.href "/eval" $ "Evaluate CalcLang Operation"
