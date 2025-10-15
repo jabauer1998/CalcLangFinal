@@ -144,7 +144,7 @@ main = do
                                                  marshalledASTPtr <- liftIO $ marshallStorageArray astArray
                                                  fileNameC <- liftIO $ newCString fileName
                                                  targetTripleC <- liftIO $ newCString targetTriple
-                                                 liftIO $ processASTList marshalledASTPtr fileNameC targetTripleC
+                                                 liftIO $ processASTListWithTriple marshalledASTPtr fileNameC targetTripleC
                                                  Scott.setHeader "Content-Disposition" (TL.pack $ "attachment; filename=\"" ++ fileName ++ "\"")
                                                  Scott.setHeader "Content-Type" "application/octet-stream"
                                                  Scott.file fileName

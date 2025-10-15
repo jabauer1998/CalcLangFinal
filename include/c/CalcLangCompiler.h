@@ -5,5 +5,6 @@
 
 void processAST(AstNode* node);
 void processASTList(StoreArray* arr, char* output);
+void processASTListWithTriple(StoreArray* arr, char* output, char* triple);
 
 #endif

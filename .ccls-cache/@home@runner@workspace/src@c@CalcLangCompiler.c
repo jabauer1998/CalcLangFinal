@@ -70,8 +70,9 @@ void processASTList(StoreArray* storeArray, char* output){
     LLVMDisposeMessage(error);
     LLVMDisposeTargetMachine(targetMachine);
   }
+}
 
-  void processASTList(StoreArray* storeArray, char* output, char* triple){
+  void processASTListWithTriple(StoreArray* storeArray, char* output, char* triple){
     LLVMModuleRef mod = codeGen(storeArray);
     char *error = NULL;  
       // Verify the module and get the error message
