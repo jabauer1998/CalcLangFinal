@@ -117,7 +117,7 @@ main = do
                                                                                               H.title "Choose Target Triple"
                                                                                      H.body $ do
                                                                                               H.h1 "Choose Target Triple"
-                                                                                              H.form ! A.action (toValue (("/compile/" ++ fileName) :: Text)) ! A.method "get" $ do
+                                                                                              H.form ! A.action (toValue (("/compile/" ++ fileName) :: TL.Text)) ! A.method "get" $ do
                                                                                                                                                              H.label ! A.for "arch" $ "Architecture:"
                                                                                                                                                              H.select ! A.id "arch" ! A.name "arch" $ do
                                                                                                                                                                                                     H.option ! A.value "x86_64" $ "x86_64"
