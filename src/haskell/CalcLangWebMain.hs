@@ -109,41 +109,40 @@ main = do
                                                                                        H.a ! href "/" $ "Back to Intro"
                                                                                        H.a ! A.href "/eval" $ "Evaluate CalcLang"
                                                Scott.html (renderHtml pageHtml)
-                           Scott.get "/clp" $ do
+                           Scott.get "/clp/:pathFile" $ do
+                                              let fileName <- Scott.pathParam "pathFile"
                                               let targetTripleForm = H.docTypeHtml $ do
                                                                                      H.head $ do
                                                                                               H.link ! A.rel "stylesheet" ! A.href "css/StyleSheet.css"
-                                                                                              H.title "Create Lesson Plan"
+                                                                                              H.title "Choose Target Triple"
                                                                                      H.body $ do
-                                                                                              H.h1 "Create Lesson Plan"
-                                                                                              H.form ! A.action "/compile" ! A.method "get" $ do
-                                                                                                                                               H.label ! A.for "myInput" $ "Enter File Name"
-                                                                                                                                               H.input ! A.type_ "text" ! A.id "myOtherInput" ! A.name "newFileName"
-                                                                                                                                               H.label ! A.for "arch" $ "Architecture:"
-                                                                                                                                               H.select ! A.id "arch" ! A.name "arch" $ do
-                                                                                                                                                                                    H.option ! A.value "x86_64" $ "x86_64"
-                                                                                                                                                                                    H.option ! A.value "i386" $ "i386"
-                                                                                                                                                                                    H.option ! A.value "aarch64" $ "aarch64"
-                                                                                                                                                                                    H.option ! A.value "arm" $ "arm"
-                                                                                                                                                                                    H.option ! A.value "riscv64" $ "riscv64"
-                                                                                                                                               H.label ! A.for "vendor" $ "Vendor:"
-                                                                                                                                               H.select ! A.id "vendor" ! A.name "vendor" $ do
-                                                                                                                                                                                      H.option ! A.value "unknown" $ "unknown"
-                                                                                                                                                                                      H.option ! A.value "pc" $ "pc"
-                                                                                                                                                                                      H.option ! A.value "apple" $ "apple"
-                                                                                                                                                                                      H.option ! A.value "nvidia" $ "nvidia"
-                                                                                                                                               H.label ! A.for "os" $ "Operating System:"
-                                                                                                                                               H.select ! A.id "os" ! A.name "os" $ do
-                                                                                                                                                                                H.option ! A.value "linux" $ "linux-gnu"
-                                                                                                                                                                                H.option ! A.value "darwin" $ "darwin"
-                                                                                                                                                                                H.option ! A.value "windows" $ "windows-msvc"
-                                                                                                                                                                                H.option ! A.value "freebsd" $ "freebsd"
-                                                                                                                                               H.input ! A.type_ "submit" ! A.value "Generate Target Triple"
+                                                                                              H.h1 "Choose Target Triple"
+                                                                                              H.form ! A.action ("/compile/" ++ fileName) ! A.method "get" $ do
+                                                                                                                                                           H.label ! A.for "arch" $ "Architecture:"
+                                                                                                                                                           H.select ! A.id "arch" ! A.name "arch" $ do
+                                                                                                                                                                                                    H.option ! A.value "x86_64" $ "x86_64"
+                                                                                                                                                                                                    H.option ! A.value "i386" $ "i386"
+                                                                                                                                                                                                    H.option ! A.value "aarch64" $ "aarch64"
+                                                                                                                                                                                                    H.option ! A.value "arm" $ "arm"
+                                                                                                                                                                                                    H.option ! A.value "riscv64" $ "riscv64"
+                                                                                                                                                            H.label ! A.for "vendor" $ "Vendor:"
+                                                                                                                                                            H.select ! A.id "vendor" ! A.name "vendor" $ do
+                                                                                                                                                                                                         H.option ! A.value "unknown" $ "unknown"
+                                                                                                                                                                                                         H.option ! A.value "pc" $ "pc"
+                                                                                                                                                                                                         H.option ! A.value "apple" $ "apple"
+                                                                                                                                                                                                         H.option ! A.value "nvidia" $ "nvidia"
+                                                                                                                                                            H.label ! A.for "os" $ "Operating System:"
+                                                                                                                                                            H.select ! A.id "os" ! A.name "os" $ do
+                                                                                                                                                                                                 H.option ! A.value "linux" $ "linux-gnu"
+                                                                                                                                                                                                 H.option ! A.value "darwin" $ "darwin"
+                                                                                                                                                                                                 H.option ! A.value "windows" $ "windows-msvc"
+                                                                                                                                                                                                 H.option ! A.value "freebsd" $ "freebsd"
+                                                                                                                                                            H.input ! A.type_ "submit" ! A.value "Generate Target Triple"
                                                                                               H.a ! A.href "/" $ "Back To Intro"
                                                                                               H.a ! A.href "/eval" $ "Evaluate CalcLang"
                                               Scott.html (renderHtml targetTripleForm)
-                           Scott.get "/compile" $ do
-                                                 newFileName <- Scott.queryParam "newFileName" :: Scott.ActionM TL.Text
+                           Scott.get "/compile/:fileName" $ do
+                                                 newFileName <- Scott.pathParam "fileName" :: Scott.ActionM TL.Text
                                                  arch <- Scott.queryParam "arch" :: Scott.ActionM TL.Text
                                                  vendor <- Scott.queryParam "vendor" :: Scott.ActionM TL.Text
                                                  os <- Scott.queryParam "os" :: Scott.ActionM TL.Text
