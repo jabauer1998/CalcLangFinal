@@ -198,11 +198,11 @@ main = do
                                                                                                                            H.a ! A.href "/" $ "Back To Intro"
                                                                                                                            H.a ! A.href "/help" $ "Help using CalcLang"
                                                                                                                            H.a ! A.href "/eval" $ "Evaluate CalcLang Operation"
-                                                                         CreateLessonPlanCommandVal _ -> H.docTypeHtml $ do
+                                                                         CreateLessonPlanCommandVal x -> H.docTypeHtml $ do
                                                                                                                    H.head $ do
                                                                                                                             H.title "Reloading Page"
                                                                                                                             H.link ! A.rel "stylesheet" ! A.href "css/StyleSheet.css"
-                                                                                                                            H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ ("0;url=/clp" :: Text))
+                                                                                                                            H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ (("0;url=/clp/" ++ x) :: Text))
                                                                          QuitVal -> H.docTypeHtml $ do
                                                                                                     H.head $ do
                                                                                                              H.title "Reloading Page"
