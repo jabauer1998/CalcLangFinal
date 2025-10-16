@@ -16,8 +16,8 @@ ZLibDevPath:=$(shell nix-build --no-out-link '<nixpkgs>' -A zlib.dev)
 all: build-lib build-haskell install-haskell
 
 build-haskell:
-        cabal update
-        cabal build --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --extra-include-dirs=$(LLVMInclude) --extra-lib-dirs=$(LLVMLib) --extra-lib-dirs=$(ZLibPath)/lib --extra-include-dirs=$(ZLibDevPath)/include
+	cabal update
+	cabal build --extra-include-dirs=$(AbsIncDirC) --extra-include-dirs=$(AbsIncDirH) --extra-include-dirs=$(LLVMInclude) --extra-lib-dirs=$(LLVMLib) --extra-lib-dirs=$(ZLibPath)/lib --extra-include-dirs=$(ZLibDevPath)/include
 install-haskell: build-haskell
         rm -f $(AbsInstallDir)/WCalcLang $(AbsInstallDir)/ICalcLang $(AbsInstallDir)/CCalcLang
         find dist-newstyle -name "WCalcLang" -type f -executable -exec cp {} $(AbsInstallDir)/WCalcLang \;
