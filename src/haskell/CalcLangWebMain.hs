@@ -110,7 +110,7 @@ main = do
                                                                                        H.a ! A.href "/eval" $ "Evaluate CalcLang"
                                                Scott.html (renderHtml pageHtml)
                            Scott.get "/clp/:pathFile" $ do
-                                              let fileName <- Scott.pathParam "pathFile"
+                                              fileName <- Scott.pathParam "pathFile" :: Scott.ActionM TL.Text
                                               let targetTripleForm = H.docTypeHtml $ do
                                                                                      H.head $ do
                                                                                               H.link ! A.rel "stylesheet" ! A.href "css/StyleSheet.css"
