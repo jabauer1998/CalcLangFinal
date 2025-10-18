@@ -22,7 +22,10 @@ void processAST (AstNode* node){
 
 void processASTList(StoreArray* storeArray, char* output){
   LLVMModuleRef mod = codeGen(storeArray);
-  char *error = NULL;  
+
+  printf("Made it Here!!!");
+  fflush(stdout);
+  char *error = NULL;
     // Verify the module and get the error message
   LLVMBool broken = LLVMVerifyModule(mod, LLVMReturnStatusAction, &error);
 
@@ -90,6 +93,9 @@ void processASTList(StoreArray* storeArray, char* output){
       LLVMInitializeAllTargetMCs();
       LLVMInitializeAllAsmPrinters();
       LLVMInitializeAllAsmParsers();
+
+      char* triple = LLVMGetDefaultTargetTriple();
+      printf("%s", triple);
       
       // Get the target from the triple
       if (LLVMGetTargetFromTriple(triple, &target, &error)) {

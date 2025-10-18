@@ -29,6 +29,8 @@ import Network.Wai (Application)
 import Network.Wai.Middleware.Static
 import Foreign.C.String (CString, newCString)
 import Foreign.Ptr (Ptr)
+import Network.Wai.Handler.Warp
+import Data.Text.Encoding (encodeUtf8)
 
 import CalcLangInterpreter
 import CalcLangParser
@@ -62,26 +64,30 @@ main = do
        hist <- IORef.newIORef []
 
        args <- getArgs
-       port <- case args of
+       (port, ipAddr) <- case args of
          [] -> do
                putStrLn "No Command Line arguments found defaulting to port 5000"
-               return 5000
+               return (5000, "127.0.0.1")
          [arg1] -> case readMaybe arg1 :: Maybe Int of
-                     Just num -> return num
+                     Just num -> return (num, "127.0.0.1")
                      Nothing -> do
                                 putStrLn ("Command Line port expected but found " ++ arg1 ++ "\n defaulting to port 5000")
-                                return 5000    
-         (arg1:_) -> case readMaybe arg1 :: Maybe Int of
-                       Just num -> do
-                                   putStrLn "Warning to many arguments passed to command line expected just a single port number"
-                                   return num
-                       Nothing -> do
-                                  putStrLn ("Command Line port expected but found " ++ arg1 ++ "\n defaulting to port 5000")
-                                  return 5000
+                                return (5000, "127.0.0.1")    
+         (arg1:arg2:_) -> case (readMaybe arg1 :: Maybe Int, readMaybe arg2 :: Maybe HostPreference) of
+                            (Just num, Just ip) -> do
+                                                   return (num, ip)
+                            (Nothing, Just ip) -> do
+                                                  putStrLn ("Command Line port expected but found nothing \n defaulting to port 5000")
+                                                  return (5000, ip)
+                            (Nothing, Nothing) -> do
+                                                  putStrLn ("Command Line Port and Ip expected defaulting to localhost and port 5000")
+                                                  return (5000, "127.0.0.1")
+                            (Just num, Nothing) -> do
+                                                   putStrLn ("No ip found defaulting to localhost")
+                                                   return (num, "127.0.0.1")
     
-       putStrLn $ "Starting CalcLang Web Server on 0.0.0.0:" ++ (show port)
-
-       let settings = setHost "0.0.0.0" $ setPort port defaultSettings
+       putStrLn $ "Starting CalcLang Web Server on " ++ (show ipAddr) ++ ":" ++ (show port)
+       let settings = setHost ipAddr $ setPort port defaultSettings
        Scott.scottyOpts (Scott.Options 1 settings) $ do
                            Scott.middleware $ staticPolicy (noDots >-> hasPrefix "css/" >-> addBase "src/")
                            Scott.get "/" $ do
@@ -113,33 +119,38 @@ main = do
                                               fileName <- Scott.pathParam "pathFile" :: Scott.ActionM TL.Text
                                               let targetTripleForm = H.docTypeHtml $ do
                                                                                      H.head $ do
-                                                                                              H.link ! A.rel "stylesheet" ! A.href "css/StyleSheet.css"
                                                                                               H.title "Choose Target Triple"
+                                                                                              H.link ! A.rel "stylesheet" ! A.href "../css/StyleSheet.css"
                                                                                      H.body $ do
                                                                                               H.h1 "Choose Target Triple"
-                                                                                              H.form ! A.action (toValue (("/compile/" ++ fileName) :: TL.Text)) ! A.method "get" $ do
-                                                                                                                                                             H.label ! A.for "arch" $ "Architecture:"
-                                                                                                                                                             H.select ! A.id "arch" ! A.name "arch" $ do
-                                                                                                                                                                                                    H.option ! A.value "x86_64" $ "x86_64"
-                                                                                                                                                                                                    H.option ! A.value "i386" $ "i386"
-                                                                                                                                                                                                    H.option ! A.value "aarch64" $ "aarch64"
-                                                                                                                                                                                                    H.option ! A.value "arm" $ "arm"
-                                                                                                                                                                                                    H.option ! A.value "riscv64" $ "riscv64"
-                                                                                                                                                             H.label ! A.for "vendor" $ "Vendor:"
-                                                                                                                                                             H.select ! A.id "vendor" ! A.name "vendor" $ do                                                                                                                                                                                                                                               H.option ! A.value "unknown" $ "unknown"                                                                                                                                                                                                           H.option ! A.value "pc" $ "pc"
-                                                                                                                                                                                                        H.option ! A.value "apple" $ "apple"
-                                                                                                                                                                                                        H.option ! A.value "nvidia" $ "nvidia"
-                                                                                                                                                             H.label ! A.for "os" $ "Operating System:"
-                                                                                                                                                             H.select ! A.id "os" ! A.name "os" $ do                                                                                                                                                                                                                                               H.option ! A.value "linux" $ "linux-gnu"
-                                                                                                                                                                                                H.option ! A.value "darwin" $ "darwin"
-                                                                                                                                                                                                H.option ! A.value "windows" $ "windows-msvc"
-                                                                                                                                                                                                H.option ! A.value "freebsd" $ "freebsd"
-                                                                                                                                                             H.input ! A.type_ "submit" ! A.value "Generate Target Triple"
+                                                                                              H.form ! A.action "/compile" ! A.method "get" $ do
+                                                                                                                                              H.label ! A.for "fileInput" $ "Enter File Name:"
+                                                                                                                                              H.input ! A.type_ "text" ! A.id "fileInput" ! A.name "fileInput" ! A.placeholder (toValue fileName)
+                                                                                                                                              H.label ! A.for "arch" $ "Architecture:"
+                                                                                                                                              H.select ! A.id "arch" ! A.name "arch" $ do
+                                                                                                                                                H.option ! A.value "x86_64" $ "x86_64"
+                                                                                                                                                H.option ! A.value "i386" $ "i386"
+                                                                                                                                                H.option ! A.value "aarch64" $ "aarch64"
+                                                                                                                                                H.option ! A.value "arm" $ "arm"
+                                                                                                                                                H.option ! A.value "riscv64" $ "riscv64"
+                                                                                                                                              H.label ! A.for "vendor" $ "Vendor:"
+                                                                                                                                              H.select ! A.id "vendor" ! A.name "vendor" $ do
+                                                                                                                                                H.option ! A.value "unknown" $ "unknown"
+                                                                                                                                                H.option ! A.value "pc" $ "pc"
+                                                                                                                                                H.option ! A.value "apple" $ "apple"
+                                                                                                                                                H.option ! A.value "nvidia" $ "nvidia"
+                                                                                                                                              H.label ! A.for "os" $ "Operating System:"
+                                                                                                                                              H.select ! A.id "os" ! A.name "os" $ do
+                                                                                                                                                H.option ! A.value "linux" $ "linux-gnu"
+                                                                                                                                                H.option ! A.value "darwin" $ "darwin"
+                                                                                                                                                H.option ! A.value "windows" $ "windows-msvc"
+                                                                                                                                                H.option ! A.value "freebsd" $ "freebsd"
+                                                                                                                                              H.input ! A.type_ "submit" ! A.value "Generate Target Triple"
                                                                                               H.a ! A.href "/" $ "Back To Intro"
                                                                                               H.a ! A.href "/eval" $ "Evaluate CalcLang"
                                               Scott.html (renderHtml targetTripleForm)
-                           Scott.get "/compile/:fileName" $ do
-                                                 newFileName <- Scott.pathParam "fileName" :: Scott.ActionM TL.Text
+                           Scott.get "/compile" $ do
+                                                 newFileName <- Scott.queryParam "fileInput" :: Scott.ActionM TL.Text
                                                  arch <- Scott.queryParam "arch" :: Scott.ActionM TL.Text
                                                  vendor <- Scott.queryParam "vendor" :: Scott.ActionM TL.Text
                                                  os <- Scott.queryParam "os" :: Scott.ActionM TL.Text
@@ -147,7 +158,8 @@ main = do
                                                  let fileName = TL.unpack newFileName
                                                  ioHist <- liftIO $ IORef.readIORef hist
                                                  let filteredHist = filter (not . isCommand) ioHist
-                                                 let astArray = StoreArray (length filteredHist) filteredHist
+                                                 _ <- liftIO $ putStrLn $ show filteredHist 
+                                                 let astArray = StoreArray (length filteredHist) (reverse filteredHist)
                                                  marshalledASTPtr <- liftIO $ marshallStorageArray astArray
                                                  fileNameC <- liftIO $ newCString fileName
                                                  targetTripleC <- liftIO $ newCString targetTriple
@@ -199,7 +211,7 @@ main = do
                                                                                                                    H.head $ do
                                                                                                                             H.title "Reloading Page"
                                                                                                                             H.link ! A.rel "stylesheet" ! A.href "css/StyleSheet.css"
-                                                                                                                            H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ (("0;url=/clp/" ++ x) :: Text))
+                                                                                                                            H.meta ! A.httpEquiv "refresh" ! A.content (toValue $ (("0;url=/clp/" <> (TL.pack x)) :: Text))
                                                                          QuitVal -> H.docTypeHtml $ do
                                                                                                     H.head $ do
                                                                                                              H.title "Reloading Page"

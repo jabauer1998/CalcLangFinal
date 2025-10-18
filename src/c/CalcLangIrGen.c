@@ -371,8 +371,8 @@ LLVMValueRef codeGenFunctionCall(FunctionCall* call, ScopeStack stack, LLVMBuild
   funcName[0] = call->name;
   funcName[1] = '\0';
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, funcName);
-  LLVMTypeRef myFuncType = LLVMTypeOf(myFunc);
   StoreArray* array = call->params;
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, array->length, 0);
   LLVMValueRef args[array->length];
   for(int i = 0; i < array->length; i++){
     args[i] = codeGenExpression(array->firstElem[i], stack, builder, parentFunc, mod, ctx);
