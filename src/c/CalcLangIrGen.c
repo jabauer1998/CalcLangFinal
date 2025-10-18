@@ -615,7 +615,9 @@ void codeGenNode(AstNode* node, ScopeStack stack, LLVMBuilderRef builder, LLVMVa
     for(int i = 0; i < size; i++){
       char name = genParamName(ptr->firstElem[i]);
       LLVMValueRef arg1 = LLVMGetParam(func, i);
-      addElemToVarTable(&stack, name, arg1);
+      LLVMValueRef ptrToy = LLVMBuildAlloca(builder, point, "");
+      LLVMBuildStore(builder, arg1, ptrToy);
+      addElemToVarTable(&stack, name, ptrToy);
     }
     pushScope(&stack);
     LLVMBasicBlockRef entryBlock = LLVMAppendBasicBlockInContext(ctx, func, "entry");
