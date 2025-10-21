@@ -2,11 +2,11 @@
 #define SCOPED_VAR_DEF_TABLE
 
 #include "CalcLangAstC.h"
-#include "VarDefLinkedList.h"
+#include "DefLinkedList.h"
 #include <llvm-c/Core.h>
 
 typedef struct VScope{
-  VarDefList list;
+  DefList list;
   struct VScope* next;
 } VarScope;
 

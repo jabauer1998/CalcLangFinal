@@ -70,12 +70,12 @@ int addElemTest(){
   ScopeStack stack = createVarTable();
   LLVMValueRef ref = LLVMConstInt(LLVMInt32Type(), 20, 1);
   pushScope(&stack);
-  addElemToVarTable(&stack, "elem", ref);
+  addElemToVarTable(&stack, 'e', ref);
   pushScope(&stack);
-  addElemToVarTable(&stack, "elem", ref);
-  addElemToVarTable(&stack, "elem2", ref);
+  addElemToVarTable(&stack, 'f', ref);
+  addElemToVarTable(&stack, 'g', ref);
   pushScope(&stack);
-  addElemToVarTable(&stack, "elem3", ref);
+  addElemToVarTable(&stack, 'h', ref);
   
   char* str = varTableToString(stack);
 
@@ -111,18 +111,18 @@ int getElemTest(){
   LLVMValueRef ref3 = LLVMConstInt(LLVMInt32Type(), 80, 1);
   
   pushScope(&stack);
-  addElemToVarTable(&stack, "elem", ref);
+  addElemToVarTable(&stack, 'e', ref);
   pushScope(&stack);
-  addElemToVarTable(&stack, "ele3", ref2);
-  addElemToVarTable(&stack, "elem2", ref3);
+  addElemToVarTable(&stack, 'f', ref2);
+  addElemToVarTable(&stack, 'g', ref3);
   pushScope(&stack);
-  addElemToVarTable(&stack, "elem3", ref);
+  addElemToVarTable(&stack, 'h', ref);
 
-  LLVMValueRef myRef = getElemFromVarTable(stack, "elem2");
+  LLVMValueRef myRef = getElemFromVarTable(stack, 'g');
 
   ASSERT_EQ(myRef, ref3, "Error ref in table is not equal");
 
-  LLVMValueRef myOtherRef = getElemFromVarScope(stack, "elem2");
+  LLVMValueRef myOtherRef = getElemFromVarScope(stack, 'f');
   ASSERT_EQ(myOtherRef, NULL, "Error ref in scope is not equal");
   
   popScope(&stack);

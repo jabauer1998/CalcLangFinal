@@ -296,7 +296,9 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, CalcLangValue* right){
     result->valType = IS_SET;
     result->valData.set = resultSet;
   } else {
-    perror("Invalid types found for CalcLangAddition Operation");
+    printf("Invalid types found for CalcLangAddition Operation");
+    printf("LeftType: %d\nRightType: %d\n", left->valType, right->valType);
+    fflush(stdout);
   }
 
   return result;
@@ -518,7 +520,9 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, CalcLangValue* right){
     result->valType = IS_SET;
     result->valData.set = resultSet;
   } else {
-    perror("Invalid types found for CalcLangAddition Operation");
+    printf("Invalid types found for CalcLangSubtraction Operation\n");
+    printf("LeftType: %d\nRightType: %d\n", left->valType, right->valType);
+    fflush(stdout);
   }
 
   freeCalcLangValue(left);
@@ -1659,11 +1663,33 @@ CalcLangValue* copyValue(CalcLangValue* val){
   if(val == NULL)
     return NULL;
 
-  int size = sizeof(CalcLangValue);
-  CalcLangValue* newVal = malloc(size);
-  memcpy(newVal, val, size);
+  if(val->valType == IS_TUPLE){
+    CalcLangValue* newVal = malloc(sizeof(CalcLangValue));
+    newVal->valType = IS_TUPLE;
+    newVal->valData.tuple = malloc(sizeof(TupleValue));
+    newVal->valData.tuple->size = val->valData.tuple->size;
+    newVal->valData.tuple->list = malloc(sizeof(CalcLangValue*) * val->valData.tuple->size);
+    for(int i = 0; i < newVal->valData.set->size; i++){
+      newVal->valData.tuple->list[i] = copyValue(val->valData.tuple->list[i]);
+    }
+    return newVal;
+  } else if(val->valType == IS_SET){
+    CalcLangValue* newVal = malloc(sizeof(CalcLangValue));
+    newVal->valType = IS_SET;
+    newVal->valData.set = malloc(sizeof(SetValue));
+    newVal->valData.set->size = val->valData.set->size;
+    newVal->valData.set->list = malloc(sizeof(CalcLangValue*) * val->valData.set->size);
+    for(int i = 0; i < newVal->valData.set->size; i++){
+      newVal->valData.set->list[i] = copyValue(val->valData.set->list[i]);
+    }
+    return newVal;
+  } else {
+    int size = sizeof(CalcLangValue);
+    CalcLangValue* newVal = malloc(size);
+    memcpy(newVal, val, size);
 
-  return newVal;
+    return newVal;
+  }
 }
 
 void freeCalcLangValue(CalcLangValue* val){

@@ -9,7 +9,7 @@ ScopeStack createVarTable(){
 
 void freeScope(VarScope* stack){
   if(stack->list != NULL)
-    freeVarDefList(stack->list);
+    freeDefList(stack->list);
   free(stack);
 }
 
@@ -44,12 +44,12 @@ void freeVarTable(ScopeStack stack){
 }
 
 void addElemToVarTable(ScopeStack* stack, char name, LLVMValueRef ref){
-  addVarDef(&((*stack)->list), name, ref);
+  addDef(&((*stack)->list), name, ref);
 }
 
 LLVMValueRef getElemFromVarTable(ScopeStack stack, char name){
   for(VarScope* iterator = stack; iterator != NULL; iterator = iterator->next){
-    LLVMValueRef ref = getVarDef(iterator->list, name);
+    LLVMValueRef ref = getDef(iterator->list, name);
     if(ref != NULL)
       return ref;
   }
@@ -57,13 +57,13 @@ LLVMValueRef getElemFromVarTable(ScopeStack stack, char name){
 }
 
 LLVMValueRef getElemFromVarScope(ScopeStack stack, char name){
-  return getVarDef(stack->list, name);
+  return getDef(stack->list, name);
 }
 
 void varTableToStr(VarScope* scope, int size, char* str){
   for(VarScope* myScope = scope; myScope != NULL; myScope=myScope->next){
       strncat(str, "List: ", size);
-      varDefListToStr(myScope->list, size, str);
+      defListToStr(myScope->list, size, str);
       strncat(str, "\n|\nV\n", size);
   }
   strncat(str, "NULL", size);

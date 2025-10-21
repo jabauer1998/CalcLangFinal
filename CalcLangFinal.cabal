@@ -65,14 +65,14 @@ executable CCalcLang
                   
     install-includes: CalcLangAstC.h,
                       CalcLangCompiler.h,
-                      VarDefLinkedList.h,
+                      DefLinkedList.h,
                       ScopedVarDefTable.h,
                       CalcLangIrGen.h,
                       StringUtils.h
                       
     includes: CalcLangAstC.h,
               CalcLangCompiler.h,
-              VarDefLinkedList.h,
+              DefLinkedList.h,
               ScopedVarDefTable.h,
               CalcLangIrGen.h,
               StringUtils.h
@@ -88,7 +88,7 @@ executable CCalcLang
     c-sources:     src/c/StringUtils.c,
                    src/c/CalcLangAstC.c,
                    src/c/CalcLangCompiler.c,
-                   src/c/VarDefLinkedList.c,
+                   src/c/DefLinkedList.c,
                    src/c/ScopedVarDefTable.c,
                    src/c/CalcLangIrGen.c
 
@@ -125,14 +125,14 @@ executable ICalcLang
     
     install-includes: CalcLangAstC.h,
                       CalcLangCompiler.h,
-                      VarDefLinkedList.h,
+                      DefLinkedList.h,
                       ScopedVarDefTable.h,
                       CalcLangIrGen.h,
                       StringUtils.h
                       
     includes: CalcLangAstC.h,
               CalcLangCompiler.h,
-              VarDefLinkedList.h,
+              DefLinkedList.h,
               ScopedVarDefTable.h,
               CalcLangIrGen.h,
               StringUtils.h
@@ -145,7 +145,7 @@ executable ICalcLang
     c-sources:     src/c/StringUtils.c,
                    src/c/CalcLangAstC.c,
                    src/c/CalcLangCompiler.c,
-                   src/c/VarDefLinkedList.c,
+                   src/c/DefLinkedList.c,
                    src/c/ScopedVarDefTable.c,
                    src/c/CalcLangIrGen.c
 
@@ -166,14 +166,14 @@ executable WCalcLang
 
     install-includes: CalcLangAstC.h,
                           CalcLangCompiler.h,
-                          VarDefLinkedList.h,
+                          DefLinkedList.h,
                           ScopedVarDefTable.h,
                           CalcLangIrGen.h,
                           StringUtils.h
 
     includes: CalcLangAstC.h,
               CalcLangCompiler.h,
-              VarDefLinkedList.h,
+              DefLinkedList.h,
               ScopedVarDefTable.h,
               CalcLangIrGen.h,
               StringUtils.h
@@ -206,7 +206,7 @@ executable WCalcLang
     c-sources: src/c/StringUtils.c,
                src/c/CalcLangAstC.c,
                src/c/CalcLangCompiler.c,
-               src/c/VarDefLinkedList.c,
+               src/c/DefLinkedList.c,
                src/c/ScopedVarDefTable.c,
                src/c/CalcLangIrGen.c
 
