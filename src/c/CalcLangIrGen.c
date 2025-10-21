@@ -72,6 +72,7 @@ LLVMModuleRef codeGen(StoreArray* arr){
   LLVMTypeRef mainParamTypes[] = {intType, LLVMPointerType(charPtrType, 0)};
   LLVMTypeRef mainFunctionType = LLVMFunctionType(intType, mainParamTypes, 2, 0); // 2 parameters, not variadic
   LLVMValueRef mainFunction = LLVMAddFunction(module, "main", mainFunctionType);
+  LLVMSetLinkage(mainFunction, LLVMExternalLinkage);
   LLVMBasicBlockRef entryBlock = LLVMAppendBasicBlockInContext(ctx, mainFunction, "entry");
   LLVMPositionBuilderAtEnd(builder, entryBlock);
   

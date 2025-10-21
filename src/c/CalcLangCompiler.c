@@ -32,6 +32,11 @@ void processASTList(StoreArray* storeArray, char* output){
   if(broken){
     perror("Linked Module has Error: \n");
     perror(error);
+    if (LLVMPrintModuleToFile(mod, output, &error) != 0) {
+        fprintf(stderr, "Error writing LLVM IR to file: %s\n", error);
+	LLVMDisposeMessage(error);
+        exit(EXIT_FAILURE);
+    }
     LLVMDisposeMessage(error);
   } else {
     LLVMTargetRef target;
