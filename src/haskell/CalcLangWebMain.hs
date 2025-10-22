@@ -125,7 +125,7 @@ main = do
                                                                                               H.h1 "Choose Target Triple"
                                                                                               H.form ! A.action "/compile" ! A.method "get" $ do
                                                                                                                                               H.label ! A.for "fileInput" $ "Enter File Name:"
-                                                                                                                                              H.input ! A.type_ "text" ! A.id "fileInput" ! A.name "fileInput" ! A.placeholder (toValue fileName)
+                                                                                                                                              H.input ! A.type_ "text" ! A.id "fileInput" ! A.name "fileInput" ! A.value (toValue fileName)
                                                                                                                                               H.label ! A.for "arch" $ "Architecture:"
                                                                                                                                               H.select ! A.id "arch" ! A.name "arch" $ do
                                                                                                                                                 H.option ! A.value "x86_64" $ "x86_64"

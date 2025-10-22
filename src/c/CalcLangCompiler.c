@@ -98,9 +98,6 @@ void processASTList(StoreArray* storeArray, char* output){
       LLVMInitializeAllTargetMCs();
       LLVMInitializeAllAsmPrinters();
       LLVMInitializeAllAsmParsers();
-
-      char* triple = LLVMGetDefaultTargetTriple();
-      printf("%s", triple);
       
       // Get the target from the triple
       if (LLVMGetTargetFromTriple(triple, &target, &error)) {
@@ -115,8 +112,11 @@ void processASTList(StoreArray* storeArray, char* output){
         return;
       }
 
+      printf("Output is %s", output);
+
       char myData[1000];
       myData[0] = '\0';
+      
       char* beg = "clang -static -o ";
       strncat(myData, beg, strlen(beg));
       strncat(myData, output, strlen(output));
