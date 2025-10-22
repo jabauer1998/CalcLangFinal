@@ -49,7 +49,10 @@ CalcLangValue* setCalcLangValue(CalcLangValue** value, int size){
   toRet->valType = IS_SET;
   toRet->valData.set = malloc(sizeof(SetValue));
   toRet->valData.set->size = size;
-  toRet->valData.set->list = value;
+  toRet->valData.set->list = malloc(sizeof(CalcLangValue*) * size);
+  for(int i = 0; i < size; i++){
+    toRet->valData.set->list[i] = copyValue(value[i]);
+  }
   return toRet;
 }
 
@@ -59,7 +62,7 @@ CalcLangValue* tupleCalcLangValue(CalcLangValue** value, int size){
   toRet->valData.set = malloc(sizeof(TupleValue));
   toRet->valData.set->size = size;
   toRet->valData.set->list = value;
-  return toRet;
+  return copyValue(toRet);
 }
 
 bool toBool(CalcLangValue* val){
@@ -301,6 +304,13 @@ CalcLangValue* addCalcLangValues(CalcLangValue* left, CalcLangValue* right){
     fflush(stdout);
   }
 
+  if(left != right){
+    freeCalcLangValue(left);
+    freeCalcLangValue(right);
+  } else {
+    freeCalcLangValue(left);
+  }
+  
   return result;
 }
 
@@ -525,8 +535,14 @@ CalcLangValue* subCalcLangValues(CalcLangValue* left, CalcLangValue* right){
     fflush(stdout);
   }
 
-  freeCalcLangValue(left);
-  freeCalcLangValue(right);
+  /*
+  if(left != right){
+    freeCalcLangValue(left);
+    freeCalcLangValue(right);
+  } else {
+    freeCalcLangValue(left);
+  }
+  */
 
   return result;
 }
@@ -770,10 +786,15 @@ CalcLangValue* multCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   } else {
     perror("Invalid types found for CalcLangAddition Operation");
   }
-  
+
+  /*
+  if(left != right){
     freeCalcLangValue(left);
-  
     freeCalcLangValue(right);
+  } else {
+    freeCalcLangValue(left);
+  }
+  */
 
   return result;
 }
@@ -1017,9 +1038,14 @@ CalcLangValue* divCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   }
 
   
+  /*
+  if(left != right){
     freeCalcLangValue(left);
-  
     freeCalcLangValue(right);
+  } else {
+    freeCalcLangValue(left);
+  }
+  */
 
   return result;
 }
@@ -1263,10 +1289,14 @@ CalcLangValue* powCalcLangValues(CalcLangValue* left, CalcLangValue* right){
     perror("Invalid types found for CalcLangAddition Operation");
   }
 
-  
+  /*
+  if(left != right){
     freeCalcLangValue(left);
-  
     freeCalcLangValue(right);
+  } else {
+    freeCalcLangValue(left);
+  }
+  */
 
   return result;
 }
@@ -1294,8 +1324,14 @@ CalcLangValue* dotProductVals(CalcLangValue* left, CalcLangValue* right){
     perror("Invalid type for dot product expected Tuple and Tuple");
   }
 
-  freeCalcLangValue(left);
-  freeCalcLangValue(right);
+  /*
+  if(left != right){
+    freeCalcLangValue(left);
+    freeCalcLangValue(right);
+  } else {
+    freeCalcLangValue(left);
+  }
+  */
   
   return NULL;
 }
@@ -1384,9 +1420,14 @@ CalcLangValue* equalsCalcLangValues(CalcLangValue* left, CalcLangValue* right){
   }
 
   
+  /*
+  if(left != right){
     freeCalcLangValue(left);
-  
     freeCalcLangValue(right);
+  } else {
+    freeCalcLangValue(left);
+  }
+  */
 
   return result;
 }
@@ -1417,11 +1458,15 @@ CalcLangValue* lessThenCalcLangValues(CalcLangValue* left, CalcLangValue* right)
       perror("Invalid types found for CalcLangAddition Operation");
       return NULL;
   }
-
   
+  /*
+  if(left != right){
     freeCalcLangValue(left);
-  
     freeCalcLangValue(right);
+  } else {
+    freeCalcLangValue(left);
+  }
+  */
 
   return result;
 }
@@ -1452,10 +1497,14 @@ CalcLangValue* greaterThenCalcLangValues(CalcLangValue* left, CalcLangValue* rig
     perror("Invalid types found for CalcLangAddition Operation");
   }
 
-  
+  /*
+  if(left != right){
     freeCalcLangValue(left);
-  
     freeCalcLangValue(right);
+  } else {
+    freeCalcLangValue(left);
+  }
+  */
 
   return result;
 }
@@ -1485,11 +1534,15 @@ CalcLangValue* lessThenOrEqualToCalcLangValues(CalcLangValue* left, CalcLangValu
   } else {
     perror("Invalid types found for CalcLangAddition Operation");
   }
-
   
+  /*
+  if(left != right){
     freeCalcLangValue(left);
-  
     freeCalcLangValue(right);
+  } else {
+    freeCalcLangValue(left);
+  }
+  */
 
   return result;
 }
@@ -1521,9 +1574,14 @@ CalcLangValue* greaterThenOrEqualToCalcLangValues(CalcLangValue* left, CalcLangV
     return NULL;
   }
 
+  /*
+  if(left != right){
     freeCalcLangValue(left);
-  
     freeCalcLangValue(right);
+  } else {
+    freeCalcLangValue(left);
+  }
+  */
 
   return result;
 }
@@ -1565,7 +1623,7 @@ CalcLangValue* notCalcLangValue(CalcLangValue* toNot){
     perror("Invalid type for not operation");
   }
 
-  freeCalcLangValue(toNot);
+  //freeCalcLangValue(toNot);
 
   return result;
 }
@@ -1610,7 +1668,7 @@ CalcLangValue* negateCalcLangValue(CalcLangValue* toNot){
     perror("Invalid type for negate operation");
   }
 
-  freeCalcLangValue(toNot);
+  //freeCalcLangValue(toNot);
 
   return result;
 }
@@ -1655,7 +1713,8 @@ void printValue(CalcLangValue* val){
     }
     printf("}");
   } else {
-    perror("Cant print type for specified CalcLangValue!!!");
+    printf("Cant print type for specified CalcLangValue!!!");
+    printf("ValType is %d", val->valType);
   }
 }
 

@@ -130,7 +130,7 @@ LLVMValueRef codeGenEqualsOperation(EqualOperation* op, ScopeStack stack, DefLis
 LLVMValueRef codeGenLessThenOrEqualsOperation(LessThenOrEqualsOperation* op, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, funcDefs, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, funcDefs, builder, parentFunc, mod, ctx);
-  LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "lessThenOrEqualsCalcLangValues");
+  LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "lessThenOrEqualToCalcLangValues");
   LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
   return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
@@ -139,7 +139,7 @@ LLVMValueRef codeGenLessThenOrEqualsOperation(LessThenOrEqualsOperation* op, Sco
 LLVMValueRef codeGenGreaterThenOrEqualsOperation(GreaterThenOrEqualsOperation* op, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
   LLVMValueRef leftRef = codeGenExpression(op->left, stack, funcDefs, builder, parentFunc, mod, ctx);
   LLVMValueRef rightRef = codeGenExpression(op->right, stack, funcDefs, builder, parentFunc, mod, ctx);
-  LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "greaterThenOrEqualsCalcLangValues");
+  LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "greaterThenOrEqualToCalcLangValues");
   LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { leftRef, rightRef };
   return LLVMBuildCall2(builder, myFuncType, myFunc, args, 2, "");
@@ -337,7 +337,12 @@ LLVMValueRef codeGenIdentifierValue(IdentAst* ident, ScopeStack stack, DefList f
   }
   LLVMTypeRef myType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
   LLVMTypeRef point = LLVMPointerType(myType, 0);
-  LLVMValueRef res = LLVMBuildLoad2(builder, point, value, "");
+  LLVMValueRef copyFunc = LLVMGetNamedFunction(mod, "copyValue");
+  LLVMTypeRef copyFuncType = createFunctionPointerType(ctx, 1, 0);
+  LLVMValueRef args[] = { value };
+  LLVMValueRef callRes = LLVMBuildCall2(builder, copyFuncType, copyFunc, args, 1, "");
+  LLVMValueRef res = LLVMBuildLoad2(builder, point, callRes, "");
+  
   return res;
 }
 
@@ -370,17 +375,20 @@ LLVMValueRef codeGenPercentValue(PercentAst* percent, ScopeStack stack, DefList 
 }
 
 LLVMValueRef codeGenFunctionCall(FunctionCall* call, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
-  char funcName[2];
-  funcName[0] = call->name;
-  funcName[1] = '\0';
-  LLVMValueRef myFunc = LLVMGetNamedFunction(mod, funcName);
+  LLVMValueRef funcDef = getDef(funcDefs, call->name);
+  if(funcDef == NULL){
+    char funcName[2];
+    funcName[0] = call->name;
+    funcName[1] = '\0';
+    funcDef = LLVMGetNamedFunction(mod, funcName);
+  }
   StoreArray* array = call->params;
   LLVMTypeRef myFuncType = createFunctionPointerType(ctx, array->length, 0);
   LLVMValueRef args[array->length];
   for(int i = 0; i < array->length; i++){
     args[i] = codeGenExpression(array->firstElem[i], stack, funcDefs,  builder, parentFunc, mod, ctx);
   }
-  return LLVMBuildCall2(builder, myFuncType, myFunc, args, array->length, "");
+  return LLVMBuildCall2(builder, myFuncType, funcDef, args, array->length, "");
 }
 
 LLVMValueRef codeGenNegateOperation(NegateOperation* negate, ScopeStack stack, DefList funcDefs,  LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMModuleRef mod, LLVMContextRef ctx){
@@ -425,10 +433,12 @@ LLVMValueRef codeGenIfExpression(IfExpr* ifStat, ScopeStack stack, DefList funcD
   LLVMPositionBuilderAtEnd(builder, thenBlock);
   LLVMValueRef thenResult = codeGenExpression(ifStat->ifTrue, stack, funcDefs, builder, func, mod, ctx);
   LLVMBuildBr(builder, mergeBlock);
+  thenBlock = LLVMGetInsertBlock(builder);
 
   LLVMPositionBuilderAtEnd(builder, elseBlock);
   LLVMValueRef elseResult = codeGenExpression(ifStat->ifFalse, stack, funcDefs, builder, func, mod, ctx);
   LLVMBuildBr(builder, mergeBlock);
+  elseBlock = LLVMGetInsertBlock(builder);
 
   LLVMPositionBuilderAtEnd(builder, mergeBlock);
   LLVMValueRef phiNode = LLVMBuildPhi(builder, point, "");
@@ -616,6 +626,8 @@ void codeGenNode(AstNode* node, ScopeStack stack, DefList funcDefs, LLVMBuilderR
     myName[1] = '\0';
     LLVMValueRef func = LLVMAddFunction(mod, myName, funcType);
     LLVMSetLinkage(func, LLVMExternalLinkage);
+
+    addDef(&funcDefs, name, func);
     
     LLVMBasicBlockRef entryBlock = LLVMAppendBasicBlockInContext(ctx, func, "entry");
     LLVMPositionBuilderAtEnd(builder, entryBlock);

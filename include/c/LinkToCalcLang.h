@@ -5,11 +5,11 @@
 
 #define IS_INT 0
 #define IS_REAL 1
-#define IS_DOLLAR 3
-#define IS_PERCENT 4
-#define IS_BOOL 5
-#define IS_SET 6
-#define IS_TUPLE 7
+#define IS_DOLLAR 2
+#define IS_PERCENT 3
+#define IS_BOOL 4
+#define IS_SET 5
+#define IS_TUPLE 6
 
 struct CalcLangVal;
 
@@ -47,10 +47,10 @@ CalcLangValue* dotProductCalcLangValues(CalcLangValue* left, CalcLangValue* righ
 CalcLangValue* equalsCalcLangValues(CalcLangValue* left, CalcLangValue* right);
 CalcLangValue* lessThenCalcLangValues(CalcLangValue* left, CalcLangValue* right);
 CalcLangValue* greaterThenCalcLangValues(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* lessThenOrEqualToCalcLangValue(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* greaterThenOrEqualToCalcLangValue(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* notCalcLangValue(CalcLangValue* value);
-CalcLangValue* negateCalcLangValue(CalcLangValue* value);
+CalcLangValue* lessThenOrEqualToCalcLangValues(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* greaterThenOrEqualToCalcLangValues(CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* notCalcLangValues(CalcLangValue* value);
+CalcLangValue* negateCalcLangValues(CalcLangValue* value);
 CalcLangValue* integerCalcLangValue(int input);
 CalcLangValue* realCalcLangValue(float input);
 CalcLangValue* dollarCalcLangValue(float input);
