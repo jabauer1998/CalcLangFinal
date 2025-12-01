@@ -1625,3 +1625,55 @@ void getInput(){
   }
 }
 
+CalcLangValue* copyValue(CalcLangValue* val){
+  if(val == NULL)
+    return NULL;
+
+  if(val->valType == IS_TUPLE){
+    CalcLangValue* newVal = malloc(sizeof(CalcLangValue));
+    newVal->valType = IS_TUPLE;
+    newVal->valData.tuple = malloc(sizeof(TupleValue));
+    newVal->valData.tuple->size = val->valData.tuple->size;
+    newVal->valData.tuple->list = malloc(sizeof(CalcLangValue*) * val->valData.tuple->size);
+    for(int i = 0; i < newVal->valData.set->size; i++){
+      newVal->valData.tuple->list[i] = copyValue(val->valData.tuple->list[i]);
+    }
+    return newVal;
+  } else if(val->valType == IS_SET){
+    CalcLangValue* newVal = malloc(sizeof(CalcLangValue));
+    newVal->valType = IS_SET;
+    newVal->valData.set = malloc(sizeof(SetValue));
+    newVal->valData.set->size = val->valData.set->size;
+    newVal->valData.set->list = malloc(sizeof(CalcLangValue*) * val->valData.set->size);
+    for(int i = 0; i < newVal->valData.set->size; i++){
+      newVal->valData.set->list[i] = copyValue(val->valData.set->list[i]);
+    }
+    return newVal;
+  } else {
+    int size = sizeof(CalcLangValue);
+    CalcLangValue* newVal = malloc(size);
+    memcpy(newVal, val, size);
+
+    return newVal;
+  }
+}
+
+void freeCalcLangValue(CalcLangValue* val){
+  if(val != NULL){
+    if(val->valType == IS_TUPLE){
+      TupleValue* tup = val->valData.tuple;
+      for(int i = 0; i < tup->size; i++){
+	freeCalcLangValue(tup->list[i]);
+      }
+      free(tup);
+    } else if(val->valType == IS_SET){
+      SetValue* set = val->valData.set;
+      for(int i = 0; i < set->size; i++){
+	freeCalcLangValue(set->list[i]);
+      }
+      free(set);
+    }
+    free(val);
+  }
+}
+

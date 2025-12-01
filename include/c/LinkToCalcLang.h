@@ -60,6 +60,8 @@ CalcLangValue* tupleCalcLangValue(LLVMIntArena* arena, CalcLangValue**values, in
 CalcLangValue* setCalcLangValue(LLVMIntArena* arena, CalcLangValue**values, int size);
 bool toBool(CalcLangValue* val);
 void printValue(CalcLangValue* val);
+CalcLangValue* copyValue(CalcLangValue* val);
+void freeCalcLangValue(CalcLangValue* val);
 void printString(char* str);
 void getInput();
 

@@ -337,7 +337,7 @@ define dso_local zeroext i1 @toBool(ptr noundef %0) #0 {
   br label %54
 
 53:                                               ; preds = %43
-  call void @perror(ptr noundef @.str) #4
+  call void @perror(ptr noundef @.str) #6
   store i1 true, ptr %2, align 1
   br label %54
 
@@ -720,7 +720,7 @@ define dso_local ptr @addCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   br label %288
 
 287:                                              ; preds = %217
-  call void @perror(ptr noundef @.str.1) #4
+  call void @perror(ptr noundef @.str.1) #6
   store ptr null, ptr %4, align 8
   br label %1415
 
@@ -1522,7 +1522,7 @@ define dso_local ptr @addCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   br label %874
 
 873:                                              ; preds = %803
-  call void @perror(ptr noundef @.str.1) #4
+  call void @perror(ptr noundef @.str.1) #6
   store ptr null, ptr %4, align 8
   br label %1415
 
@@ -2684,7 +2684,7 @@ define dso_local ptr @subCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   br label %288
 
 287:                                              ; preds = %217
-  call void @perror(ptr noundef @.str.1) #4
+  call void @perror(ptr noundef @.str.1) #6
   store ptr null, ptr %4, align 8
   br label %1415
 
@@ -3486,7 +3486,7 @@ define dso_local ptr @subCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   br label %874
 
 873:                                              ; preds = %803
-  call void @perror(ptr noundef @.str.1) #4
+  call void @perror(ptr noundef @.str.1) #6
   store ptr null, ptr %4, align 8
   br label %1415
 
@@ -4858,7 +4858,7 @@ define dso_local ptr @multCalcLangValues(ptr noundef %0, ptr noundef %1, ptr nou
   br label %446
 
 445:                                              ; preds = %375
-  call void @perror(ptr noundef @.str.1) #4
+  call void @perror(ptr noundef @.str.1) #6
   store ptr null, ptr %4, align 8
   br label %1570
 
@@ -5660,7 +5660,7 @@ define dso_local ptr @multCalcLangValues(ptr noundef %0, ptr noundef %1, ptr nou
   br label %1032
 
 1031:                                             ; preds = %961
-  call void @perror(ptr noundef @.str.1) #4
+  call void @perror(ptr noundef @.str.1) #6
   store ptr null, ptr %4, align 8
   br label %1570
 
@@ -6356,7 +6356,7 @@ define dso_local ptr @multCalcLangValues(ptr noundef %0, ptr noundef %1, ptr nou
   br label %1538
 
 1537:                                             ; preds = %1479, %1474
-  call void @perror(ptr noundef @.str.2) #4
+  call void @perror(ptr noundef @.str.2) #6
   br label %1538
 
 1538:                                             ; preds = %1537, %1531
@@ -7015,7 +7015,7 @@ define dso_local ptr @divCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   br label %425
 
 424:                                              ; preds = %354
-  call void @perror(ptr noundef @.str.1) #4
+  call void @perror(ptr noundef @.str.1) #6
   store ptr null, ptr %4, align 8
   br label %1548
 
@@ -7817,7 +7817,7 @@ define dso_local ptr @divCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   br label %1011
 
 1010:                                             ; preds = %940
-  call void @perror(ptr noundef @.str.1) #4
+  call void @perror(ptr noundef @.str.1) #6
   store ptr null, ptr %4, align 8
   br label %1548
 
@@ -8513,7 +8513,7 @@ define dso_local ptr @divCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   br label %1517
 
 1516:                                             ; preds = %1458, %1453
-  call void @perror(ptr noundef @.str.2) #4
+  call void @perror(ptr noundef @.str.2) #6
   br label %1517
 
 1517:                                             ; preds = %1516, %1510
@@ -8721,7 +8721,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %91 = getelementptr inbounds %struct.CalcLangVal, ptr %90, i32 0, i32 1
   %92 = load i32, ptr %91, align 8
   %93 = sitofp i32 %92 to double
-  %94 = call double @pow(double noundef %89, double noundef %93) #5
+  %94 = call double @pow(double noundef %89, double noundef %93) #7
   %95 = fptosi double %94 to i32
   %96 = load ptr, ptr %8, align 8
   %97 = getelementptr inbounds %struct.CalcLangVal, ptr %96, i32 0, i32 1
@@ -8752,7 +8752,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %114 = load ptr, ptr %7, align 8
   %115 = getelementptr inbounds %struct.CalcLangVal, ptr %114, i32 0, i32 1
   %116 = load double, ptr %115, align 8
-  %117 = call double @pow(double noundef %113, double noundef %116) #5
+  %117 = call double @pow(double noundef %113, double noundef %116) #7
   %118 = load ptr, ptr %8, align 8
   %119 = getelementptr inbounds %struct.CalcLangVal, ptr %118, i32 0, i32 1
   store double %117, ptr %119, align 8
@@ -8783,7 +8783,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %137 = load ptr, ptr %7, align 8
   %138 = getelementptr inbounds %struct.CalcLangVal, ptr %137, i32 0, i32 1
   %139 = load double, ptr %138, align 8
-  %140 = call double @pow(double noundef %136, double noundef %139) #5
+  %140 = call double @pow(double noundef %136, double noundef %139) #7
   %141 = load ptr, ptr %8, align 8
   %142 = getelementptr inbounds %struct.CalcLangVal, ptr %141, i32 0, i32 1
   store double %140, ptr %142, align 8
@@ -8814,7 +8814,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %160 = getelementptr inbounds %struct.CalcLangVal, ptr %159, i32 0, i32 1
   %161 = load i32, ptr %160, align 8
   %162 = sitofp i32 %161 to double
-  %163 = call double @pow(double noundef %158, double noundef %162) #5
+  %163 = call double @pow(double noundef %158, double noundef %162) #7
   %164 = load ptr, ptr %8, align 8
   %165 = getelementptr inbounds %struct.CalcLangVal, ptr %164, i32 0, i32 1
   store double %163, ptr %165, align 8
@@ -8845,7 +8845,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %183 = getelementptr inbounds %struct.CalcLangVal, ptr %182, i32 0, i32 1
   %184 = load i32, ptr %183, align 8
   %185 = sitofp i32 %184 to double
-  %186 = call double @pow(double noundef %181, double noundef %185) #5
+  %186 = call double @pow(double noundef %181, double noundef %185) #7
   %187 = load ptr, ptr %8, align 8
   %188 = getelementptr inbounds %struct.CalcLangVal, ptr %187, i32 0, i32 1
   store double %186, ptr %188, align 8
@@ -8876,7 +8876,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %206 = load ptr, ptr %7, align 8
   %207 = getelementptr inbounds %struct.CalcLangVal, ptr %206, i32 0, i32 1
   %208 = load double, ptr %207, align 8
-  %209 = call double @pow(double noundef %205, double noundef %208) #5
+  %209 = call double @pow(double noundef %205, double noundef %208) #7
   %210 = load ptr, ptr %8, align 8
   %211 = getelementptr inbounds %struct.CalcLangVal, ptr %210, i32 0, i32 1
   store double %209, ptr %211, align 8
@@ -8906,7 +8906,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %228 = load ptr, ptr %7, align 8
   %229 = getelementptr inbounds %struct.CalcLangVal, ptr %228, i32 0, i32 1
   %230 = load double, ptr %229, align 8
-  %231 = call double @pow(double noundef %227, double noundef %230) #5
+  %231 = call double @pow(double noundef %227, double noundef %230) #7
   %232 = load ptr, ptr %8, align 8
   %233 = getelementptr inbounds %struct.CalcLangVal, ptr %232, i32 0, i32 1
   store double %231, ptr %233, align 8
@@ -8936,7 +8936,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %250 = load ptr, ptr %7, align 8
   %251 = getelementptr inbounds %struct.CalcLangVal, ptr %250, i32 0, i32 1
   %252 = load double, ptr %251, align 8
-  %253 = call double @pow(double noundef %249, double noundef %252) #5
+  %253 = call double @pow(double noundef %249, double noundef %252) #7
   %254 = load ptr, ptr %8, align 8
   %255 = getelementptr inbounds %struct.CalcLangVal, ptr %254, i32 0, i32 1
   store double %253, ptr %255, align 8
@@ -8967,7 +8967,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %273 = getelementptr inbounds %struct.CalcLangVal, ptr %272, i32 0, i32 1
   %274 = load i32, ptr %273, align 8
   %275 = sitofp i32 %274 to double
-  %276 = call double @pow(double noundef %271, double noundef %275) #5
+  %276 = call double @pow(double noundef %271, double noundef %275) #7
   %277 = load ptr, ptr %8, align 8
   %278 = getelementptr inbounds %struct.CalcLangVal, ptr %277, i32 0, i32 1
   store double %276, ptr %278, align 8
@@ -8998,7 +8998,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %296 = load ptr, ptr %7, align 8
   %297 = getelementptr inbounds %struct.CalcLangVal, ptr %296, i32 0, i32 1
   %298 = load double, ptr %297, align 8
-  %299 = call double @pow(double noundef %295, double noundef %298) #5
+  %299 = call double @pow(double noundef %295, double noundef %298) #7
   %300 = load ptr, ptr %8, align 8
   %301 = getelementptr inbounds %struct.CalcLangVal, ptr %300, i32 0, i32 1
   store double %299, ptr %301, align 8
@@ -9028,7 +9028,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %318 = load ptr, ptr %7, align 8
   %319 = getelementptr inbounds %struct.CalcLangVal, ptr %318, i32 0, i32 1
   %320 = load double, ptr %319, align 8
-  %321 = call double @pow(double noundef %317, double noundef %320) #5
+  %321 = call double @pow(double noundef %317, double noundef %320) #7
   %322 = load ptr, ptr %8, align 8
   %323 = getelementptr inbounds %struct.CalcLangVal, ptr %322, i32 0, i32 1
   store double %321, ptr %323, align 8
@@ -9058,7 +9058,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %340 = load ptr, ptr %7, align 8
   %341 = getelementptr inbounds %struct.CalcLangVal, ptr %340, i32 0, i32 1
   %342 = load double, ptr %341, align 8
-  %343 = call double @pow(double noundef %339, double noundef %342) #5
+  %343 = call double @pow(double noundef %339, double noundef %342) #7
   %344 = load ptr, ptr %8, align 8
   %345 = getelementptr inbounds %struct.CalcLangVal, ptr %344, i32 0, i32 1
   store double %343, ptr %345, align 8
@@ -9088,7 +9088,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   %362 = load ptr, ptr %7, align 8
   %363 = getelementptr inbounds %struct.CalcLangVal, ptr %362, i32 0, i32 1
   %364 = load double, ptr %363, align 8
-  %365 = call double @pow(double noundef %361, double noundef %364) #5
+  %365 = call double @pow(double noundef %361, double noundef %364) #7
   %366 = load ptr, ptr %8, align 8
   %367 = getelementptr inbounds %struct.CalcLangVal, ptr %366, i32 0, i32 1
   store double %365, ptr %367, align 8
@@ -9201,7 +9201,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   br label %449
 
 448:                                              ; preds = %378
-  call void @perror(ptr noundef @.str.1) #4
+  call void @perror(ptr noundef @.str.1) #6
   store ptr null, ptr %4, align 8
   br label %1573
 
@@ -10003,7 +10003,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   br label %1035
 
 1034:                                             ; preds = %964
-  call void @perror(ptr noundef @.str.1) #4
+  call void @perror(ptr noundef @.str.1) #6
   store ptr null, ptr %4, align 8
   br label %1573
 
@@ -10699,7 +10699,7 @@ define dso_local ptr @powCalcLangValues(ptr noundef %0, ptr noundef %1, ptr noun
   br label %1541
 
 1540:                                             ; preds = %1482, %1477
-  call void @perror(ptr noundef @.str.2) #4
+  call void @perror(ptr noundef @.str.2) #6
   br label %1541
 
 1541:                                             ; preds = %1540, %1534
@@ -10922,14 +10922,14 @@ define dso_local ptr @dotProductVals(ptr noundef %0, ptr noundef %1, ptr noundef
   br label %86
 
 82:                                               ; preds = %31
-  call void @perror(ptr noundef @.str.5) #4
+  call void @perror(ptr noundef @.str.5) #6
   br label %83
 
 83:                                               ; preds = %82
   br label %85
 
 84:                                               ; preds = %26, %21
-  call void @perror(ptr noundef @.str.6) #4
+  call void @perror(ptr noundef @.str.6) #6
   br label %85
 
 85:                                               ; preds = %84, %83
@@ -11441,7 +11441,7 @@ define dso_local ptr @equalsCalcLangValues(ptr noundef %0, ptr noundef %1, ptr n
   br label %370
 
 369:                                              ; preds = %306
-  call void @perror(ptr noundef @.str.1) #4
+  call void @perror(ptr noundef @.str.1) #6
   store ptr null, ptr %4, align 8
   br label %461
 
@@ -11555,7 +11555,7 @@ define dso_local ptr @equalsCalcLangValues(ptr noundef %0, ptr noundef %1, ptr n
   br label %445
 
 444:                                              ; preds = %381
-  call void @perror(ptr noundef @.str.1) #4
+  call void @perror(ptr noundef @.str.1) #6
   store ptr null, ptr %4, align 8
   br label %461
 
@@ -11563,7 +11563,7 @@ define dso_local ptr @equalsCalcLangValues(ptr noundef %0, ptr noundef %1, ptr n
   br label %447
 
 446:                                              ; preds = %376, %371
-  call void @perror(ptr noundef @.str.2) #4
+  call void @perror(ptr noundef @.str.2) #6
   store ptr null, ptr %4, align 8
   br label %461
 
@@ -11829,7 +11829,7 @@ define dso_local ptr @lessThenCalcLangValues(ptr noundef %0, ptr noundef %1, ptr
   br label %159
 
 158:                                              ; preds = %140, %135
-  call void @perror(ptr noundef @.str.2) #4
+  call void @perror(ptr noundef @.str.2) #6
   store ptr null, ptr %4, align 8
   br label %166
 
@@ -12077,7 +12077,7 @@ define dso_local ptr @greaterThenCalcLangValues(ptr noundef %0, ptr noundef %1, 
   br label %162
 
 161:                                              ; preds = %142, %137
-  call void @perror(ptr noundef @.str.2) #4
+  call void @perror(ptr noundef @.str.2) #6
   br label %162
 
 162:                                              ; preds = %161, %147
@@ -12324,7 +12324,7 @@ define dso_local ptr @lessThenOrEqualToCalcLangValues(ptr noundef %0, ptr nounde
   br label %162
 
 161:                                              ; preds = %142, %137
-  call void @perror(ptr noundef @.str.2) #4
+  call void @perror(ptr noundef @.str.2) #6
   br label %162
 
 162:                                              ; preds = %161, %147
@@ -12571,7 +12571,7 @@ define dso_local ptr @greaterThenOrEqualToCalcLangValues(ptr noundef %0, ptr nou
   br label %162
 
 161:                                              ; preds = %142, %137
-  call void @perror(ptr noundef @.str.2) #4
+  call void @perror(ptr noundef @.str.2) #6
   store ptr null, ptr %4, align 8
   br label %169
 
@@ -12870,7 +12870,7 @@ define dso_local ptr @notCalcLangValue(ptr noundef %0, ptr noundef %1) #0 {
   br label %209
 
 202:                                              ; preds = %132
-  call void @perror(ptr noundef @.str.7) #4
+  call void @perror(ptr noundef @.str.7) #6
   br label %203
 
 203:                                              ; preds = %202
@@ -13181,7 +13181,7 @@ define dso_local ptr @negateCalcLangValue(ptr noundef %0, ptr noundef %1) #0 {
   br label %220
 
 212:                                              ; preds = %142
-  call void @perror(ptr noundef @.str.8) #4
+  call void @perror(ptr noundef @.str.8) #6
   br label %213
 
 213:                                              ; preds = %212
@@ -13508,12 +13508,349 @@ define dso_local void @getInput() #0 {
 
 declare i32 @getchar() #1
 
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local ptr @copyValue(ptr noundef %0) #0 {
+  %2 = alloca ptr, align 8
+  %3 = alloca ptr, align 8
+  %4 = alloca ptr, align 8
+  %5 = alloca i32, align 4
+  %6 = alloca ptr, align 8
+  %7 = alloca i32, align 4
+  %8 = alloca i32, align 4
+  %9 = alloca ptr, align 8
+  store ptr %0, ptr %3, align 8
+  %10 = load ptr, ptr %3, align 8
+  %11 = icmp eq ptr %10, null
+  br i1 %11, label %12, label %13
+
+12:                                               ; preds = %1
+  store ptr null, ptr %2, align 8
+  br label %152
+
+13:                                               ; preds = %1
+  %14 = load ptr, ptr %3, align 8
+  %15 = getelementptr inbounds %struct.CalcLangVal, ptr %14, i32 0, i32 0
+  %16 = load i32, ptr %15, align 8
+  %17 = icmp eq i32 %16, 6
+  br i1 %17, label %18, label %78
+
+18:                                               ; preds = %13
+  %19 = call noalias ptr @malloc(i64 noundef 16) #8
+  store ptr %19, ptr %4, align 8
+  %20 = load ptr, ptr %4, align 8
+  %21 = getelementptr inbounds %struct.CalcLangVal, ptr %20, i32 0, i32 0
+  store i32 6, ptr %21, align 8
+  %22 = call noalias ptr @malloc(i64 noundef 16) #8
+  %23 = load ptr, ptr %4, align 8
+  %24 = getelementptr inbounds %struct.CalcLangVal, ptr %23, i32 0, i32 1
+  store ptr %22, ptr %24, align 8
+  %25 = load ptr, ptr %3, align 8
+  %26 = getelementptr inbounds %struct.CalcLangVal, ptr %25, i32 0, i32 1
+  %27 = load ptr, ptr %26, align 8
+  %28 = getelementptr inbounds %struct.TupleValue, ptr %27, i32 0, i32 0
+  %29 = load i32, ptr %28, align 8
+  %30 = load ptr, ptr %4, align 8
+  %31 = getelementptr inbounds %struct.CalcLangVal, ptr %30, i32 0, i32 1
+  %32 = load ptr, ptr %31, align 8
+  %33 = getelementptr inbounds %struct.TupleValue, ptr %32, i32 0, i32 0
+  store i32 %29, ptr %33, align 8
+  %34 = load ptr, ptr %3, align 8
+  %35 = getelementptr inbounds %struct.CalcLangVal, ptr %34, i32 0, i32 1
+  %36 = load ptr, ptr %35, align 8
+  %37 = getelementptr inbounds %struct.TupleValue, ptr %36, i32 0, i32 0
+  %38 = load i32, ptr %37, align 8
+  %39 = sext i32 %38 to i64
+  %40 = mul i64 8, %39
+  %41 = call noalias ptr @malloc(i64 noundef %40) #8
+  %42 = load ptr, ptr %4, align 8
+  %43 = getelementptr inbounds %struct.CalcLangVal, ptr %42, i32 0, i32 1
+  %44 = load ptr, ptr %43, align 8
+  %45 = getelementptr inbounds %struct.TupleValue, ptr %44, i32 0, i32 1
+  store ptr %41, ptr %45, align 8
+  store i32 0, ptr %5, align 4
+  br label %46
+
+46:                                               ; preds = %73, %18
+  %47 = load i32, ptr %5, align 4
+  %48 = load ptr, ptr %4, align 8
+  %49 = getelementptr inbounds %struct.CalcLangVal, ptr %48, i32 0, i32 1
+  %50 = load ptr, ptr %49, align 8
+  %51 = getelementptr inbounds %struct.SetValue, ptr %50, i32 0, i32 0
+  %52 = load i32, ptr %51, align 8
+  %53 = icmp slt i32 %47, %52
+  br i1 %53, label %54, label %76
+
+54:                                               ; preds = %46
+  %55 = load ptr, ptr %3, align 8
+  %56 = getelementptr inbounds %struct.CalcLangVal, ptr %55, i32 0, i32 1
+  %57 = load ptr, ptr %56, align 8
+  %58 = getelementptr inbounds %struct.TupleValue, ptr %57, i32 0, i32 1
+  %59 = load ptr, ptr %58, align 8
+  %60 = load i32, ptr %5, align 4
+  %61 = sext i32 %60 to i64
+  %62 = getelementptr inbounds ptr, ptr %59, i64 %61
+  %63 = load ptr, ptr %62, align 8
+  %64 = call ptr @copyValue(ptr noundef %63)
+  %65 = load ptr, ptr %4, align 8
+  %66 = getelementptr inbounds %struct.CalcLangVal, ptr %65, i32 0, i32 1
+  %67 = load ptr, ptr %66, align 8
+  %68 = getelementptr inbounds %struct.TupleValue, ptr %67, i32 0, i32 1
+  %69 = load ptr, ptr %68, align 8
+  %70 = load i32, ptr %5, align 4
+  %71 = sext i32 %70 to i64
+  %72 = getelementptr inbounds ptr, ptr %69, i64 %71
+  store ptr %64, ptr %72, align 8
+  br label %73
+
+73:                                               ; preds = %54
+  %74 = load i32, ptr %5, align 4
+  %75 = add nsw i32 %74, 1
+  store i32 %75, ptr %5, align 4
+  br label %46, !llvm.loop !107
+
+76:                                               ; preds = %46
+  %77 = load ptr, ptr %4, align 8
+  store ptr %77, ptr %2, align 8
+  br label %152
+
+78:                                               ; preds = %13
+  %79 = load ptr, ptr %3, align 8
+  %80 = getelementptr inbounds %struct.CalcLangVal, ptr %79, i32 0, i32 0
+  %81 = load i32, ptr %80, align 8
+  %82 = icmp eq i32 %81, 5
+  br i1 %82, label %83, label %143
+
+83:                                               ; preds = %78
+  %84 = call noalias ptr @malloc(i64 noundef 16) #8
+  store ptr %84, ptr %6, align 8
+  %85 = load ptr, ptr %6, align 8
+  %86 = getelementptr inbounds %struct.CalcLangVal, ptr %85, i32 0, i32 0
+  store i32 5, ptr %86, align 8
+  %87 = call noalias ptr @malloc(i64 noundef 16) #8
+  %88 = load ptr, ptr %6, align 8
+  %89 = getelementptr inbounds %struct.CalcLangVal, ptr %88, i32 0, i32 1
+  store ptr %87, ptr %89, align 8
+  %90 = load ptr, ptr %3, align 8
+  %91 = getelementptr inbounds %struct.CalcLangVal, ptr %90, i32 0, i32 1
+  %92 = load ptr, ptr %91, align 8
+  %93 = getelementptr inbounds %struct.SetValue, ptr %92, i32 0, i32 0
+  %94 = load i32, ptr %93, align 8
+  %95 = load ptr, ptr %6, align 8
+  %96 = getelementptr inbounds %struct.CalcLangVal, ptr %95, i32 0, i32 1
+  %97 = load ptr, ptr %96, align 8
+  %98 = getelementptr inbounds %struct.SetValue, ptr %97, i32 0, i32 0
+  store i32 %94, ptr %98, align 8
+  %99 = load ptr, ptr %3, align 8
+  %100 = getelementptr inbounds %struct.CalcLangVal, ptr %99, i32 0, i32 1
+  %101 = load ptr, ptr %100, align 8
+  %102 = getelementptr inbounds %struct.SetValue, ptr %101, i32 0, i32 0
+  %103 = load i32, ptr %102, align 8
+  %104 = sext i32 %103 to i64
+  %105 = mul i64 8, %104
+  %106 = call noalias ptr @malloc(i64 noundef %105) #8
+  %107 = load ptr, ptr %6, align 8
+  %108 = getelementptr inbounds %struct.CalcLangVal, ptr %107, i32 0, i32 1
+  %109 = load ptr, ptr %108, align 8
+  %110 = getelementptr inbounds %struct.SetValue, ptr %109, i32 0, i32 1
+  store ptr %106, ptr %110, align 8
+  store i32 0, ptr %7, align 4
+  br label %111
+
+111:                                              ; preds = %138, %83
+  %112 = load i32, ptr %7, align 4
+  %113 = load ptr, ptr %6, align 8
+  %114 = getelementptr inbounds %struct.CalcLangVal, ptr %113, i32 0, i32 1
+  %115 = load ptr, ptr %114, align 8
+  %116 = getelementptr inbounds %struct.SetValue, ptr %115, i32 0, i32 0
+  %117 = load i32, ptr %116, align 8
+  %118 = icmp slt i32 %112, %117
+  br i1 %118, label %119, label %141
+
+119:                                              ; preds = %111
+  %120 = load ptr, ptr %3, align 8
+  %121 = getelementptr inbounds %struct.CalcLangVal, ptr %120, i32 0, i32 1
+  %122 = load ptr, ptr %121, align 8
+  %123 = getelementptr inbounds %struct.SetValue, ptr %122, i32 0, i32 1
+  %124 = load ptr, ptr %123, align 8
+  %125 = load i32, ptr %7, align 4
+  %126 = sext i32 %125 to i64
+  %127 = getelementptr inbounds ptr, ptr %124, i64 %126
+  %128 = load ptr, ptr %127, align 8
+  %129 = call ptr @copyValue(ptr noundef %128)
+  %130 = load ptr, ptr %6, align 8
+  %131 = getelementptr inbounds %struct.CalcLangVal, ptr %130, i32 0, i32 1
+  %132 = load ptr, ptr %131, align 8
+  %133 = getelementptr inbounds %struct.SetValue, ptr %132, i32 0, i32 1
+  %134 = load ptr, ptr %133, align 8
+  %135 = load i32, ptr %7, align 4
+  %136 = sext i32 %135 to i64
+  %137 = getelementptr inbounds ptr, ptr %134, i64 %136
+  store ptr %129, ptr %137, align 8
+  br label %138
+
+138:                                              ; preds = %119
+  %139 = load i32, ptr %7, align 4
+  %140 = add nsw i32 %139, 1
+  store i32 %140, ptr %7, align 4
+  br label %111, !llvm.loop !108
+
+141:                                              ; preds = %111
+  %142 = load ptr, ptr %6, align 8
+  store ptr %142, ptr %2, align 8
+  br label %152
+
+143:                                              ; preds = %78
+  store i32 16, ptr %8, align 4
+  %144 = load i32, ptr %8, align 4
+  %145 = sext i32 %144 to i64
+  %146 = call noalias ptr @malloc(i64 noundef %145) #8
+  store ptr %146, ptr %9, align 8
+  %147 = load ptr, ptr %9, align 8
+  %148 = load ptr, ptr %3, align 8
+  %149 = load i32, ptr %8, align 4
+  %150 = sext i32 %149 to i64
+  call void @llvm.memcpy.p0.p0.i64(ptr align 8 %147, ptr align 8 %148, i64 %150, i1 false)
+  %151 = load ptr, ptr %9, align 8
+  store ptr %151, ptr %2, align 8
+  br label %152
+
+152:                                              ; preds = %143, %141, %76, %12
+  %153 = load ptr, ptr %2, align 8
+  ret ptr %153
+}
+
+; Function Attrs: nounwind allocsize(0)
+declare noalias ptr @malloc(i64 noundef) #4
+
+; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: readwrite)
+declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #5
+
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local void @freeCalcLangValue(ptr noundef %0) #0 {
+  %2 = alloca ptr, align 8
+  %3 = alloca ptr, align 8
+  %4 = alloca i32, align 4
+  %5 = alloca ptr, align 8
+  %6 = alloca i32, align 4
+  store ptr %0, ptr %2, align 8
+  %7 = load ptr, ptr %2, align 8
+  %8 = icmp ne ptr %7, null
+  br i1 %8, label %9, label %68
+
+9:                                                ; preds = %1
+  %10 = load ptr, ptr %2, align 8
+  %11 = getelementptr inbounds %struct.CalcLangVal, ptr %10, i32 0, i32 0
+  %12 = load i32, ptr %11, align 8
+  %13 = icmp eq i32 %12, 6
+  br i1 %13, label %14, label %37
+
+14:                                               ; preds = %9
+  %15 = load ptr, ptr %2, align 8
+  %16 = getelementptr inbounds %struct.CalcLangVal, ptr %15, i32 0, i32 1
+  %17 = load ptr, ptr %16, align 8
+  store ptr %17, ptr %3, align 8
+  store i32 0, ptr %4, align 4
+  br label %18
+
+18:                                               ; preds = %32, %14
+  %19 = load i32, ptr %4, align 4
+  %20 = load ptr, ptr %3, align 8
+  %21 = getelementptr inbounds %struct.TupleValue, ptr %20, i32 0, i32 0
+  %22 = load i32, ptr %21, align 8
+  %23 = icmp slt i32 %19, %22
+  br i1 %23, label %24, label %35
+
+24:                                               ; preds = %18
+  %25 = load ptr, ptr %3, align 8
+  %26 = getelementptr inbounds %struct.TupleValue, ptr %25, i32 0, i32 1
+  %27 = load ptr, ptr %26, align 8
+  %28 = load i32, ptr %4, align 4
+  %29 = sext i32 %28 to i64
+  %30 = getelementptr inbounds ptr, ptr %27, i64 %29
+  %31 = load ptr, ptr %30, align 8
+  call void @freeCalcLangValue(ptr noundef %31)
+  br label %32
+
+32:                                               ; preds = %24
+  %33 = load i32, ptr %4, align 4
+  %34 = add nsw i32 %33, 1
+  store i32 %34, ptr %4, align 4
+  br label %18, !llvm.loop !109
+
+35:                                               ; preds = %18
+  %36 = load ptr, ptr %3, align 8
+  call void @free(ptr noundef %36) #7
+  br label %66
+
+37:                                               ; preds = %9
+  %38 = load ptr, ptr %2, align 8
+  %39 = getelementptr inbounds %struct.CalcLangVal, ptr %38, i32 0, i32 0
+  %40 = load i32, ptr %39, align 8
+  %41 = icmp eq i32 %40, 5
+  br i1 %41, label %42, label %65
+
+42:                                               ; preds = %37
+  %43 = load ptr, ptr %2, align 8
+  %44 = getelementptr inbounds %struct.CalcLangVal, ptr %43, i32 0, i32 1
+  %45 = load ptr, ptr %44, align 8
+  store ptr %45, ptr %5, align 8
+  store i32 0, ptr %6, align 4
+  br label %46
+
+46:                                               ; preds = %60, %42
+  %47 = load i32, ptr %6, align 4
+  %48 = load ptr, ptr %5, align 8
+  %49 = getelementptr inbounds %struct.SetValue, ptr %48, i32 0, i32 0
+  %50 = load i32, ptr %49, align 8
+  %51 = icmp slt i32 %47, %50
+  br i1 %51, label %52, label %63
+
+52:                                               ; preds = %46
+  %53 = load ptr, ptr %5, align 8
+  %54 = getelementptr inbounds %struct.SetValue, ptr %53, i32 0, i32 1
+  %55 = load ptr, ptr %54, align 8
+  %56 = load i32, ptr %6, align 4
+  %57 = sext i32 %56 to i64
+  %58 = getelementptr inbounds ptr, ptr %55, i64 %57
+  %59 = load ptr, ptr %58, align 8
+  call void @freeCalcLangValue(ptr noundef %59)
+  br label %60
+
+60:                                               ; preds = %52
+  %61 = load i32, ptr %6, align 4
+  %62 = add nsw i32 %61, 1
+  store i32 %62, ptr %6, align 4
+  br label %46, !llvm.loop !110
+
+63:                                               ; preds = %46
+  %64 = load ptr, ptr %5, align 8
+  call void @free(ptr noundef %64) #7
+  br label %65
+
+65:                                               ; preds = %63, %37
+  br label %66
+
+66:                                               ; preds = %65, %35
+  %67 = load ptr, ptr %2, align 8
+  call void @free(ptr noundef %67) #7
+  br label %68
+
+68:                                               ; preds = %66, %1
+  ret void
+}
+
+; Function Attrs: nounwind
+declare void @free(ptr noundef) #3
+
 attributes #0 = { noinline nounwind optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 attributes #2 = { cold "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 attributes #3 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #4 = { cold }
-attributes #5 = { nounwind }
+attributes #4 = { nounwind allocsize(0) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #5 = { nocallback nofree nounwind willreturn memory(argmem: readwrite) }
+attributes #6 = { cold }
+attributes #7 = { nounwind }
+attributes #8 = { nounwind allocsize(0) }
 
 !llvm.module.flags = !{!0, !1, !2, !3, !4}
 !llvm.ident = !{!5}
@@ -13625,3 +13962,7 @@ attributes #5 = { nounwind }
 !104 = distinct !{!104, !7}
 !105 = distinct !{!105, !7}
 !106 = distinct !{!106, !7}
+!107 = distinct !{!107, !7}
+!108 = distinct !{!108, !7}
+!109 = distinct !{!109, !7}
+!110 = distinct !{!110, !7}
