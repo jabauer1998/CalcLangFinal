@@ -1,6 +1,7 @@
 #ifndef LINK_TO_CALC_LANG
 #define LINK_TO_CALC_LANG
 
+#include "CalcLangCIntArena.h"
 #include <stdbool.h>
 
 #define IS_INT 0
@@ -38,25 +39,25 @@ typedef struct CalcLangVal{
   CalcLangValueData valData;
 } CalcLangValue;
 
-CalcLangValue* addCalcLangValues(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* subCalcLangValues(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* multCalcLangValues(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* divCalcLangValues(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* powCalcLangValues(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* dotProductCalcLangValues(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* equalsCalcLangValues(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* lessThenCalcLangValues(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* greaterThenCalcLangValues(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* lessThenOrEqualToCalcLangValues(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* greaterThenOrEqualToCalcLangValues(CalcLangValue* left, CalcLangValue* right);
-CalcLangValue* notCalcLangValues(CalcLangValue* value);
-CalcLangValue* negateCalcLangValues(CalcLangValue* value);
-CalcLangValue* integerCalcLangValue(int input);
-CalcLangValue* realCalcLangValue(float input);
-CalcLangValue* dollarCalcLangValue(float input);
-CalcLangValue* percentCalcLangValue(float percent);
-CalcLangValue* tupleCalcLangValue(CalcLangValue**values, int size);
-CalcLangValue* setCalcLangValue(CalcLangValue**values, int size);
+CalcLangValue* addCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* subCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* multCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* divCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* powCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* dotProductCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* equalsCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* lessThenCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* greaterThenCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* lessThenOrEqualToCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* greaterThenOrEqualToCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
+CalcLangValue* notCalcLangValues(LLVMIntArena* arena, CalcLangValue* value);
+CalcLangValue* negateCalcLangValues(LLVMIntArena* arena, CalcLangValue* value);
+CalcLangValue* integerCalcLangValue(LLVMIntArena* arena, int input);
+CalcLangValue* realCalcLangValue(LLVMIntArena* arena, float input);
+CalcLangValue* dollarCalcLangValue(LLVMIntArena* arena, float input);
+CalcLangValue* percentCalcLangValue(LLVMIntArena* arena, float percent);
+CalcLangValue* tupleCalcLangValue(LLVMIntArena* arena, CalcLangValue**values, int size);
+CalcLangValue* setCalcLangValue(LLVMIntArena* arena, CalcLangValue**values, int size);
 bool toBool(CalcLangValue* val);
 void printValue(CalcLangValue* val);
 void printString(char* str);

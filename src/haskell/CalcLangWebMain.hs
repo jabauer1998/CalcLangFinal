@@ -141,9 +141,9 @@ main = do
                                                                                                                                                 H.option ! A.value "nvidia" $ "nvidia"
                                                                                                                                               H.label ! A.for "os" $ "Operating System:"
                                                                                                                                               H.select ! A.id "os" ! A.name "os" $ do
-                                                                                                                                                H.option ! A.value "linux" $ "linux-gnu"
+                                                                                                                                                H.option ! A.value "linux-gnu" $ "linux-gnu"
                                                                                                                                                 H.option ! A.value "darwin" $ "darwin"
-                                                                                                                                                H.option ! A.value "windows" $ "windows-msvc"
+                                                                                                                                                H.option ! A.value "windows-msvc" $ "windows-msvc"
                                                                                                                                                 H.option ! A.value "freebsd" $ "freebsd"
                                                                                                                                               H.input ! A.type_ "submit" ! A.value "Generate Target Triple"
                                                                                               H.a ! A.href "/" $ "Back To Intro"
