@@ -24,8 +24,8 @@ install-haskell: build-haskell
 	find dist-newstyle -name "ICalcLang" -type f -executable -exec cp {} $(AbsInstallDir)/ICalcLang \;
 	find dist-newstyle -name "CCalcLang" -type f -executable -exec cp {} $(AbsInstallDir)/CCalcLang \;
 build-lib:
-	clang -S -emit-llvm src/c/LinkToCalcLang.c -o ir/c/LinkToCalcLang.ll -I$(AbsIncDirC)
-	clang -S -emit-llvm src/c/CalcLangCIntArena.c -o ir/c/CalcLangCIntArena.ll -I$(AbsIncDirC)
+	clang -S -emit-llvm src/c/LinkToCalcLang.c -g -o ir/c/LinkToCalcLang.ll -I$(AbsIncDirC)
+	clang -S -emit-llvm src/c/CalcLangCIntArena.c -g -o ir/c/CalcLangCIntArena.ll -I$(AbsIncDirC)
 
 tree-printing-test:
 	clang -c $(TestSrcDir)/TreePrintingTest.c -o $(TestObjDir)/TreePrintingTest.o -I$(TestIncDir) -I$(AbsIncDirC)

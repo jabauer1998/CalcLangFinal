@@ -35,14 +35,14 @@ CalcLangValue* dollarCalcLangValue(LLVMIntArena* arena, float myDollar){
 }
 
 CalcLangValue* percentCalcLangValue(LLVMIntArena* arena, float myPercent){
-  CalcLangValue* toRet = arenaAlloc(arena, sizeof(CalcLangValue));
+  CalcLangValue* toRet = (CalcLangValue*)arenaAlloc(arena, sizeof(CalcLangValue));
   toRet->valType = IS_PERCENT;
   toRet->valData.dollar = myPercent;
   return toRet;
 }
 
 CalcLangValue* setCalcLangValue(LLVMIntArena* arena, CalcLangValue** value, int size){
-  CalcLangValue* toRet = arenaAlloc(arena, sizeof(CalcLangValue)); 
+  CalcLangValue* toRet = (CalcLangValue*)arenaAlloc(arena, sizeof(CalcLangValue)); 
   toRet->valType = IS_SET;
   toRet->valData.set = arenaAlloc(arena, sizeof(SetValue));
   toRet->valData.set->size = size;
@@ -54,11 +54,14 @@ CalcLangValue* setCalcLangValue(LLVMIntArena* arena, CalcLangValue** value, int 
 }
 
 CalcLangValue* tupleCalcLangValue(LLVMIntArena* arena, CalcLangValue** value, int size){
-  CalcLangValue* toRet = arenaAlloc(arena, sizeof(CalcLangValue));
+  CalcLangValue* toRet = (CalcLangValue*)arenaAlloc(arena, sizeof(CalcLangValue));
   toRet->valType = IS_TUPLE;
-  toRet->valData.set = arenaAlloc(arena, sizeof(TupleValue));
-  toRet->valData.set->size = size;
-  toRet->valData.set->list = value;
+  toRet->valData.tuple = (TupleValue*)arenaAlloc(arena, sizeof(TupleValue));
+  toRet->valData.tuple->size = size;
+  toRet->valData.tuple->list = arenaAlloc(arena, sizeof(CalcLangValue*) * size);
+  for(int i = 0; i < size; i++){
+    toRet->valData.tuple->list[i] = value[i];
+  }
   return toRet;
 }
 
@@ -178,9 +181,9 @@ CalcLangValue* addCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcL
     result->valData.tuple = resultTup;
   } else if(left->valType == IS_TUPLE && right->valType == IS_PERCENT){
     TupleValue* leftTup = left->valData.tuple;
-    TupleValue* resultTup = arenaAlloc(arena, sizeof(TupleValue));
+    TupleValue* resultTup = (TupleValue*)arenaAlloc(arena, sizeof(TupleValue));
     resultTup->size = leftTup->size;
-    resultTup->list = arenaAlloc(arena, sizeof(CalcLangValue*) * resultTup->size);
+    resultTup->list = (CalcLangValue**)arenaAlloc(arena, sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
       resultTup->list[i] = addCalcLangValues(arena, leftTup->list[i], right);  
     }
@@ -188,9 +191,9 @@ CalcLangValue* addCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcL
     result->valData.tuple = resultTup;
   } else if(left->valType == IS_PERCENT && right->valType == IS_TUPLE){
     TupleValue* rightTup = right->valData.tuple;
-    TupleValue* resultTup = arenaAlloc(arena, sizeof(TupleValue));
+    TupleValue* resultTup = (TupleValue*)arenaAlloc(arena, sizeof(TupleValue));
     resultTup->size = rightTup->size;
-    resultTup->list = arenaAlloc(arena, sizeof(CalcLangValue*) * resultTup->size);
+    resultTup->list = (CalcLangValue**)arenaAlloc(arena, sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < rightTup->size; i++){
       resultTup->list[i] = addCalcLangValues(arena, left, rightTup->list[i]);  
     }
@@ -202,7 +205,7 @@ CalcLangValue* addCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcL
     if(rightSet->size == leftSet->size){
       SetValue* resultSet = arenaAlloc(arena, sizeof(SetValue));
       resultSet->size = leftSet->size;
-      resultSet->list = arenaAlloc(arena, sizeof(SetValue*) * resultSet->size);
+      resultSet->list = arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
       for(int i = 0; i < leftSet->size; i++){
 	resultSet->list[i] = addCalcLangValues(arena, leftSet->list[i], rightSet->list[i]);  
       }
@@ -214,9 +217,9 @@ CalcLangValue* addCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcL
     }
   } else if(left->valType == IS_SET && right->valType == IS_INT){
     SetValue* leftSet = left->valData.set;
-    SetValue* resultSet = arenaAlloc(arena, sizeof(SetValue));
+    SetValue* resultSet = (SetValue*)arenaAlloc(arena, sizeof(SetValue));
     resultSet->size = leftSet->size;
-    resultSet->list = arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
+    resultSet->list = (CalcLangValue**)arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
       resultSet->list[i] = addCalcLangValues(arena, leftSet->list[i], right);
     }
@@ -224,9 +227,9 @@ CalcLangValue* addCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcL
     result->valData.set = resultSet;
   } else if(left->valType == IS_INT && right->valType == IS_SET){
     SetValue* rightSet = right->valData.set;
-    SetValue* resultSet = arenaAlloc(arena, sizeof(SetValue));
+    SetValue* resultSet = (SetValue*)arenaAlloc(arena, sizeof(SetValue));
     resultSet->size = rightSet->size;
-    resultSet->list = arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
+    resultSet->list = (CalcLangValue**)arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
       resultSet->list[i] = addCalcLangValues(arena, left, rightSet->list[i]);  
     }
@@ -236,7 +239,7 @@ CalcLangValue* addCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcL
     SetValue* leftSet = left->valData.set;
     SetValue* resultSet = arenaAlloc(arena, sizeof(SetValue));
     resultSet->size = leftSet->size;
-    resultSet->list = arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
+    resultSet->list = (CalcLangValue**)arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
       resultSet->list[i] = addCalcLangValues(arena, leftSet->list[i], right);  
     }
@@ -246,7 +249,7 @@ CalcLangValue* addCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcL
     SetValue* rightSet = right->valData.set;
     SetValue* resultSet = arenaAlloc(arena, sizeof(SetValue));
     resultSet->size = rightSet->size;
-    resultSet->list = arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
+    resultSet->list = (CalcLangValue**)arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
       resultSet->list[i] = addCalcLangValues(arena, left, rightSet->list[i]);  
     }
@@ -254,9 +257,9 @@ CalcLangValue* addCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcL
     result->valData.set = resultSet;
   } else if(left->valType == IS_SET && right->valType == IS_DOLLAR){
     SetValue* leftSet = left->valData.set;
-    SetValue* resultSet = arenaAlloc(arena, sizeof(SetValue));
+    SetValue* resultSet = (SetValue*)arenaAlloc(arena, sizeof(SetValue));
     resultSet->size = leftSet->size;
-    resultSet->list = arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
+    resultSet->list = (CalcLangValue**)arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
       resultSet->list[i] = addCalcLangValues(arena, leftSet->list[i], right);  
     }
@@ -266,7 +269,7 @@ CalcLangValue* addCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcL
     SetValue* rightSet = right->valData.set;
     SetValue* resultSet = arenaAlloc(arena, sizeof(SetValue));
     resultSet->size = rightSet->size;
-    resultSet->list = arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
+    resultSet->list = (CalcLangValue**)arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < rightSet->size; i++){
       resultSet->list[i] = addCalcLangValues(arena, left, rightSet->list[i]);
     }
@@ -274,7 +277,7 @@ CalcLangValue* addCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcL
     result->valData.set = resultSet;
   } else if(left->valType == IS_SET && right->valType == IS_PERCENT){
     SetValue* leftSet = left->valData.set;
-    SetValue* resultSet = arenaAlloc(arena, sizeof(SetValue));
+    SetValue* resultSet = (SetValue*)arenaAlloc(arena, sizeof(SetValue));
     resultSet->size = leftSet->size;
     resultSet->list = arenaAlloc(arena, sizeof(CalcLangValue*) * resultSet->size);
     for(int i = 0; i < leftSet->size; i++){
@@ -344,7 +347,7 @@ CalcLangValue* subCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcL
     TupleValue* leftTup = left->valData.tuple;
     TupleValue* resultTup = arenaAlloc(arena, sizeof(TupleValue));
     resultTup->size = leftTup->size;
-    resultTup->list = arenaAlloc(arena, sizeof(CalcLangValue*) * resultTup->size);
+    resultTup->list = (CalcLangValue**)arenaAlloc(arena, sizeof(CalcLangValue*) * resultTup->size);
     for(int i = 0; i < leftTup->size; i++){
       resultTup->list[i] = subCalcLangValues(arena, leftTup->list[i], right);  
     }
@@ -1012,7 +1015,7 @@ CalcLangValue* divCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcL
 CalcLangValue* powCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right){
   if(left == NULL || right == NULL)
     return NULL;
-  CalcLangValue* result = arenaAlloc(arena, sizeof(CalcLangValue));
+  CalcLangValue* result = (CalcLangValue*)arenaAlloc(arena, sizeof(CalcLangValue));
   if(left->valType == IS_INT && right->valType == IS_INT){
     result->valType = IS_INT;
     result->valData.integer = (int)pow((double)(left->valData.integer),(double)(right->valData.integer));

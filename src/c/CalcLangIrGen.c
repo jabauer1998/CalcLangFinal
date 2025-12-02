@@ -71,12 +71,22 @@ LLVMValueRef generateArena(LLVMBuilderRef builder, LLVMModuleRef mod, LLVMContex
   LLVMTypeRef arenaType = LLVMGetTypeByName2(ctx, "struct.LLVMIntArena");
   LLVMTypeRef arenaPtrType = LLVMPointerType(arenaType, 0);
   LLVMValueRef func = LLVMGetNamedFunction(mod, "arenaInit");
-  int size = 100000;
+  int size = 1000000;
   LLVMTypeRef intType = LLVMInt32TypeInContext(ctx);
   LLVMTypeRef paramTypes[] = {intType};
   LLVMTypeRef funcType = LLVMFunctionType(arenaPtrType, paramTypes, 1, 0);
   LLVMValueRef args[] = { LLVMConstInt(intType, size, 0) };
   return LLVMBuildCall2(builder, funcType, func, args, 1, "");
+}
+
+void freeArena(LLVMValueRef arena, LLVMBuilderRef builder, LLVMModuleRef mod, LLVMContextRef ctx){
+  LLVMTypeRef arenaType = LLVMGetTypeByName2(ctx, "struct.LLVMIntArena");
+  LLVMTypeRef arenaPtrType = LLVMPointerType(arenaType, 0);
+  LLVMValueRef func = LLVMGetNamedFunction(mod, "arenaFree");
+  LLVMTypeRef paramTypes[] = {arenaPtrType};
+  LLVMTypeRef funcType = LLVMFunctionType(LLVMVoidTypeInContext(ctx), paramTypes, 1, 0);
+  LLVMValueRef args[] = { arena };
+  LLVMBuildCall2(builder, funcType, func, args, 1, "");
 }
 
 LLVMModuleRef codeGen(StoreArray* arr){
@@ -114,11 +124,14 @@ LLVMModuleRef codeGen(StoreArray* arr){
     getInputRef(builder, module, ctx);
   }
 
+  freeArena(arena, builder, module, ctx);
+
   LLVMValueRef zero = LLVMConstInt(intType, 0, 0); // Create an integer constant 0
   LLVMBuildRet(builder, zero); // Build the return instruction
 
   popScope(&stack);
   freeVarTable(stack);
+  freeDefList(funcDefs);
   LLVMDisposeBuilder(builder);
   return module;
 }
@@ -145,9 +158,12 @@ LLVMTypeRef createFunctionPointerType(LLVMContextRef ctx, int numArgs, int isVoi
 
 void printValueRef(LLVMValueRef refToPrint, ScopeStack stack,  LLVMBuilderRef builder, LLVMTypeRef ptr, LLVMModuleRef mod, LLVMContextRef ctx){
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "printValue");
-  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, 1, 1);
+  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
+  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
+  LLVMTypeRef argTypes[] = { calcLangPtrType };
+  LLVMTypeRef funcType = LLVMFunctionType(LLVMVoidTypeInContext(ctx), argTypes, 1, 0);
   LLVMValueRef args[] = { refToPrint };
-  LLVMBuildCall2(builder, myFuncType, myFunc, args, 1, "");
+  LLVMBuildCall2(builder, funcType, myFunc, args, 1, "");
 }
 
 LLVMValueRef codeGenEqualsOperation(EqualOperation* op, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMValueRef arena, LLVMModuleRef mod, LLVMContextRef ctx){
@@ -384,11 +400,7 @@ LLVMValueRef codeGenIdentifierValue(IdentAst* ident, ScopeStack stack, DefList f
   }
   LLVMTypeRef myType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
   LLVMTypeRef point = LLVMPointerType(myType, 0);
-  LLVMValueRef copyFunc = LLVMGetNamedFunction(mod, "copyValue");
-  LLVMTypeRef copyFuncType = createFunctionPointerType(ctx, 1, 0);
-  LLVMValueRef args[] = { value };
-  LLVMValueRef callRes = LLVMBuildCall2(builder, copyFuncType, copyFunc, args, 1, "");
-  LLVMValueRef res = LLVMBuildLoad2(builder, point, callRes, "");
+  LLVMValueRef res = LLVMBuildLoad2(builder, point, value, "");
   
   return res;
 }
@@ -436,12 +448,15 @@ LLVMValueRef codeGenFunctionCall(FunctionCall* call, ScopeStack stack, DefList f
     funcDef = LLVMGetNamedFunction(mod, funcName);
   }
   StoreArray* array = call->params;
-  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, array->length, 0);
-  LLVMValueRef args[array->length];
-  for(int i = 0; i < array->length; i++){
-    args[i] = codeGenExpression(array->firstElem[i], stack, funcDefs,  builder, parentFunc, arena, mod, ctx);
+  LLVMTypeRef myFuncType = createFunctionPointerType(ctx, array->length + 1, 0);
+  LLVMValueRef args[array->length + 1];
+  
+  args[0] = arena;
+  for(int i = 1; i < (array->length + 1); i++){
+    args[i] = codeGenExpression(array->firstElem[i - 1], stack, funcDefs,  builder, parentFunc, arena, mod, ctx);
   }
-  return LLVMBuildCall2(builder, myFuncType, funcDef, args, array->length, "");
+  
+  return LLVMBuildCall2(builder, myFuncType, funcDef, args, array->length + 1, "");
 }
 
 LLVMValueRef codeGenNegateOperation(NegateOperation* negate, ScopeStack stack, DefList funcDefs,  LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMValueRef arena, LLVMModuleRef mod, LLVMContextRef ctx){
@@ -677,6 +692,7 @@ void codeGenNode(AstNode* node, ScopeStack stack, DefList funcDefs, LLVMBuilderR
   case DOLLAR_AST: {
     LLVMValueRef dollarVal = codeGenExpression(node, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
     printValueRef(dollarVal, stack, builder, calcLangPtr, mod, ctx);
+    resetArena(arena, builder, mod, ctx);
     break;
   }
   case PERCENT_AST: {
@@ -712,11 +728,14 @@ void codeGenNode(AstNode* node, ScopeStack stack, DefList funcDefs, LLVMBuilderR
     int size = ptr->length;
     LLVMTypeRef myType = LLVMGetTypeByName(mod, "struct.CalcLangVal");
     LLVMTypeRef point = LLVMPointerType(myType, 0);
-    LLVMTypeRef paramTypes[size];
-    for(int i = 0; i < size; i++){
+    LLVMTypeRef arenaType = LLVMGetTypeByName2(ctx, "struct.LLVMIntArena");
+    LLVMTypeRef arenaPtrType = LLVMPointerType(arenaType, 0);
+    LLVMTypeRef paramTypes[size + 1];
+    paramTypes[0] = arenaPtrType;
+    for(int i = 1; i < size + 1; i++){
       paramTypes[i] = point;
     }
-    LLVMTypeRef funcType = LLVMFunctionType(point, paramTypes, size, 0);
+    LLVMTypeRef funcType = LLVMFunctionType(point, paramTypes, size + 1, 0);
     char myName[2];
     myName[0] = name;
     myName[1] = '\0';
@@ -727,16 +746,19 @@ void codeGenNode(AstNode* node, ScopeStack stack, DefList funcDefs, LLVMBuilderR
     
     LLVMBasicBlockRef entryBlock = LLVMAppendBasicBlockInContext(ctx, func, "entry");
     LLVMPositionBuilderAtEnd(builder, entryBlock);
+
+    LLVMValueRef argArena = LLVMGetParam(func, 0);
     
-    for(int i = 0; i < size; i++){
-      char name = genParamName(ptr->firstElem[i]);
+    for(int i = 1; i < (size + 1); i++){
+      char name = genParamName(ptr->firstElem[i - 1]);
       LLVMValueRef arg1 = LLVMGetParam(func, i);
       LLVMValueRef ptrToy = LLVMBuildAlloca(builder, point, "");
       LLVMBuildStore(builder, arg1, ptrToy);
       addElemToVarTable(&stack, name, ptrToy);
     }
+    
     pushScope(&stack);
-    LLVMValueRef result = codeGenExpression(myNode->expr, stack, funcDefs, builder, func, arena, mod, ctx);
+    LLVMValueRef result = codeGenExpression(myNode->expr, stack, funcDefs, builder, func, argArena, mod, ctx);
     LLVMBuildRet(builder, result);
     
     popScope(&stack);

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-LLVMIntArena* arenaInit(int capacity){
+LLVMIntArena* arenaInit(unsigned int capacity){
   LLVMIntArena *arena = (LLVMIntArena*)malloc(sizeof(LLVMIntArena));
   if (arena == NULL) {
         perror("Failed to allocate Arena struct");
@@ -12,6 +12,7 @@ LLVMIntArena* arenaInit(int capacity){
   }
 
   arena->buffer = (char*)malloc(capacity);
+  
   if (arena->buffer == NULL) {
        perror("Failed to allocate arena buffer");
        free(arena); // Free the arena struct if buffer allocation fails
@@ -29,12 +30,14 @@ void* arenaAlloc(LLVMIntArena* arena, int size){
         return NULL;
     }
     if (arena->offset + size > arena->capacity) {
-        fprintf(stderr, "Error: Arena out of memory for allocation of size %zu\n", size);
+      fprintf(stderr, "Error: Arena out of memory for allocation of size %zu\n and capacity %d, and current offset %d\n", size, arena->capacity, arena->offset);
+      fflush(stdout);
         return NULL; // Not enough space
     }
 
     void *ptr = arena->buffer + arena->offset;
     arena->offset += size;
+    fflush(stdout);
     memset(ptr, 0, size); // Initialize allocated memory to zero
     return ptr;
 }

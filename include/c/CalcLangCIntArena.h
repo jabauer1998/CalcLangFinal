@@ -3,11 +3,11 @@
 
 typedef struct LLVMIntArena {
     char *buffer;      // Pointer to the start of the allocated memory buffer
-    int capacity;   // Total capacity of the arena
+    unsigned int capacity;   // Total capacity of the arena
     int offset;     // Current allocation offset within the buffer
 } LLVMIntArena;
 
-LLVMIntArena* arenaInit(int size);
+LLVMIntArena* arenaInit(unsigned int size);
 void* arenaAlloc(LLVMIntArena* arena, int size);
 void arenaReset(LLVMIntArena *arena);
 void arenaFree(LLVMIntArena *arena);
