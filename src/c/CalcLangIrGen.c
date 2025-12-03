@@ -89,6 +89,33 @@ void freeArena(LLVMValueRef arena, LLVMBuilderRef builder, LLVMModuleRef mod, LL
   LLVMBuildCall2(builder, funcType, func, args, 1, "");
 }
 
+void defineFunctions(StoreArray* arr, DefList funcDefs, LLVMModuleRef mod, LLVMContextRef ctx){
+  for(int i = 0; i < arr->length; i++){
+    AstNode* node = arr->firstElem[i];
+    if(node->nodeType == FUNCTION_DEFINITION){
+      FunctionDef* myNode = &(node->actualNodeData.function);
+      LLVMTypeRef myType = LLVMGetTypeByName(mod, "struct.CalcLangVal");
+      LLVMTypeRef point = LLVMPointerType(myType, 0);
+      LLVMTypeRef arenaType = LLVMGetTypeByName2(ctx, "struct.LLVMIntArena");
+      LLVMTypeRef arenaPtrType = LLVMPointerType(arenaType, 0);
+      int size = myNode->param->length;
+      LLVMTypeRef paramTypes[size + 1];
+      paramTypes[0] = arenaPtrType;
+      for(int i = 1; i < size + 1; i++){
+	paramTypes[i] = point;
+      }
+      LLVMTypeRef funcType = LLVMFunctionType(point, paramTypes, size + 1, 0);
+
+      char myName[2];
+      myName[0] = myNode->name;
+      myName[1] = '\0';
+      LLVMValueRef func = LLVMAddFunction(mod, myName, funcType);
+      LLVMSetLinkage(func, LLVMExternalLinkage);
+      addDef(&funcDefs, myNode->name, func);
+    }
+  }
+}
+
 LLVMModuleRef codeGen(StoreArray* arr){
   ScopeStack stack = createVarTable();
   DefList funcDefs = createDefList();
@@ -101,6 +128,8 @@ LLVMModuleRef codeGen(StoreArray* arr){
   
   LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
   LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
+
+  defineFunctions(arr, funcDefs, module, ctx);
   
   //Define main method
   LLVMTypeRef intType = LLVMInt32TypeInContext(ctx);
@@ -447,6 +476,7 @@ LLVMValueRef codeGenFunctionCall(FunctionCall* call, ScopeStack stack, DefList f
     funcName[1] = '\0';
     funcDef = LLVMGetNamedFunction(mod, funcName);
   }
+  
   StoreArray* array = call->params;
   LLVMTypeRef myFuncType = createFunctionPointerType(ctx, array->length + 1, 0);
   LLVMValueRef args[array->length + 1];
@@ -722,27 +752,21 @@ void codeGenNode(AstNode* node, ScopeStack stack, DefList funcDefs, LLVMBuilderR
   case FUNCTION_DEFINITION: {
     FunctionDef* myNode = &(node->actualNodeData.function);
     LLVMBasicBlockRef toResume = LLVMGetInsertBlock(builder);
-    pushScope(&stack);
-    char name = myNode->name;
-    StoreArray* ptr = myNode->param;
-    int size = ptr->length;
+
     LLVMTypeRef myType = LLVMGetTypeByName(mod, "struct.CalcLangVal");
     LLVMTypeRef point = LLVMPointerType(myType, 0);
-    LLVMTypeRef arenaType = LLVMGetTypeByName2(ctx, "struct.LLVMIntArena");
-    LLVMTypeRef arenaPtrType = LLVMPointerType(arenaType, 0);
-    LLVMTypeRef paramTypes[size + 1];
-    paramTypes[0] = arenaPtrType;
-    for(int i = 1; i < size + 1; i++){
-      paramTypes[i] = point;
-    }
-    LLVMTypeRef funcType = LLVMFunctionType(point, paramTypes, size + 1, 0);
-    char myName[2];
-    myName[0] = name;
-    myName[1] = '\0';
-    LLVMValueRef func = LLVMAddFunction(mod, myName, funcType);
-    LLVMSetLinkage(func, LLVMExternalLinkage);
 
-    addDef(&funcDefs, name, func);
+    pushScope(&stack);
+
+    LLVMValueRef func = getDef(funcDefs, myNode->name);
+    if(func == NULL){
+      char funcName[2];
+      funcName[0] = myNode->name;
+      funcName[1] = '\0';
+      func = LLVMGetNamedFunction(mod, funcName);
+    }
+
+    int size = myNode->param->length;
     
     LLVMBasicBlockRef entryBlock = LLVMAppendBasicBlockInContext(ctx, func, "entry");
     LLVMPositionBuilderAtEnd(builder, entryBlock);
@@ -750,7 +774,7 @@ void codeGenNode(AstNode* node, ScopeStack stack, DefList funcDefs, LLVMBuilderR
     LLVMValueRef argArena = LLVMGetParam(func, 0);
     
     for(int i = 1; i < (size + 1); i++){
-      char name = genParamName(ptr->firstElem[i - 1]);
+      char name = genParamName(myNode->param->firstElem[i - 1]);
       LLVMValueRef arg1 = LLVMGetParam(func, i);
       LLVMValueRef ptrToy = LLVMBuildAlloca(builder, point, "");
       LLVMBuildStore(builder, arg1, ptrToy);
