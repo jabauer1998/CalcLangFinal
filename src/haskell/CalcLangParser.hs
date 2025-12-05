@@ -227,6 +227,31 @@ parsePlan = do
             startPosition <- getPosition
             (parseLexeme (string "plan")) >> return (PlanCmd startPosition)
 
+parseGraph :: CalcLangLexer Token
+parseGraph = do
+             start <- getPosition
+             (parseLexeme (string "graph")) >> return (Graph start)
+
+parseOf :: CalcLangLexer Token
+parseOf = do
+          start <- getPosition
+          (parseLexeme (string "of")) >> return (Of start)
+
+parseFrom :: CalcLangLexer Token
+parseFrom = do
+            start <- getPosition
+            (parseLexeme (string "from")) >> return (From start)
+
+parseTo :: CalcLangLexer Token
+parseTo = do
+          start <- getPosition
+          (parseLexeme (string "to")) >> return (To start)
+
+parseBy :: CalcLangLexer Token
+parseBy = do
+          start <- getPosition
+          (parseLexeme (string "by")) >> return (By start)
+
 parseHistory :: CalcLangLexer Token
 parseHistory = do
                startPosition <- getPosition
@@ -596,6 +621,21 @@ parseLessonPlanCommand = do
                          case path of
                            FullPath _ str -> return (CreateLessonPlanCommand start str)
 
+parseGraphCommand :: CalcLangParser AstNode
+parseGraphCommand = do
+                    start <- getPosition
+                    _ <- parseCreate
+                    _ <- parseGraph
+                    _ <- parseOf
+                    funcName <- parseIdentifier
+                    _ <- parseFrom
+                    fromNum <- parseNumber
+                    _ <- parseTo
+                    toNum <- parseNumber
+                    _ <- parseBy
+                    byNum <- parseNumber
+                    return (CreateGraphCommand start funcName fromNum toNum byNum)
+
 parseHelpCommand :: CalcLangParser AstNode
 parseHelpCommand = do
                    start <- getPosition
@@ -603,7 +643,7 @@ parseHelpCommand = do
                    return (HelpCommand start)
 
 parseCommand :: CalcLangParser AstNode
-parseCommand = try parseHelpCommand <|> try parseShowFunctionsCommand <|> try parseShowHistoryCommand <|> try parseShowVariablesCommand <|> try parseQuitCommand <|> try parseLessonPlanCommand
+parseCommand = try parseHelpCommand <|> try parseShowFunctionsCommand <|> try parseShowHistoryCommand <|> try parseShowVariablesCommand <|> try parseQuitCommand <|> try parseLessonPlanCommand <|> try parseGraphCommand
 
   
 parseAstNode :: CalcLangParser AstNode

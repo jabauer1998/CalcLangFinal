@@ -26,6 +26,7 @@ install-haskell: build-haskell
 build-lib:
 	clang -S -emit-llvm src/c/LinkToCalcLang.c -g -o ir/c/LinkToCalcLang.ll -I$(AbsIncDirC)
 	clang -S -emit-llvm src/c/CalcLangCIntArena.c -g -o ir/c/CalcLangCIntArena.ll -I$(AbsIncDirC)
+	clang -S -emit-llvm src/c/CalcLangCGraph.c -g -o ir/c/CalcLangCGraph.ll -I$(AbsIncDirC)
 
 tree-printing-test:
 	clang -c $(TestSrcDir)/TreePrintingTest.c -o $(TestObjDir)/TreePrintingTest.o -I$(TestIncDir) -I$(AbsIncDirC)

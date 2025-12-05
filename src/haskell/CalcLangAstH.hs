@@ -88,6 +88,11 @@ data Token = Ident Char SourcePos
            | ShowCmd SourcePos
            | FunctionsCmd SourcePos
            | VariablesCmd SourcePos
+           | Of SourcePos
+           | From SourcePos
+           | Graph SourcePos
+           | To SourcePos
+           | By SourcePos
            | QuitCmd SourcePos
            | CreateCmd SourcePos
            | LessonCmd SourcePos
@@ -190,6 +195,7 @@ data AstNode = EqualOperation SourcePos AstNode AstNode
              | ShowFunctionsCommand SourcePos
              | ShowVariablesCommand SourcePos
              | ShowHistoryCommand SourcePos
+             | CreateGraphCommand SourcePos AstNode AstNode AstNode AstNode
              | QuitCommand SourcePos
              | HelpCommand SourcePos
              | CreateLessonPlanCommand SourcePos String
@@ -256,6 +262,7 @@ data CAstNode = CEqualOperation (Ptr CSourcePos) (Ptr CAstNode) (Ptr CAstNode)
               | CAssign (Ptr CSourcePos) CChar (Ptr CAstNode)
               | CIfExpr (Ptr CSourcePos) (Ptr CAstNode) (Ptr CAstNode) (Ptr CAstNode)
               | CParenExpr (Ptr CSourcePos) (Ptr CAstNode)
+              | CCreateGraphCommand (Ptr CSourcePos) CChar CString CString CString
               | CErrorNode String
               deriving (Eq, Show)
 
@@ -516,6 +523,13 @@ instance Storable CAstNode where
                                                 pokeByteOff ptr 0 (25 :: CInt)
                                                 pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
                                                 pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) expr
+                         CCreateGraphCommand pos name begin end incr -> do
+                                                                        pokeByteOff ptr 0 (26 :: CInt)
+                                                                        pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                                        pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) name
+                                                                        pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar)) begin
+                                                                        pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar) + sizeOf (undefined :: Ptr CInt)) end
+                                                                        pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar) + sizeOf (undefined :: Ptr CInt) + sizeOf (undefined :: Ptr CInt)) incr
                          _ -> error "Unknown AST node tag"
 
 

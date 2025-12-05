@@ -20,6 +20,7 @@ data CalcLangValue = BoolVal Bool
                    | ReadHistoryCommandVal
                    | HelpCommandVal
                    | CreateLessonPlanCommandVal String
+                   | CreateGraphCommandVal [Integer]
                    | ErrorVal [String]
                    deriving (Show, Eq)
 
@@ -156,6 +157,19 @@ generateParam paramLexeme toExpr = case paramLexeme of
                                      IdentAst _ x -> (x, toExpr)
                                      _ -> ('\0', ErrorNode "param does have expression")
 
+generateVal :: AstNode -> Int -> (Char, AstNode)
+generateVal node myInt = case node of
+                                     IdentAst p x -> (x, IntNumberAst p (show myInt))
+                                     _ -> ('\0', ErrorNode "param does have expression")
+
+generateNumberFNode :: AstNode -> Int
+generateNumberFNode node = case node of
+                        IntNumberAst _ x -> read x :: Int
+
+generateNumberFVal :: CalcLangValue -> Integer
+generateNumberFVal node = case node of
+                            IntVal val -> fromIntegral val :: Integer
+
 interpret :: AstNode -> Env -> FunctionTable -> (CalcLangValue, Env, FunctionTable)
 interpret node vT fT = case node of
                               EqualOperation _ x y -> (equalVals (gV (interpret x vT fT)) (gV (interpret y vT fT)), vT, fT)
@@ -211,6 +225,23 @@ interpret node vT fT = case node of
                               ShowHistoryCommand _ -> (ReadHistoryCommandVal, vT, fT)
                               HelpCommand _ -> (HelpCommandVal, vT, fT)
                               QuitCommand _ -> (QuitVal, vT, fT)
+                              CreateGraphCommand pos str begin end incr -> case str of
+                                                                             IdentAst _ myStr -> do
+                                                                                                 let function = (getEntryFromTable fT myStr)
+                                                                                                 case function of
+                                                                                                   Just (params, retExpr) -> do
+                                                                                                      let myFunc = \x -> do
+                                                                                                                         let zippedData = (zipWith generateVal params [x])
+                                                                                                                         let finalZippedData = (map (\(zx, zy) -> (zx, (gV (interpret zy vT fT)))) zippedData)
+                                                                                                                         let addedScopeEnv = addScopeToEnv vT
+                                                                                                                         let vTable = (foldl (\table tuple -> addEntryToEnv table tuple) addedScopeEnv  finalZippedData)
+                                                                                                                         let retVal = (gV (interpret retExpr vTable fT))
+                                                                                                                         (generateNumberFVal retVal)
+                                                                                                      let beginNum = (generateNumberFNode begin)
+                                                                                                      let endNum = (generateNumberFNode end)
+                                                                                                      let incrNum = (generateNumberFNode incr)
+                                                                                                      let yVals = [ myFunc v | v <- [beginNum, incrNum .. endNum]]
+                                                                                                      (CreateGraphCommandVal yVals, vT, fT)
                               CreateLessonPlanCommand _ src -> (CreateLessonPlanCommandVal src, vT, fT)
                               ErrorNode s -> (ErrorVal ["Error at" ++ (show s)], vT, fT)
 

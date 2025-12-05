@@ -28,6 +28,7 @@
 #define ASSIGN 23
 #define IF_EXPR 24
 #define PAREN_EXPR 25
+#define CREATE_GRAPH_COMMAND 26
 
 struct ANode;
 
@@ -191,6 +192,14 @@ typedef struct {
   struct ANode* expr;
 } ParenExpr;
 
+typedef struct {
+  SourcePos* pos;
+  char name;
+  char* begin;
+  char* end;
+  char* incr;
+} CreateGraphCommand;
+
 typedef union {
   EqualOperation equalOperation;
   LessThenOrEqualsOperation lessOrEqual;
@@ -218,6 +227,7 @@ typedef union {
   Assign variable;
   IfExpr ifStatement;
   ParenExpr par;
+  CreateGraphCommand graph;
 } AstNodeType;
 
 typedef struct ANode{

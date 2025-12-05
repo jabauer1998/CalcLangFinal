@@ -10,6 +10,7 @@ import CalcLangParser
 import CalcLangAstH
 import Data.Char (isSpace)
 import Control.Monad.IO.Class
+import Data.Text.Chart (plot)
 
 
 foreign import ccall processASTList :: (Ptr CSA) -> CString -> IO ()
@@ -69,6 +70,9 @@ runCommandLine vT fT = do
                                                                                                                                                              cStr <- liftIO (newCString str)
                                                                                                                                                              _ <- liftIO (processASTList storeArray cStr)
                                                                                                                                                              runCommandLine x y
+                                                                                                                   (CreateGraphCommandVal ys, x, y) -> do
+                                                                                                                                                 _ <- liftIO $ plot ys
+                                                                                                                                                 runCommandLine x y
                                                                                                                    (a, x, y) -> do
                                                                                                                                 outputStrLn (toStr a)
                                                                                                                                 runCommandLine x y

@@ -5,8 +5,10 @@ import Foreign.Ptr
 import Text.Parsec.Pos
 import Foreign.Marshal.Alloc
 import Foreign.C.String
+import Foreign.C.Types
 import Foreign.Marshal.Array
 import Foreign.Storable
+import Control.Monad.IO.Class
 import Control.Monad
 
 
@@ -36,6 +38,15 @@ marshallStorageArray a = case a of
                                              let g = (CStoreArray (fromIntegral s) array)
                                              poke ptr g
                                              return ptr
+
+marshallFuncName :: AstNode -> IO CChar
+marshallFuncName node = case node of
+                          IdentAst pos ident -> return (castCharToCChar ident)
+
+marshallIntVal :: AstNode -> IO CString
+marshallIntVal node = case node of
+                        IntNumberAst pos intVal -> (newCString intVal)
+                                                
 
 -- Now we need to marshal Ast Nodes
 
@@ -232,6 +243,16 @@ marshallAstNode a = case a of
                                             let g = (CParenExpr myPos myExpr)
                                             poke ptr g
                                             return ptr
+                      CreateGraphCommand pos name begin end incr -> do
+                                                                    ptr <- (mallocBytes (sizeOf (undefined :: CAstNode)))
+                                                                    myPos <- marshallSourcePos pos
+                                                                    myExpr <- marshallFuncName name
+                                                                    myBegin <- marshallIntVal begin
+                                                                    myEnd <- marshallIntVal end
+                                                                    myIncr <- marshallIntVal incr
+                                                                    let g = (CCreateGraphCommand myPos myExpr myBegin myEnd myIncr)
+                                                                    poke ptr g
+                                                                    return ptr
                                                      
                        
                                         

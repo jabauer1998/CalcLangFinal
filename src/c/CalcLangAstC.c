@@ -192,6 +192,17 @@ void parenExpressionToStr(ParenExpr* par, int size, char* str){
   appendStrChr(')', size, str);
 }
 
+void createGraphCommandToStr(CreateGraphCommand* graph, int size, char* str){
+  strncat(str, "create graph of ", size);
+  appendStrChr(graph->name, size, str);
+  strncat(str, " from ", size);
+  strncat(str, graph->begin, size);
+  strncat(str, " to ", size);
+  strncat(str, graph->end, size);
+  strncat(str, " by ", size);
+  strncat(str, graph->incr, size);
+}
+
 //Bellow are all the Free tree methods
 
 void freePosition(SourcePos* pos){
@@ -359,6 +370,13 @@ void freeParenExpression(ParenExpr* par){
   freeTree(par->expr);
 }
 
+void freeCreateGraphCommand(CreateGraphCommand* graph){
+  freePosition(graph->pos);
+  free(graph->begin);
+  free(graph->end);
+  free(graph->incr);
+}
+
 void freeTree(AstNode* node){
   switch(node->nodeType){
   case EQUAL_OPERATION:
@@ -439,6 +457,8 @@ void freeTree(AstNode* node){
   case PAREN_EXPR:
     freeParenExpression(&(node->actualNodeData.par));
     break;
+  case CREATE_GRAPH_COMMAND:
+    freeCreateGraphCommand(&(node->actualNodeData.graph));
   default:
     fprintf(stderr, "Invalid number %d", node->nodeType);
     break;
@@ -530,6 +550,8 @@ void astToStr(AstNode* node, int size, char* str){
   case PAREN_EXPR:
     parenExpressionToStr(&(node->actualNodeData.par), size, str);
     break;
+  case CREATE_GRAPH_COMMAND:
+    createGraphCommandToStr(&node->actualNodeData.graph, size, str);
   default:
     fprintf(stderr, "Invalid number %d", node->nodeType);
     break;
