@@ -2,6 +2,9 @@ TestSrcDir:="$(shell pwd)/test/src/c"
 TestIncDir:="$(shell pwd)/test/include/c"
 TestObjDir:="$(shell pwd)/test/obj/c"
 ObjDir:="$(shell pwd)/obj/c"
+LibIrDir:="$(shell pwd)/lib/ir"
+LibSrcDir:="$(shell pwd)/lib/src/c"
+LibIncDir:="$(shell pwd)/lib/include/c"
 TestBinDir:="$(shell pwd)/test/bin"
 AbsIncDirC:="$(shell pwd)/include/c"
 AbsIncDirH:="$(shell pwd)/include/haskell"
@@ -24,9 +27,9 @@ install-haskell: build-haskell
 	find dist-newstyle -name "ICalcLang" -type f -executable -exec cp {} $(AbsInstallDir)/ICalcLang \;
 	find dist-newstyle -name "CCalcLang" -type f -executable -exec cp {} $(AbsInstallDir)/CCalcLang \;
 build-lib:
-	clang -S -emit-llvm src/c/LinkToCalcLang.c -g -o ir/c/LinkToCalcLang.ll -I$(AbsIncDirC)
-	clang -S -emit-llvm src/c/CalcLangCIntArena.c -g -o ir/c/CalcLangCIntArena.ll -I$(AbsIncDirC)
-	clang -S -emit-llvm src/c/CalcLangCGraph.c -g -o ir/c/CalcLangCGraph.ll -I$(AbsIncDirC)
+	clang -S -emit-llvm $(LibSrcDir)/CalcLangCInt.c -g -o $(LibIrDir)/CalcLangCInt.ll -I$(LibIncDir)
+	clang -S -emit-llvm $(LibSrcDir)/CalcLangCIntArena.c -g -o $(LibIrDir)/CalcLangCIntArena.ll -I$(LibIncDir)
+	clang -S -emit-llvm $(LibSrcDir)/CalcLangCGraph.c -g -o $(LibIrDir)/CalcLangCGraph.ll -I$(LibIncDir)
 
 tree-printing-test:
 	clang -c $(TestSrcDir)/TreePrintingTest.c -o $(TestObjDir)/TreePrintingTest.o -I$(TestIncDir) -I$(AbsIncDirC)

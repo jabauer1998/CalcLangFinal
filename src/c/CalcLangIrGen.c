@@ -16,7 +16,7 @@ LLVMValueRef codeGenExpression(AstNode* node, ScopeStack stack, DefList list, LL
 void loadCalcLangLinkerFile(LLVMModuleRef module, LLVMContextRef ctx, LLVMBuilderRef builder){
     LLVMMemoryBufferRef MemBuf;
     char *Message;
-    if (LLVMCreateMemoryBufferWithContentsOfFile("./ir/c/LinkToCalcLang.ll", &MemBuf, &Message)){
+    if (LLVMCreateMemoryBufferWithContentsOfFile("./lib/ir/CalcLangCInt.ll", &MemBuf, &Message)){
       perror(Message);
     }
     
@@ -31,7 +31,7 @@ void loadCalcLangLinkerFile(LLVMModuleRef module, LLVMContextRef ctx, LLVMBuilde
     }
 
     LLVMMemoryBufferRef MemBuf2;
-    if(LLVMCreateMemoryBufferWithContentsOfFile("./ir/c/CalcLangCIntArena.ll", &MemBuf2, &Message)){
+    if(LLVMCreateMemoryBufferWithContentsOfFile("./lib/ir/CalcLangCIntArena.ll", &MemBuf2, &Message)){
       perror(Message);
     }
 
@@ -41,6 +41,20 @@ void loadCalcLangLinkerFile(LLVMModuleRef module, LLVMContextRef ctx, LLVMBuilde
     }
 
     if(LLVMLinkModules2(module, ExternalModule2)){
+      perror("Linking Module Failed");
+    }
+
+    LLVMMemoryBufferRef MemBuf3;
+    if(LLVMCreateMemoryBufferWithContentsOfFile("./lib/ir/CalcLangCGraph.ll", &MemBuf3, &Message)){
+      perror(Message);
+    }
+
+    LLVMModuleRef ExternalModule3;
+    if(LLVMParseIRInContext(ctx, MemBuf3, &ExternalModule3, &Message)){
+      perror(Message);
+    }
+
+    if(LLVMLinkModules2(module, ExternalModule3)){
       perror("Linking Module Failed");
     }
 }
@@ -87,6 +101,23 @@ void freeArena(LLVMValueRef arena, LLVMBuilderRef builder, LLVMModuleRef mod, LL
   LLVMTypeRef funcType = LLVMFunctionType(LLVMVoidTypeInContext(ctx), paramTypes, 1, 0);
   LLVMValueRef args[] = { arena };
   LLVMBuildCall2(builder, funcType, func, args, 1, "");
+}
+
+void drawGraph(LLVMValueRef arena, LLVMValueRef begin, LLVMValueRef end, LLVMValueRef incr, LLVMValueRef func, LLVMBuilderRef builder, LLVMModuleRef mod, LLVMContextRef ctx){
+  LLVMTypeRef arenaType = LLVMGetTypeByName2(ctx, "struct.LLVMIntArena");
+  LLVMTypeRef arenaPtrType = LLVMPointerType(arenaType, 0);
+  LLVMTypeRef myType = LLVMGetTypeByName(mod, "struct.CalcLangVal");
+  LLVMTypeRef point = LLVMPointerType(myType, 0);
+  LLVMTypeRef paramTypes[] = {arenaPtrType, point};
+  LLVMTypeRef funcParamType = LLVMFunctionType(point, paramTypes, 2, 0);
+
+  LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "drawGraph");
+  LLVMTypeRef intType = LLVMInt32TypeInContext(ctx);
+  //Now define actualFunctionType
+  LLVMTypeRef actualArgTypes[] = {arenaPtrType, intType, intType, intType, funcParamType};
+  LLVMTypeRef actualType = LLVMFunctionType(LLVMVoidTypeInContext(ctx), actualArgTypes, 5, 0);
+  LLVMValueRef args[] = { arena, begin, end, incr, func};
+  LLVMBuildCall2(builder, actualType, myFunc, args, 5, "");
 }
 
 void defineFunctions(StoreArray* arr, DefList funcDefs, LLVMModuleRef mod, LLVMContextRef ctx){
@@ -814,6 +845,24 @@ void codeGenNode(AstNode* node, ScopeStack stack, DefList funcDefs, LLVMBuilderR
     printValueRef(resPar, stack, builder, calcLangPtr, mod, ctx);
     resetArena(arena, builder, mod, ctx);
     break;
+  }
+  case CREATE_GRAPH_COMMAND: {
+    CreateGraphCommand* myNode = &(node->actualNodeData.graph);
+
+    LLVMValueRef func = getDef(funcDefs, myNode->name);
+    if(func == NULL){
+      char funcName[2];
+      funcName[0] = myNode->name;
+      funcName[1] = '\0';
+      func = LLVMGetNamedFunction(mod, funcName);
+    }
+    LLVMTypeRef int32Type = LLVMInt32TypeInContext(ctx);
+
+    LLVMValueRef begin = LLVMConstInt(int32Type, atoi(myNode->begin), 0);
+    LLVMValueRef end = LLVMConstInt(int32Type, atoi(myNode->end), 0);
+    LLVMValueRef incr = LLVMConstInt(int32Type, atoi(myNode->incr), 0);
+
+    drawGraph(arena, begin, end, incr, func, builder, mod, ctx);
   }
   default:
     perror("Unexpected type when generating CalcLang");
