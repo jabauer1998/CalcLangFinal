@@ -459,6 +459,7 @@ void freeTree(AstNode* node){
     break;
   case CREATE_GRAPH_COMMAND:
     freeCreateGraphCommand(&(node->actualNodeData.graph));
+    break;
   default:
     fprintf(stderr, "Invalid number %d", node->nodeType);
     break;
@@ -551,7 +552,8 @@ void astToStr(AstNode* node, int size, char* str){
     parenExpressionToStr(&(node->actualNodeData.par), size, str);
     break;
   case CREATE_GRAPH_COMMAND:
-    createGraphCommandToStr(&node->actualNodeData.graph, size, str);
+    createGraphCommandToStr(&(node->actualNodeData.graph), size, str);
+    break;
   default:
     fprintf(stderr, "Invalid number %d", node->nodeType);
     break;

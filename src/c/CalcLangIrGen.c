@@ -110,11 +110,12 @@ void drawGraph(LLVMValueRef arena, LLVMValueRef begin, LLVMValueRef end, LLVMVal
   LLVMTypeRef point = LLVMPointerType(myType, 0);
   LLVMTypeRef paramTypes[] = {arenaPtrType, point};
   LLVMTypeRef funcParamType = LLVMFunctionType(point, paramTypes, 2, 0);
+  LLVMTypeRef funcParamTypePtr = LLVMPointerType(funcParamType, 0);
 
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "drawGraph");
   LLVMTypeRef intType = LLVMInt32TypeInContext(ctx);
   //Now define actualFunctionType
-  LLVMTypeRef actualArgTypes[] = {arenaPtrType, intType, intType, intType, funcParamType};
+  LLVMTypeRef actualArgTypes[] = {arenaPtrType, intType, intType, intType, funcParamTypePtr};
   LLVMTypeRef actualType = LLVMFunctionType(LLVMVoidTypeInContext(ctx), actualArgTypes, 5, 0);
   LLVMValueRef args[] = { arena, begin, end, incr, func};
   LLVMBuildCall2(builder, actualType, myFunc, args, 5, "");
@@ -863,6 +864,8 @@ void codeGenNode(AstNode* node, ScopeStack stack, DefList funcDefs, LLVMBuilderR
     LLVMValueRef incr = LLVMConstInt(int32Type, atoi(myNode->incr), 0);
 
     drawGraph(arena, begin, end, incr, func, builder, mod, ctx);
+    resetArena(arena, builder, mod, ctx);
+    break;
   }
   default:
     perror("Unexpected type when generating CalcLang");

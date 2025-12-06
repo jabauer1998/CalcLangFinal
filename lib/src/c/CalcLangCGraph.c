@@ -11,23 +11,23 @@ bool closeTo(long double x, long double y, long double deviation) {
   return fabsl(x-y) < deviation;
 }
 
-CalcLangPixel** initializeDisplay(int windowWidth, int windowHeight){
+CalcLangPixel** initializeDisplay(int windowHeight, int windowWidth){
   CalcLangPixel** display = malloc(sizeof(CalcLangPixel*) * windowHeight);
   memset(display, 0, windowHeight);
   for(int i = 0; i < windowHeight; i++){
     display[i] = (CalcLangPixel*)malloc(sizeof(CalcLangPixel) * windowWidth);
-    memset(display, 0, windowWidth);
+    memset(display[i], 0, windowWidth);
   }
   return display;
 }
 
-CalcLangPixel** quantifyPlane(long double xSteps, long double ySteps, long double xMin, long double yMax, int windowWidth, int windowHeight){
-  CalcLangPixel** display = initializeDisplay(windowWidth, windowHeight);
+CalcLangPixel** quantifyPlane(long double xSteps, long double ySteps, long double xMin, long double yMax, int windowHeight, int windowWidth){
+  CalcLangPixel** display = initializeDisplay(windowHeight, windowWidth);
 
   for(int y = 0; y < windowHeight; y++){
     for(int x = 0; x < windowWidth; x++){
-      *&display[y][x].x = (xMin + (xSteps * x));
-      *&display[x][y].y = (yMax - (ySteps * y));
+      display[y][x].x = (xMin + (xSteps * x));
+      display[y][x].y = (yMax - (ySteps * y));
     }
   }
 
@@ -40,7 +40,7 @@ char yCompress(long double num, long double pixel, long double range){
   // splits the pixel's height by 1/8
   long double steps = range/8;
 
-  long double goal = num - (pixel - (range/2) );
+  long double goal = num - (pixel - (range/2));
   int counter = 0;
   long double step = 0;
   while(step < goal) {
@@ -65,7 +65,7 @@ void printPlane(CalcLangPixel** display, int windowHeight, int windowWidth){
   for(int y = 0; y < windowHeight; y++)
     puts(output[y]);
 
-  for(int i = 0; i <= windowHeight; i++)
+  for(int i = 0; i < windowHeight; i++)
     free(output[i]);
   free(output);
 }
@@ -88,7 +88,7 @@ void shadeGraph(CalcLangPixel** display, CalcLangValue* (*dataFunc)(LLVMIntArena
 
   for(int y = 0; y < windowHeight; y++){
     for(int x = 0; x < windowWidth; x++){
-      CalcLangPixel* pixel = &display[y][x];
+      CalcLangPixel* pixel = &(display[y][x]);
 
       relX = pixel->x;
       relY = pixel->y;
@@ -105,11 +105,11 @@ void shadeGraph(CalcLangPixel** display, CalcLangValue* (*dataFunc)(LLVMIntArena
 void drawLine(CalcLangPixel** display, CalcLangValue* (*dataFunc)(LLVMIntArena*,CalcLangValue*), LLVMIntArena* arena, long double xSteps, long double ySteps, int windowHeight, int windowWidth){
   long double relX, relY;
 
-    for(int y = 0 ; y < windowHeight ; y++) {
-        for(int x = 0 ; x < windowWidth ; x++) {
-            CalcLangPixel* pixel = &display[y][x];
-            relX = pixel -> x;
-            relY = pixel -> y;
+    for(int y = 0; y < windowHeight ; y++) {
+        for(int x = 0; x < windowWidth ; x++) {
+	    CalcLangPixel* pixel = &(display[y][x]);
+            relX = pixel->x;
+            relY = pixel->y;
 
             long double output = calcLangValueFuncWrapper(arena, dataFunc, relX);
             if(closeTo(output, relY, ySteps/2.1))
@@ -122,7 +122,7 @@ void drawPlane(CalcLangPixel** display, long double xSteps, long double ySteps, 
   long double relX, relY;
     for(int y = 0; y < windowHeight; y++) {
         for(int x = 0; x < windowWidth; x++) {
-            CalcLangPixel* pixel = &display[y][x];
+	    CalcLangPixel* pixel = &(display[y][x]);
             relX = pixel->x;
             relY = pixel->y;
 
