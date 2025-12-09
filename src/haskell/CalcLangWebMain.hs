@@ -23,7 +23,7 @@ import Text.Blaze.Html.Renderer.Text (renderHtml)
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
 import Data.Text.Lazy(Text)
-import Network.Wai.Handler.Warp (Settings, defaultSettings, setHost, setPort)
+import Network.Wai.Handler.Warp (Settings, defaultSettings, setHost, setPort, HostPreference)
 import qualified Network.Wai.Handler.Warp as Warp
 import Network.Wai (Application)
 import Network.Wai.Middleware.Static
@@ -31,6 +31,7 @@ import Foreign.C.String (CString, newCString)
 import Foreign.Ptr (Ptr)
 import Network.Wai.Handler.Warp
 import Data.Text.Encoding (encodeUtf8)
+import qualified Data.String
 
 import CalcLangInterpreter
 import CalcLangParser
@@ -73,18 +74,11 @@ main = do
                      Nothing -> do
                                 putStrLn ("Command Line port expected but found " ++ arg1 ++ "\n defaulting to port 5000")
                                 return (5000, "127.0.0.1")    
-         (arg1:arg2:_) -> case (readMaybe arg1 :: Maybe Int, readMaybe arg2 :: Maybe HostPreference) of
-                            (Just num, Just ip) -> do
-                                                   return (num, ip)
-                            (Nothing, Just ip) -> do
-                                                  putStrLn ("Command Line port expected but found nothing \n defaulting to port 5000")
-                                                  return (5000, ip)
-                            (Nothing, Nothing) -> do
-                                                  putStrLn ("Command Line Port and Ip expected defaulting to localhost and port 5000")
-                                                  return (5000, "127.0.0.1")
-                            (Just num, Nothing) -> do
-                                                   putStrLn ("No ip found defaulting to localhost")
-                                                   return (num, "127.0.0.1")
+         (arg1:arg2:_) -> case readMaybe arg1 :: Maybe Int of
+                            Just num -> return (num, Data.String.fromString arg2)
+                            Nothing -> do
+                                       putStrLn ("Command Line port expected but found " ++ arg1 ++ "\n defaulting to port 5000")
+                                       return (5000, Data.String.fromString arg2)
     
        putStrLn $ "Starting CalcLang Web Server on " ++ (show ipAddr) ++ ":" ++ (show port)
        let settings = setHost ipAddr $ setPort port defaultSettings
@@ -141,10 +135,11 @@ main = do
                                                                                                                                                 H.option ! A.value "nvidia" $ "nvidia"
                                                                                                                                               H.label ! A.for "os" $ "Operating System:"
                                                                                                                                               H.select ! A.id "os" ! A.name "os" $ do
-                                                                                                                                                H.option ! A.value "linux-gnu" $ "linux-gnu"
-                                                                                                                                                H.option ! A.value "darwin" $ "darwin"
-                                                                                                                                                H.option ! A.value "windows-msvc" $ "windows-msvc"
-                                                                                                                                                H.option ! A.value "freebsd" $ "freebsd"
+                                                                                                                                                H.option ! A.value "linux-musl" $ "Linux (musl)"
+                                                                                                                                                H.option ! A.value "linux-gnu" $ "Linux (glibc)"
+                                                                                                                                                H.option ! A.value "darwin" $ "macOS"
+                                                                                                                                                H.option ! A.value "windows-msvc" $ "Windows"
+                                                                                                                                                H.option ! A.value "freebsd" $ "FreeBSD"
                                                                                                                                               H.input ! A.type_ "submit" ! A.value "Generate Target Triple"
                                                                                               H.a ! A.href "/" $ "Back To Intro"
                                                                                               H.a ! A.href "/eval" $ "Evaluate CalcLang"
@@ -246,5 +241,199 @@ main = do
                                                                                                                                          H.input ! A.type_ "submit" ! A.value "Submit"
                                                                                           H.a ! A.href "/" $ "Back To Intro"
                                                                                           H.a ! A.href "/help" $ "Help Page"
+                                                                                          H.a ! A.href "/graph" $ "Graph a Function"
                                                Scott.html (renderHtml myInputForm)
-                                                                                           
+
+                           Scott.get "/graph" $ do
+                                               myFTBefore <- liftIO (IORef.readIORef fT)
+                                               let funcList = getFunctionNames myFTBefore
+                                               let graphForm = H.docTypeHtml $ do
+                                                                               H.head $ do
+                                                                                        H.link ! A.rel "stylesheet" ! A.href "css/StyleSheet.css"
+                                                                                        H.title "Graph a Function"
+                                                                               H.body $ do
+                                                                                        H.h1 "Graph a Function"
+                                                                                        H.p "First define a function using the eval page, then graph it here."
+                                                                                        H.p $ H.toHtml $ "Available functions: " ++ (if null funcList then "(none defined)" else intercalate ", " funcList)
+                                                                                        H.form ! A.action "/graph-result" ! A.method "get" $ do
+                                                                                                 H.div ! A.class_ "form-group" $ do
+                                                                                                          H.label ! A.for "funcName" $ "Function Name (single letter):"
+                                                                                                          H.input ! A.type_ "text" ! A.id "funcName" ! A.name "funcName" ! A.maxlength "1" ! A.placeholder "f"
+                                                                                                 H.div ! A.class_ "form-group" $ do
+                                                                                                          H.label ! A.for "fromVal" $ "From (start x value):"
+                                                                                                          H.input ! A.type_ "number" ! A.id "fromVal" ! A.name "fromVal" ! A.value "-10"
+                                                                                                 H.div ! A.class_ "form-group" $ do
+                                                                                                          H.label ! A.for "toVal" $ "To (end x value):"
+                                                                                                          H.input ! A.type_ "number" ! A.id "toVal" ! A.name "toVal" ! A.value "10"
+                                                                                                 H.div ! A.class_ "form-group" $ do
+                                                                                                          H.label ! A.for "stepVal" $ "Step (increment):"
+                                                                                                          H.input ! A.type_ "number" ! A.id "stepVal" ! A.name "stepVal" ! A.value "1"
+                                                                                                 H.input ! A.type_ "submit" ! A.value "Generate Graph"
+                                                                                        H.a ! A.href "/eval" $ "Define a Function"
+                                                                                        H.a ! A.href "/" $ "Back To Intro"
+                                               Scott.html (renderHtml graphForm)
+
+                           Scott.get "/graph-result" $ do
+                                                      funcNameParam <- Scott.queryParam "funcName" :: Scott.ActionM TL.Text
+                                                      fromValParam <- Scott.queryParam "fromVal" :: Scott.ActionM TL.Text
+                                                      toValParam <- Scott.queryParam "toVal" :: Scott.ActionM TL.Text
+                                                      stepValParam <- Scott.queryParam "stepVal" :: Scott.ActionM TL.Text
+                                                      let funcName = if TL.null funcNameParam then 'f' else TL.head funcNameParam
+                                                      let fromVal = maybe (-10) Prelude.id (readMaybe (TL.unpack fromValParam) :: Maybe Int)
+                                                      let toVal = maybe 10 Prelude.id (readMaybe (TL.unpack toValParam) :: Maybe Int)
+                                                      let stepVal = maybe 1 Prelude.id (readMaybe (TL.unpack stepValParam) :: Maybe Int)
+                                                      myVTBefore <- liftIO (IORef.readIORef vT)
+                                                      myFTBefore <- liftIO (IORef.readIORef fT)
+                                                      let graphData = computeGraphData funcName fromVal toVal stepVal myVTBefore myFTBefore
+                                                      let pageHtml = case graphData of
+                                                                       Left errMsg -> H.docTypeHtml $ do
+                                                                                                      H.head $ do
+                                                                                                               H.title "Graph Error"
+                                                                                                               H.link ! A.rel "stylesheet" ! A.href "css/StyleSheet.css"
+                                                                                                      H.body $ do
+                                                                                                               H.h1 "Error Generating Graph"
+                                                                                                               H.pre $ H.toHtml errMsg
+                                                                                                               H.a ! A.href "/graph" $ "Try Again"
+                                                                                                               H.a ! A.href "/eval" $ "Define a Function"
+                                                                       Right points -> H.docTypeHtml $ do
+                                                                                                        H.head $ do
+                                                                                                                 H.title $ H.toHtml $ "Graph of " ++ [funcName] ++ "(x)"
+                                                                                                                 H.link ! A.rel "stylesheet" ! A.href "css/StyleSheet.css"
+                                                                                                                 H.style $ H.toHtml graphStyles
+                                                                                                        H.body $ do
+                                                                                                                 H.h1 $ H.toHtml $ "Graph of " ++ [funcName] ++ "(x)"
+                                                                                                                 H.div ! A.id "graph-container" $ do
+                                                                                                                          H.canvas ! A.id "graphCanvas" ! A.width "800" ! A.height "500" $ ""
+                                                                                                                 H.div ! A.class_ "graph-info" $ do
+                                                                                                                          H.p $ H.toHtml $ "Range: x = " ++ show fromVal ++ " to " ++ show toVal ++ ", step = " ++ show stepVal
+                                                                                                                          H.p $ H.toHtml $ "Points: " ++ show (length points)
+                                                                                                                 H.script $ H.toHtml $ graphScript points fromVal toVal
+                                                                                                                 H.a ! A.href "/graph" $ "Graph Another Function"
+                                                                                                                 H.a ! A.href "/eval" $ "Evaluate CalcLang"
+                                                      Scott.html (renderHtml pageHtml)
+
+getFunctionNames :: FunctionTable -> [String]
+getFunctionNames ft = case ft of
+                        SymbolTable entries -> Prelude.map (\(c, _) -> [c]) entries
+
+computeGraphData :: Char -> Int -> Int -> Int -> Env -> FunctionTable -> Either String [(Int, Double)]
+computeGraphData funcName fromVal toVal stepVal vT fT =
+    let entry = getEntryFromTable fT funcName
+    in case entry of
+         Nothing -> Left $ "Function '" ++ [funcName] ++ "' not found. Please define it first using: func " ++ [funcName] ++ "(x) = <expression>"
+         Just (params, retExpr) ->
+           let xVals = [fromVal, fromVal + stepVal .. toVal]
+               evalPoint x =
+                 let zippedData = zipWith (\p _ -> (getParamChar p, IntVal x)) params [1..]
+                     addedScopeEnv = addScopeToEnv vT
+                     vTable = foldl (\table tuple -> addEntryToEnv table tuple) addedScopeEnv zippedData
+                     (retVal, _, _) = interpret retExpr vTable fT
+                 in (x, valToDouble retVal)
+               points = Prelude.map evalPoint xVals
+           in Right points
+
+getParamChar :: AstNode -> Char
+getParamChar node = case node of
+                      IdentAst _ c -> c
+                      _ -> 'x'
+
+valToDouble :: CalcLangValue -> Double
+valToDouble val = case val of
+                    IntVal i -> fromIntegral i
+                    RealVal d -> d
+                    PercentVal p -> p
+                    DollarVal d -> d
+                    BoolVal b -> if b then 1.0 else 0.0
+                    _ -> 0.0
+
+graphStyles :: String
+graphStyles = unlines
+  [ "#graph-container { background: #1a1a2e; border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }"
+  , "#graphCanvas { display: block; margin: 0 auto; background: #16213e; border-radius: 8px; }"
+  , ".graph-info { text-align: center; margin-top: 15px; color: #a0a0a0; }"
+  , ".graph-info p { margin: 5px 0; }"
+  ]
+
+graphScript :: [(Int, Double)] -> Int -> Int -> String
+graphScript points fromVal toVal = unlines
+  [ "const canvas = document.getElementById('graphCanvas');"
+  , "const ctx = canvas.getContext('2d');"
+  , "const width = canvas.width;"
+  , "const height = canvas.height;"
+  , "const padding = 50;"
+  , ""
+  , "const points = " ++ pointsToJS points ++ ";"
+  , ""
+  , "const xMin = " ++ show fromVal ++ ";"
+  , "const xMax = " ++ show toVal ++ ";"
+  , "const yVals = points.map(p => p.y);"
+  , "const yMin = Math.min(...yVals);"
+  , "const yMax = Math.max(...yVals);"
+  , "const yRange = yMax - yMin || 1;"
+  , "const yPadding = yRange * 0.1;"
+  , ""
+  , "function scaleX(x) { return padding + ((x - xMin) / (xMax - xMin)) * (width - 2 * padding); }"
+  , "function scaleY(y) { return height - padding - ((y - (yMin - yPadding)) / (yRange + 2 * yPadding)) * (height - 2 * padding); }"
+  , ""
+  , "ctx.strokeStyle = '#3a3a5c';"
+  , "ctx.lineWidth = 1;"
+  , "ctx.beginPath();"
+  , "for (let i = 0; i <= 10; i++) {"
+  , "  const x = padding + (i / 10) * (width - 2 * padding);"
+  , "  ctx.moveTo(x, padding);"
+  , "  ctx.lineTo(x, height - padding);"
+  , "  const y = padding + (i / 10) * (height - 2 * padding);"
+  , "  ctx.moveTo(padding, y);"
+  , "  ctx.lineTo(width - padding, y);"
+  , "}"
+  , "ctx.stroke();"
+  , ""
+  , "ctx.strokeStyle = '#6c63ff';"
+  , "ctx.lineWidth = 2;"
+  , "if (scaleY(0) >= padding && scaleY(0) <= height - padding) {"
+  , "  ctx.beginPath();"
+  , "  ctx.moveTo(padding, scaleY(0));"
+  , "  ctx.lineTo(width - padding, scaleY(0));"
+  , "  ctx.stroke();"
+  , "}"
+  , "if (scaleX(0) >= padding && scaleX(0) <= width - padding) {"
+  , "  ctx.beginPath();"
+  , "  ctx.moveTo(scaleX(0), padding);"
+  , "  ctx.lineTo(scaleX(0), height - padding);"
+  , "  ctx.stroke();"
+  , "}"
+  , ""
+  , "ctx.strokeStyle = '#e94560';"
+  , "ctx.lineWidth = 3;"
+  , "ctx.beginPath();"
+  , "if (points.length > 0) {"
+  , "  ctx.moveTo(scaleX(points[0].x), scaleY(points[0].y));"
+  , "  for (let i = 1; i < points.length; i++) {"
+  , "    ctx.lineTo(scaleX(points[i].x), scaleY(points[i].y));"
+  , "  }"
+  , "}"
+  , "ctx.stroke();"
+  , ""
+  , "ctx.fillStyle = '#e94560';"
+  , "points.forEach(p => {"
+  , "  ctx.beginPath();"
+  , "  ctx.arc(scaleX(p.x), scaleY(p.y), 4, 0, 2 * Math.PI);"
+  , "  ctx.fill();"
+  , "});"
+  , ""
+  , "ctx.fillStyle = '#a0a0a0';"
+  , "ctx.font = '12px Arial';"
+  , "ctx.textAlign = 'center';"
+  , "for (let i = 0; i <= 5; i++) {"
+  , "  const xVal = xMin + (i / 5) * (xMax - xMin);"
+  , "  ctx.fillText(xVal.toFixed(0), scaleX(xVal), height - padding + 20);"
+  , "}"
+  , "ctx.textAlign = 'right';"
+  , "for (let i = 0; i <= 5; i++) {"
+  , "  const yVal = (yMin - yPadding) + (i / 5) * (yRange + 2 * yPadding);"
+  , "  ctx.fillText(yVal.toFixed(1), padding - 10, scaleY(yVal) + 4);"
+  , "}"
+  ]
+
+pointsToJS :: [(Int, Double)] -> String
+pointsToJS pts = "[" ++ intercalate "," (Prelude.map (\(x,y) -> "{x:" ++ show x ++ ",y:" ++ show y ++ "}") pts) ++ "]"
