@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <sys/ioctl.h> // Required for ioctl and TIOCGWINSZ
 #include <unistd.h>    // Required for STDOUT_FILENO
+#include <limits.h>
 #include "CalcLangCInt.h"
 
 bool closeTo(long double x, long double y, long double deviation) {
@@ -26,8 +27,8 @@ CalcLangPixel** quantifyPlane(long double xSteps, long double ySteps, long doubl
 
   for(int y = 0; y < windowHeight; y++){
     for(int x = 0; x < windowWidth; x++){
-      display[y][x].x = (xMin + (xSteps * x));
-      display[y][x].y = (yMax - (ySteps * y));
+      display[y][x].x = xMin + (xSteps * x);
+      display[y][x].y = yMax - (ySteps * y);
     }
   }
 
@@ -58,20 +59,16 @@ void printPlane(CalcLangPixel** display, int windowHeight, int windowWidth){
 
   for(int y = 0; y < windowHeight; y++) {
     for(int x = 0; x < windowWidth; x++)
-      output[y][x] = *&display[y][x].display;
+      output[y][x] = display[y][x].display;
     output[y][windowWidth] = '\0';
   }
 
   for(int y = 0; y < windowHeight; y++)
     puts(output[y]);
-
-  for(int i = 0; i < windowHeight; i++)
-    free(output[i]);
-  free(output);
 }
 
 long double calcLangValueFuncWrapper(LLVMIntArena* arena, CalcLangValue* (*valFunc)(LLVMIntArena*, CalcLangValue*), long double val){
-  CalcLangValue* cVal = arenaAlloc(arena, sizeof(CalcLangValue*));
+  CalcLangValue* cVal = arenaAlloc(arena, sizeof(CalcLangValue));
   cVal->valType = IS_INT;
   cVal->valData.integer = (int)val;
   CalcLangValue* res = valFunc(arena, cVal);
@@ -105,17 +102,28 @@ void shadeGraph(CalcLangPixel** display, CalcLangValue* (*dataFunc)(LLVMIntArena
 void drawLine(CalcLangPixel** display, CalcLangValue* (*dataFunc)(LLVMIntArena*,CalcLangValue*), LLVMIntArena* arena, long double xSteps, long double ySteps, int windowHeight, int windowWidth){
   long double relX, relY;
 
-    for(int y = 0; y < windowHeight ; y++) {
+    for(int y = 0; y < windowHeight; y++) {
         for(int x = 0; x < windowWidth ; x++) {
 	    CalcLangPixel* pixel = &(display[y][x]);
             relX = pixel->x;
             relY = pixel->y;
 
             long double output = calcLangValueFuncWrapper(arena, dataFunc, relX);
+	    arenaReset(arena);
             if(closeTo(output, relY, ySteps/2.1))
 	      pixel->display = yCompress(output, relY, ySteps);
         }
     }
+}
+
+void printDisplayCordinates(CalcLangPixel** display, int windowHeight, int windowWidth){
+  for(int y = 0; y < windowHeight; y++){
+    printf("{");
+    for(int x = 0; x < windowWidth; x++){
+      printf("(%Lf,%Lf)", display[y][x].x, display[y][x].y);
+    }
+    printf("}\n");
+  }
 }
 
 void drawPlane(CalcLangPixel** display, long double xSteps, long double ySteps, int windowHeight, int windowWidth){
@@ -149,6 +157,21 @@ void clearDisplay(CalcLangPixel** display, int windowHeight){
   free(display);
 }
 
+long double findYMax(LLVMIntArena* arena, int begin, int end, int byAmount, CalcLangValue* (*valFunc)(LLVMIntArena* arena, CalcLangValue*)){
+  if(begin >= end)
+    return 0;
+
+  long double yMax = calcLangValueFuncWrapper(arena, valFunc, begin);
+  for(int i = begin + 1; i <= end; i+=byAmount){
+    long double toRet = calcLangValueFuncWrapper(arena, valFunc, i);
+    arenaReset(arena);
+    if(toRet > yMax){
+      yMax = toRet;
+    }
+  }
+  return yMax;
+}
+
 bool drawGraph(LLVMIntArena* arena, int begin, int end, int byAmount, CalcLangValue* (*valFunc)(LLVMIntArena* arena, CalcLangValue*)){
   struct winsize w;
   // Use ioctl to get the window size information
@@ -157,10 +180,13 @@ bool drawGraph(LLVMIntArena* arena, int begin, int end, int byAmount, CalcLangVa
       perror("ioctl failed");
       return false;
   }
-    
-  CalcLangPixel** display = quantifyPlane(byAmount, byAmount, begin, 14, w.ws_row, w.ws_col);
-  drawPlane(display, byAmount, byAmount, w.ws_row, w.ws_col);
-  drawLine(display, valFunc, arena, byAmount, byAmount, w.ws_row, w.ws_col);
+
+  long double yMax = findYMax(arena, begin, end, byAmount, valFunc);
+  CalcLangPixel** display = quantifyPlane(((end - begin) / w.ws_col), (yMax / w.ws_row), begin, yMax, w.ws_row, w.ws_col);
+  //printDisplayCordinates(display, w.ws_row, w.ws_col);
+  drawPlane(display, ((end - begin) / w.ws_col), (yMax / w.ws_row), w.ws_row, w.ws_col);
+  drawLine(display, valFunc, arena, ((end - begin) / w.ws_col), (yMax / w.ws_row), w.ws_row, w.ws_col);
+  shadeGraph(display, valFunc, arena, ((end - begin) / w.ws_col), (yMax / w.ws_row), begin, end, w.ws_row, w.ws_col);
   printPlane(display, w.ws_row, w.ws_col);
   clearDisplay(display, w.ws_row);
   return true;

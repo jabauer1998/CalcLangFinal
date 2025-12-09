@@ -85,7 +85,7 @@ LLVMValueRef generateArena(LLVMBuilderRef builder, LLVMModuleRef mod, LLVMContex
   LLVMTypeRef arenaType = LLVMGetTypeByName2(ctx, "struct.LLVMIntArena");
   LLVMTypeRef arenaPtrType = LLVMPointerType(arenaType, 0);
   LLVMValueRef func = LLVMGetNamedFunction(mod, "arenaInit");
-  int size = 1000000;
+  int size = 10000000;
   LLVMTypeRef intType = LLVMInt32TypeInContext(ctx);
   LLVMTypeRef paramTypes[] = {intType};
   LLVMTypeRef funcType = LLVMFunctionType(arenaPtrType, paramTypes, 1, 0);
@@ -807,13 +807,26 @@ void codeGenNode(AstNode* node, ScopeStack stack, DefList funcDefs, LLVMBuilderR
     
     for(int i = 1; i < (size + 1); i++){
       char name = genParamName(myNode->param->firstElem[i - 1]);
+      char fullName[2];
+      fullName[0] = name;
+      fullName[1] = '\0';
+      printStringRef("Param Name ", builder, mod, ctx);
+      printStringRef(fullName, builder, mod, ctx);
       LLVMValueRef arg1 = LLVMGetParam(func, i);
+      printStringRef(" and value ", builder, mod, ctx);
+      printValueRef(arg1, stack, builder, calcLangPtr, mod, ctx);
       LLVMValueRef ptrToy = LLVMBuildAlloca(builder, point, "");
       LLVMBuildStore(builder, arg1, ptrToy);
       addElemToVarTable(&stack, name, ptrToy);
     }
     
     pushScope(&stack);
+
+    char funcName[2];
+    funcName[0] = myNode->name;
+    funcName[1] = '\0';
+    printStringRef("Entering ", builder, mod, ctx);
+    printStringRef(funcName, builder, mod, ctx);
     LLVMValueRef result = codeGenExpression(myNode->expr, stack, funcDefs, builder, func, argArena, mod, ctx);
     LLVMBuildRet(builder, result);
     

@@ -165,10 +165,12 @@ generateVal node myInt = case node of
 generateNumberFNode :: AstNode -> Int
 generateNumberFNode node = case node of
                         IntNumberAst _ x -> read x :: Int
+                        RealNumberAst _ x -> floor (read x :: Double) :: Int
 
 generateNumberFVal :: CalcLangValue -> Integer
 generateNumberFVal node = case node of
                             IntVal val -> fromIntegral val :: Integer
+                            RealVal val -> floor val :: Integer
 
 interpret :: AstNode -> Env -> FunctionTable -> (CalcLangValue, Env, FunctionTable)
 interpret node vT fT = case node of

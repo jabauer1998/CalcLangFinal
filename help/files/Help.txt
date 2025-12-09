@@ -1,6 +1,6 @@
-------------------------------
-Help Message
-------------------------------
+  ------------------------------
+  Help Message
+  ------------------------------
   Welcome to using CalcLang. CalcLang is a language developed for teachers to teach the concept of functions within a math class.
   The language can handle basic arithmetic and variable definitions and function definitions.\n"
   The language logs history of previous commands within a session and the user can go back and modify previous commands.
