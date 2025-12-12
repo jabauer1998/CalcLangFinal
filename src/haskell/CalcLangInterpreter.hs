@@ -1,4 +1,4 @@
-module CalcLangInterpreter(interpret, FunctionTable, VariableTable, Env(..), STable(..), CalcLangValue(..), toStr) where
+module CalcLangInterpreter(interpret, FunctionTable, VariableTable, Env(..), STable(..), CalcLangValue(..), toStr, getEntryFromTable, addScopeToEnv, addEntryToEnv) where
 
 import Numeric
 import System.IO
@@ -245,6 +245,29 @@ interpret node vT fT = case node of
                                                                                                       let yVals = [ myFunc v | v <- [beginNum, incrNum .. endNum]]
                                                                                                       (CreateGraphCommandVal yVals, vT, fT)
                               CreateLessonPlanCommand _ src -> (CreateLessonPlanCommandVal src, vT, fT)
+                              GetElement _ index elem -> do
+                                                         let value = interpret elem vT fT
+                                                         case value of
+                                                           (TupleVal list, nVT, nFT) -> ((reverse list) !! index, nVT, nFT)
+                                                           (SetVal list, nVT, nFT) -> ((reverse list) !! index, nVT, nFT)
+                                                           (ErrorVal l, vT, fT) -> (ErrorVal l, vT, fT)
+                                                           _ -> (ErrorVal ["Error unexpected type for get element operation"], vT, fT)
+                              GetLength _ elem -> do
+                                                  let value = interpret elem vT fT
+                                                  case value of
+                                                    (TupleVal list, nVT, nFT) -> (IntVal (length list), nVT, nFT)
+                                                    (SetVal list, nVT, nFT) -> (IntVal (length list), nVT, nFT)
+                                                    (ErrorVal l, vT, fT) -> (ErrorVal l, vT, fT)
+                                                    _ -> (ErrorVal ["Error unexpected type for length  operation"], vT, fT)
+                              SinOperation _ elem -> do
+                                                     let (val, myVT, myFT) = interpret elem vT fT
+                                                     (sinVal val, myVT, myFT)
+                              TanOperation _ elem -> do
+                                                     let (val, myVT, myFT) = interpret elem vT fT
+                                                     (tanVal val, myVT, myFT)
+                              CosOperation _ elem -> do
+                                                     let (val, myVT, myFT)  = interpret elem vT fT
+                                                     (cosVal val, myVT, myFT)
                               ErrorNode s -> (ErrorVal ["Error at" ++ (show s)], vT, fT)
 
 gV :: (CalcLangValue, Env, FunctionTable) -> CalcLangValue
@@ -258,6 +281,34 @@ asBool aval = case aval of
                 RealVal val -> val /= 0
                 PercentVal val -> val /= 0
                 _ -> False
+
+sinVal :: CalcLangValue -> CalcLangValue
+sinVal v = case v of
+             IntVal int -> RealVal (sin ((fromIntegral int) * pi / 180))
+             RealVal r -> RealVal (sin r)
+             TupleVal t -> TupleVal (map sinVal t)
+             SetVal s -> SetVal (map sinVal s)
+             _ -> ErrorVal ["Invalid type for sinVal function"]
+
+cosVal :: CalcLangValue -> CalcLangValue
+cosVal v = case v of
+             IntVal int -> RealVal (cos ((fromIntegral int) * pi / 180))
+             RealVal r -> RealVal (cos r)
+             TupleVal t -> TupleVal (map sinVal t)
+             SetVal s -> SetVal (map cosVal s)
+             _ -> ErrorVal ["Invalid type for sinVal function"]
+
+tanVal :: CalcLangValue -> CalcLangValue
+tanVal v = case v of
+             IntVal int -> RealVal (tan ((fromIntegral int) * pi / 180))
+             RealVal r -> RealVal (tan r)
+             TupleVal t -> TupleVal (map tanVal t)
+             SetVal s -> SetVal (map tanVal s)
+             _ -> ErrorVal ["Invalid type for cosVal function"]
+
+
+
+
 
 powVals :: CalcLangValue -> CalcLangValue -> CalcLangValue
 powVals a1 a2 = case (a1, a2) of

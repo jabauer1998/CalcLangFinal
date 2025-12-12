@@ -29,6 +29,12 @@ module CalcLangAstH(Token(..), AstNode(..), SA(..), CSA(..), CSourcePos(..), CAs
 #define ASSIGN 23
 #define IF_EXPR 24
 #define PAREN_EXPR 25
+#define CREATE_GRAPH_COMMAND 26
+#define GET_ELEMENT 27
+#define GET_LENGTH 28
+#define SIN 29
+#define TAN 30
+#define COS 31
 
 --Below are all the Ast Nodes for Tokens
 import Text.Parsec
@@ -103,6 +109,12 @@ data Token = Ident Char SourcePos
            | PathComponent String SourcePos
            | SingleQuote SourcePos
            | DoubleQuote SourcePos
+           | Get SourcePos
+           | Elem SourcePos
+           | Len SourcePos
+           | Sin SourcePos
+           | Cos SourcePos
+           | Tan SourcePos
            deriving (Show, Eq)
 
 tokToString :: Token -> String
@@ -140,6 +152,10 @@ tokToString t = case t of
                   PathComponent str _ -> str
                   SingleQuote _ -> "'"
                   DoubleQuote _ -> "\""
+                  Get _ -> "get"
+                  Elem _ -> "elem"
+                  From _ -> "from"
+                  Len _ -> "len"
                   _ -> ""
                   
                   
@@ -201,6 +217,11 @@ data AstNode = EqualOperation SourcePos AstNode AstNode
              | CreateLessonPlanCommand SourcePos String
              | ErrorNode String
              | FullPath SourcePos String
+             | GetElement SourcePos Int AstNode
+             | GetLength SourcePos AstNode
+             | SinOperation SourcePos AstNode
+             | CosOperation SourcePos AstNode
+             | TanOperation SourcePos AstNode
              deriving (Eq, Show)
 
 toString :: AstNode -> String
@@ -231,6 +252,11 @@ toString myA = case myA of
                Assign _ name expr -> "let " ++ [name] ++ " = " ++ (toString expr)
                IfExpr _ cond ifTrue ifFalse -> "if " ++ (toString cond) ++ " then " ++ (toString ifTrue) ++ " else " ++ (toString ifFalse)
                ParenExpr _ expr -> "(" ++ (toString expr) ++ ")"
+               GetElement _ i node -> "get elem " ++ (show i) ++ " from " ++ (toString node)
+               GetLength _ node -> "get len from " ++ (toString node)
+               SinOperation _ node -> "sin(" ++ (toString node) ++ ")"
+               TanOperation _ node -> "tan(" ++ (toString node) ++ ")"
+               CosOperation _ node -> "cos(" ++ (toString node) ++ ")"
                ErrorNode err -> err
                
 
@@ -263,6 +289,11 @@ data CAstNode = CEqualOperation (Ptr CSourcePos) (Ptr CAstNode) (Ptr CAstNode)
               | CIfExpr (Ptr CSourcePos) (Ptr CAstNode) (Ptr CAstNode) (Ptr CAstNode)
               | CParenExpr (Ptr CSourcePos) (Ptr CAstNode)
               | CCreateGraphCommand (Ptr CSourcePos) CChar CString CString CString
+              | CGetElement (Ptr CSourcePos) (CInt) (Ptr CAstNode)
+              | CGetLength (Ptr CSourcePos) (Ptr CAstNode)
+              | CCosOperation (Ptr CSourcePos) (Ptr CAstNode)
+              | CSinOperation (Ptr CSourcePos) (Ptr CAstNode)
+              | CTanOperation (Ptr CSourcePos) (Ptr CAstNode)
               | CErrorNode String
               deriving (Eq, Show)
 
@@ -530,6 +561,31 @@ instance Storable CAstNode where
                                                                         pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar)) begin
                                                                         pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar) + sizeOf (undefined :: Ptr CInt)) end
                                                                         pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar) + sizeOf (undefined :: Ptr CInt) + sizeOf (undefined :: Ptr CInt)) incr
+                         CGetElement pos index elem -> do
+                                                       pokeByteOff ptr 0 (27 :: CInt)
+                                                       pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                       pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) index
+                                                       pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CInt)) elem
+                         CGetLength pos elem -> do
+                                                pokeByteOff ptr 0 (28 :: CInt)
+                                                pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) elem
+
+                         CSinOperation pos elem -> do
+                                                   pokeByteOff ptr 0 (29 :: CInt)
+                                                   pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                   pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) elem
+
+                         CTanOperation pos elem -> do
+                                                   pokeByteOff ptr 0 (30 :: CInt)
+                                                   pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                   pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) elem
+
+                         CCosOperation pos elem -> do
+                                                   pokeByteOff ptr 0 (31 :: CInt)
+                                                   pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
+                                                   pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) elem
+                                                       
                          _ -> error "Unknown AST node tag"
 
 

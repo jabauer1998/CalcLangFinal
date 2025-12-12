@@ -65,6 +65,129 @@ CalcLangValue* tupleCalcLangValue(LLVMIntArena* arena, CalcLangValue** value, in
   return toRet;
 }
 
+CalcLangValue* sinCalcLangValue(LLVMIntArena* arena, CalcLangValue* input){
+  CalcLangValue* toRet = (CalcLangValue*)arenaAlloc(arena, sizeof(CalcLangValue));
+  if(input->valType == IS_TUPLE){
+    toRet->valData.tuple = (TupleValue*)arenaAlloc(arena, sizeof(TupleValue));
+    toRet->valType = IS_TUPLE;
+    toRet->valData.tuple->size = input->valData.tuple->size;
+    for(int i = 0; i < toRet->valData.tuple->size; i++){
+      toRet->valData.tuple->list[i] = sinCalcLangValue(arena, input->valData.tuple->list[i]);
+    }
+  } else if(input->valType == IS_SET){
+    toRet->valData.set = (SetValue*)arenaAlloc(arena, sizeof(SetValue));
+    toRet->valType = IS_SET;
+    toRet->valData.set->size = input->valData.set->size;
+    for(int i = 0; i < toRet->valData.set->size; i++){
+      toRet->valData.set->list[i] = sinCalcLangValue(arena, input->valData.set->list[i]);
+    }
+  } else if(input->valType == IS_INT){
+    toRet->valType = IS_REAL;
+    toRet->valData.real = sin(input->valData.integer * M_PI / 180.0);
+  } else if(input->valType == IS_REAL){
+    toRet->valType = IS_REAL;
+    toRet->valData.real = sin(input->valData.real);
+  } else {
+    perror("Error invalid type for sin operation");
+    return NULL;
+  }
+  return toRet;
+}
+
+CalcLangValue* tanCalcLangValue(LLVMIntArena* arena, CalcLangValue* input){
+  CalcLangValue* toRet = (CalcLangValue*)arenaAlloc(arena, sizeof(CalcLangValue));
+  if(input->valType == IS_TUPLE){
+    toRet->valData.tuple = (TupleValue*)arenaAlloc(arena, sizeof(TupleValue));
+    toRet->valType = IS_TUPLE;
+    toRet->valData.tuple->size = input->valData.tuple->size;
+    for(int i = 0; i < toRet->valData.tuple->size; i++){
+      toRet->valData.tuple->list[i] = tanCalcLangValue(arena, input->valData.tuple->list[i]);
+    }
+  } else if(input->valType == IS_SET){
+    toRet->valData.set = (SetValue*)arenaAlloc(arena, sizeof(SetValue));
+    toRet->valType = IS_SET;
+    toRet->valData.set->size = input->valData.set->size;
+    for(int i = 0; i < toRet->valData.set->size; i++){
+      toRet->valData.set->list[i] = tanCalcLangValue(arena, input->valData.set->list[i]);
+    }
+  } else if(input->valType == IS_INT){
+    toRet->valType = IS_REAL;
+    toRet->valData.real = tan(input->valData.integer * M_PI / 180.0);
+  } else if(input->valType == IS_REAL){
+    toRet->valType = IS_REAL;
+    toRet->valData.real = tan(input->valData.real);
+  } else {
+    perror("Error invalid type for tan operation");
+    return NULL;
+  }
+  return toRet;
+}
+
+CalcLangValue* cosCalcLangValue(LLVMIntArena* arena, CalcLangValue* input){
+  CalcLangValue* toRet = (CalcLangValue*)arenaAlloc(arena, sizeof(CalcLangValue));
+  if(input->valType == IS_TUPLE){
+    toRet->valData.tuple = (TupleValue*)arenaAlloc(arena, sizeof(TupleValue));
+    toRet->valType = IS_TUPLE;
+    toRet->valData.tuple->size = input->valData.tuple->size;
+    for(int i = 0; i < toRet->valData.tuple->size; i++){
+      toRet->valData.tuple->list[i] = cosCalcLangValue(arena, input->valData.tuple->list[i]);
+    }
+  } else if(input->valType == IS_SET){
+    toRet->valData.set = (SetValue*)arenaAlloc(arena, sizeof(SetValue));
+    toRet->valType = IS_SET;
+    toRet->valData.set->size = input->valData.set->size;
+    for(int i = 0; i < toRet->valData.set->size; i++){
+      toRet->valData.set->list[i] = cosCalcLangValue(arena, input->valData.set->list[i]);
+    }
+  } else if(input->valType == IS_INT){
+    toRet->valType = IS_REAL;
+    toRet->valData.real = cos(input->valData.integer * M_PI / 180.0);
+  } else if(input->valType == IS_REAL){
+    toRet->valType = IS_REAL;
+    toRet->valData.real = cos(input->valData.real);
+  } else {
+    perror("Error invalid type for cos operation");
+    return NULL;
+  }
+  
+  return toRet;
+}
+
+CalcLangValue* getElementFromCalcLangValue(LLVMIntArena* arena, int index, CalcLangValue* input){
+  if(input->valType == IS_TUPLE){
+    if(index >= input->valData.tuple->size){
+      perror("Error index is out of range for size");
+      return NULL;
+    } else {
+      return input->valData.tuple->list[index];
+    }
+  } else if(input->valType == IS_SET){
+    if(index >= input->valData.set->size){
+      perror("Error index is out of range for size");
+      return NULL;
+    } else {
+      return input->valData.set->list[index];
+    }
+  } else {
+    perror("Invalid type for Get Element Operation");
+    return NULL;
+  }
+}
+
+CalcLangValue* getLengthFromCalcLangValue(LLVMIntArena* arena, CalcLangValue* input){
+  CalcLangValue* val = (CalcLangValue*)arenaAlloc(arena, sizeof(CalcLangValue));
+  val->valType = IS_INT;
+  if(input->valType == IS_TUPLE){
+    val->valData.integer = input->valData.tuple->size;
+  } else if(input->valType == IS_SET){
+    val->valData.integer = input->valData.set->size;
+  } else {
+    perror("Invalid type for Get Length Operation");
+    return NULL;
+  }
+  return val;
+}
+
 bool toBool(CalcLangValue* val){
   if(val->valType == IS_INT){
     return val->valData.integer != 0;

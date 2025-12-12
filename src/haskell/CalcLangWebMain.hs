@@ -254,7 +254,7 @@ main = do
                                                                                H.body $ do
                                                                                         H.h1 "Graph a Function"
                                                                                         H.p "First define a function using the eval page, then graph it here."
-                                                                                        H.p $ H.toHtml $ "Available functions: " ++ (if null funcList then "(none defined)" else intercalate ", " funcList)
+                                                                                        H.p $ H.toHtml $ "Available functions: " ++ (if Prelude.null funcList then "(none defined)" else intercalate ", " funcList)
                                                                                         H.form ! A.action "/graph-result" ! A.method "get" $ do
                                                                                                  H.div ! A.class_ "form-group" $ do
                                                                                                           H.label ! A.for "funcName" $ "Function Name (single letter):"
@@ -318,7 +318,7 @@ getFunctionNames ft = case ft of
 
 computeGraphData :: Char -> Int -> Int -> Int -> Env -> FunctionTable -> Either String [(Int, Double)]
 computeGraphData funcName fromVal toVal stepVal vT fT =
-    let entry = getEntryFromTable fT funcName
+    let entry = CalcLangInterpreter.getEntryFromTable fT funcName
     in case entry of
          Nothing -> Left $ "Function '" ++ [funcName] ++ "' not found. Please define it first using: func " ++ [funcName] ++ "(x) = <expression>"
          Just (params, retExpr) ->
