@@ -158,9 +158,6 @@ void clearDisplay(CalcLangPixel** display, int windowHeight){
 }
 
 long double findYMax(LLVMIntArena* arena, int begin, int end, int byAmount, CalcLangValue* (*valFunc)(LLVMIntArena* arena, CalcLangValue*)){
-  if(begin >= end)
-    return 0;
-
   long double yMax = calcLangValueFuncWrapper(arena, valFunc, begin);
   for(int i = begin + 1; i <= end; i+=byAmount){
     long double toRet = calcLangValueFuncWrapper(arena, valFunc, i);
@@ -172,6 +169,18 @@ long double findYMax(LLVMIntArena* arena, int begin, int end, int byAmount, Calc
   return yMax;
 }
 
+long double findYMin(LLVMIntArena* arena, int begin, int end, int byAmount, CalcLangValue* (*valFunc)(LLVMIntArena* arena, CalcLangValue*)){
+  long double yMin = calcLangValueFuncWrapper(arena, valFunc, begin);
+  for(int i = begin + 1; i <= end; i+=byAmount){
+    long double toRet = calcLangValueFuncWrapper(arena, valFunc, i);
+    arenaReset(arena);
+    if(toRet < yMin){
+      yMin = toRet;
+    }
+  }
+  return yMin;
+}
+
 bool drawGraph(LLVMIntArena* arena, int begin, int end, int byAmount, CalcLangValue* (*valFunc)(LLVMIntArena* arena, CalcLangValue*)){
   struct winsize w;
   // Use ioctl to get the window size information
@@ -181,12 +190,23 @@ bool drawGraph(LLVMIntArena* arena, int begin, int end, int byAmount, CalcLangVa
       return false;
   }
 
-  long double yMax = findYMax(arena, begin, end, byAmount, valFunc);
-  CalcLangPixel** display = quantifyPlane(((end - begin) / w.ws_col), (yMax / w.ws_row), begin, yMax, w.ws_row, w.ws_col);
-  //printDisplayCordinates(display, w.ws_row, w.ws_col);
-  drawPlane(display, ((end - begin) / w.ws_col), (yMax / w.ws_row), w.ws_row, w.ws_col);
-  drawLine(display, valFunc, arena, ((end - begin) / w.ws_col), (yMax / w.ws_row), w.ws_row, w.ws_col);
-  shadeGraph(display, valFunc, arena, ((end - begin) / w.ws_col), (yMax / w.ws_row), begin, end, w.ws_row, w.ws_col);
+  long double xStep = ((end - begin) / w.ws_col) * 2;
+  long double xBegin = -(xStep * (w.ws_col / 2));
+  long double xEnd = +(xStep * (w.ws_col / 2));
+
+  long double yMax = findYMax(arena, xBegin, xEnd, byAmount, valFunc);
+  long double yMin = findYMin(arena, xBegin, xEnd, byAmount, valFunc);
+
+  long double yStep = ((yMax - yMin) / w.ws_row);
+  long double yBegin = -(yStep * (w.ws_row/2));
+  long double yEnd = +(yStep * (w.ws_row/2));
+
+  printf("Metadata: xStep=%Lf,xBegin=%Lf,xEnd=%Lf, yMax=%Lf, yMin=%Lf, yStep=%Lf, yBegin=%Lf, yEnd=%Lf\n", xStep, xBegin, xEnd, yMax, yMin, yStep, yBegin, yEnd);
+  
+  CalcLangPixel** display = quantifyPlane(xStep, yStep, xBegin, yEnd, w.ws_row, w.ws_col);
+  drawPlane(display, xStep, yStep, w.ws_row, w.ws_col);
+  drawLine(display, valFunc, arena, xStep, yStep, w.ws_row, w.ws_col);
+  shadeGraph(display, valFunc, arena, xStep, yStep, xBegin, xEnd, w.ws_row, w.ws_col);
   printPlane(display, w.ws_row, w.ws_col);
   clearDisplay(display, w.ws_row);
   return true;
