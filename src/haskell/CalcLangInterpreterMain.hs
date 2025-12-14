@@ -70,7 +70,7 @@ runCommandLine vT fT = do
                                                                                                                                                              cStr <- liftIO (newCString str)
                                                                                                                                                              _ <- liftIO (processASTList storeArray cStr)
                                                                                                                                                              runCommandLine x y
-                                                                                                                   (CreateGraphCommandVal ys, x, y) -> do
+                                                                                                                   (CreateGraphCommandIntVal ys, x, y) -> do
                                                                                                                                                  _ <- liftIO $ plot ys
                                                                                                                                                  runCommandLine x y
                                                                                                                    (a, x, y) -> do

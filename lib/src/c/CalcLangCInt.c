@@ -1,5 +1,6 @@
 #include "CalcLangCInt.h"
 #include "CalcLangCIntArena.h"
+#include "CalcLangCGraph.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -20,21 +21,21 @@ CalcLangValue* booleanCalcLangValue(LLVMIntArena* arena, int val){
   return toBool;
 }
 
-CalcLangValue* realCalcLangValue(LLVMIntArena* arena, float myReal){
+CalcLangValue* realCalcLangValue(LLVMIntArena* arena, long double myReal){
   CalcLangValue* toRet = (CalcLangValue*)arenaAlloc(arena, sizeof(CalcLangValue));
   toRet->valType = IS_REAL;
   toRet->valData.real = (double)myReal;
   return toRet;
 }
 
-CalcLangValue* dollarCalcLangValue(LLVMIntArena* arena, float myDollar){
+CalcLangValue* dollarCalcLangValue(LLVMIntArena* arena, long double myDollar){
   CalcLangValue* toRet = arenaAlloc(arena, sizeof(CalcLangValue));
   toRet->valType = IS_DOLLAR;
   toRet->valData.dollar = myDollar;
   return toRet;
 }
 
-CalcLangValue* percentCalcLangValue(LLVMIntArena* arena, float myPercent){
+CalcLangValue* percentCalcLangValue(LLVMIntArena* arena, long double myPercent){
   CalcLangValue* toRet = (CalcLangValue*)arenaAlloc(arena, sizeof(CalcLangValue));
   toRet->valType = IS_PERCENT;
   toRet->valData.dollar = myPercent;
@@ -1704,11 +1705,11 @@ void printValue(CalcLangValue* val){
   } else if(val->valType == IS_INT){
     printf("%d", val->valData.integer);
   } else if(val->valType == IS_REAL){
-    printf("%f", val->valData.real);
+    printf("%Lf", val->valData.real);
   } else if(val->valType == IS_DOLLAR){
-    printf("$%f", val->valData.dollar);
+    printf("%Lf", val->valData.dollar);
   } else if(val->valType == IS_PERCENT){
-    printf("%f%%", val->valData.percent);
+    printf("%Lf%%", val->valData.percent);
   } else if(val->valType == IS_TUPLE){
     printf("(");
     for(int i = 0; i < val->valData.tuple->size; i++){

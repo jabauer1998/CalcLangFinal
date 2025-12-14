@@ -20,7 +20,7 @@ data CalcLangValue = BoolVal Bool
                    | ReadHistoryCommandVal
                    | HelpCommandVal
                    | CreateLessonPlanCommandVal String
-                   | CreateGraphCommandVal [Integer]
+                   | CreateGraphCommandIntVal [Integer]
                    | ErrorVal [String]
                    deriving (Show, Eq)
 
@@ -157,6 +157,11 @@ generateParam paramLexeme toExpr = case paramLexeme of
                                      IdentAst _ x -> (x, toExpr)
                                      _ -> ('\0', ErrorNode "param does have expression")
 
+generateParamVal :: AstNode -> CalcLangValue -> (Char, CalcLangValue)
+generateParamVal lexeme val = case lexeme of
+                                IdentAst _ x -> (x, val)
+                                _ -> ('\0', ErrorVal ["Error param is invalid format for name must be a character"])
+
 generateVal :: AstNode -> Int -> (Char, AstNode)
 generateVal node myInt = case node of
                                      IdentAst p x -> (x, IntNumberAst p (show myInt))
@@ -171,6 +176,34 @@ generateNumberFVal :: CalcLangValue -> Integer
 generateNumberFVal node = case node of
                             IntVal val -> fromIntegral val :: Integer
                             RealVal val -> floor val :: Integer
+
+genXVals :: CalcLangValue -> CalcLangValue -> CalcLangValue -> [CalcLangValue]
+genXVals start end incr = if (asBool (greaterThanVals start end)) then []
+                          else if (asBool (equalVals start end)) then [end]
+                          else (start : (genXVals (addVals start incr) end incr))
+
+containsReal :: [CalcLangValue] -> Bool
+containsReal val = case val of
+                     [] -> False
+                     [one] -> case one of
+                                RealVal _ -> True
+                                _ -> False
+                     (one : after) -> case one of
+                                        RealVal _ -> True
+                                        _ -> (containsReal after)
+
+toReal :: CalcLangValue -> Double
+toReal v = case v of
+             RealVal val -> val
+             IntVal val -> fromIntegral val :: Double
+             _ -> -1.0
+
+toInt :: CalcLangValue -> Integer
+toInt v = case v of
+            IntVal v -> fromIntegral v :: Integer
+            RealVal v -> round v :: Integer
+            _ -> -1
+            
 
 interpret :: AstNode -> Env -> FunctionTable -> (CalcLangValue, Env, FunctionTable)
 interpret node vT fT = case node of
@@ -230,20 +263,21 @@ interpret node vT fT = case node of
                               CreateGraphCommand pos str begin end incr -> case str of
                                                                              IdentAst _ myStr -> do
                                                                                                  let function = (getEntryFromTable fT myStr)
+                                                                                                 let myBegin = (gV (interpret begin vT fT))
+                                                                                                 let myEnd = (gV (interpret end vT fT))
+                                                                                                 let myIncr = (gV (interpret incr vT fT))
+                                                                                                 let xVals = (genXVals myBegin myEnd myIncr)
                                                                                                  case function of
                                                                                                    Just (params, retExpr) -> do
-                                                                                                      let myFunc = \x -> do
-                                                                                                                         let zippedData = (zipWith generateVal params [x])
-                                                                                                                         let finalZippedData = (map (\(zx, zy) -> (zx, (gV (interpret zy vT fT)))) zippedData)
+                                                                                                     let myFunc = \x -> do
+                                                                                                                         let zippedData = (zipWith generateParamVal params [x])
                                                                                                                          let addedScopeEnv = addScopeToEnv vT
-                                                                                                                         let vTable = (foldl (\table tuple -> addEntryToEnv table tuple) addedScopeEnv  finalZippedData)
+                                                                                                                         let vTable = (foldl (\table tuple -> addEntryToEnv table tuple) addedScopeEnv  zippedData)
                                                                                                                          let retVal = (gV (interpret retExpr vTable fT))
-                                                                                                                         (generateNumberFVal retVal)
-                                                                                                      let beginNum = (generateNumberFNode begin)
-                                                                                                      let endNum = (generateNumberFNode end)
-                                                                                                      let incrNum = (generateNumberFNode incr)
-                                                                                                      let yVals = [ myFunc v | v <- [beginNum, incrNum .. endNum]]
-                                                                                                      (CreateGraphCommandVal yVals, vT, fT)
+                                                                                                                         retVal
+                                                                                                     let yVals = (map myFunc xVals)
+                                                                                                     (CreateGraphCommandIntVal (map toInt yVals), vT, fT)
+                                                                                                       
                               CreateLessonPlanCommand _ src -> (CreateLessonPlanCommandVal src, vT, fT)
                               GetElement _ index elem -> do
                                                          let value = interpret elem vT fT

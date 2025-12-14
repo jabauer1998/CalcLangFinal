@@ -200,9 +200,9 @@ typedef struct {
 typedef struct {
   SourcePos* pos;
   char name;
-  char* begin;
-  char* end;
-  char* incr;
+  struct ANode* begin;
+  struct ANode* end;
+  struct ANode* incr;
 } CreateGraphCommand;
 
 typedef struct {

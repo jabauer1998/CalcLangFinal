@@ -196,11 +196,11 @@ void createGraphCommandToStr(CreateGraphCommand* graph, int size, char* str){
   strncat(str, "create graph of ", size);
   appendStrChr(graph->name, size, str);
   strncat(str, " from ", size);
-  strncat(str, graph->begin, size);
+  astToStr(graph->begin, size, str);
   strncat(str, " to ", size);
-  strncat(str, graph->end, size);
+  astToStr(graph->end, size, str);
   strncat(str, " by ", size);
-  strncat(str, graph->incr, size);
+  astToStr(graph->incr, size, str);
 }
 
 void getElementOperationToStr(GetElementOperation* op, int size, char* str){
@@ -404,9 +404,9 @@ void freeParenExpression(ParenExpr* par){
 
 void freeCreateGraphCommand(CreateGraphCommand* graph){
   freePosition(graph->pos);
-  free(graph->begin);
-  free(graph->end);
-  free(graph->incr);
+  freeTree(graph->begin);
+  freeTree(graph->end);
+  freeTree(graph->incr);
 }
 
 void freeGetElementOperation(GetElementOperation* op){

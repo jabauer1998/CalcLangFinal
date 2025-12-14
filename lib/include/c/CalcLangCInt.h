@@ -28,9 +28,9 @@ typedef union CalcLangValData{
   TupleValue* tuple;
   SetValue* set;
   int integer;
-  double real;
-  double dollar;
-  double percent;
+  long double real;
+  long double dollar;
+  long double percent;
   bool boolean;
 } CalcLangValueData;
 
@@ -51,11 +51,11 @@ CalcLangValue* greaterThenCalcLangValues(LLVMIntArena* arena, CalcLangValue* lef
 CalcLangValue* lessThenOrEqualToCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
 CalcLangValue* greaterThenOrEqualToCalcLangValues(LLVMIntArena* arena, CalcLangValue* left, CalcLangValue* right);
 CalcLangValue* notCalcLangValues(LLVMIntArena* arena, CalcLangValue* value);
-CalcLangValue* negateCalcLangValues(LLVMIntArena* arena, CalcLangValue* value);
+CalcLangValue* negateCalcLangValue(LLVMIntArena* arena, CalcLangValue* value);
 CalcLangValue* integerCalcLangValue(LLVMIntArena* arena, int input);
-CalcLangValue* realCalcLangValue(LLVMIntArena* arena, float input);
-CalcLangValue* dollarCalcLangValue(LLVMIntArena* arena, float input);
-CalcLangValue* percentCalcLangValue(LLVMIntArena* arena, float percent);
+CalcLangValue* realCalcLangValue(LLVMIntArena* arena, long double input);
+CalcLangValue* dollarCalcLangValue(LLVMIntArena* arena, long double input);
+CalcLangValue* percentCalcLangValue(LLVMIntArena* arena, long double percent);
 CalcLangValue* tupleCalcLangValue(LLVMIntArena* arena, CalcLangValue**values, int size);
 CalcLangValue* setCalcLangValue(LLVMIntArena* arena, CalcLangValue**values, int size);
 CalcLangValue* sinCalcLangValue(LLVMIntArena* arena, CalcLangValue* input);

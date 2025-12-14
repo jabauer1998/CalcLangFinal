@@ -288,7 +288,7 @@ data CAstNode = CEqualOperation (Ptr CSourcePos) (Ptr CAstNode) (Ptr CAstNode)
               | CAssign (Ptr CSourcePos) CChar (Ptr CAstNode)
               | CIfExpr (Ptr CSourcePos) (Ptr CAstNode) (Ptr CAstNode) (Ptr CAstNode)
               | CParenExpr (Ptr CSourcePos) (Ptr CAstNode)
-              | CCreateGraphCommand (Ptr CSourcePos) CChar CString CString CString
+              | CCreateGraphCommand (Ptr CSourcePos) CChar (Ptr CAstNode) (Ptr CAstNode) (Ptr CAstNode)
               | CGetElement (Ptr CSourcePos) (CInt) (Ptr CAstNode)
               | CGetLength (Ptr CSourcePos) (Ptr CAstNode)
               | CCosOperation (Ptr CSourcePos) (Ptr CAstNode)
@@ -559,8 +559,8 @@ instance Storable CAstNode where
                                                                         pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos
                                                                         pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos)) name
                                                                         pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar)) begin
-                                                                        pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar) + sizeOf (undefined :: Ptr CInt)) end
-                                                                        pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar) + sizeOf (undefined :: Ptr CInt) + sizeOf (undefined :: Ptr CInt)) incr
+                                                                        pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar) + sizeOf (undefined :: Ptr CAstNode)) end
+                                                                        pokeByteOff ptr (sizeOf(undefined :: Ptr CInt) + sizeOf(undefined :: Ptr CSourcePos) + sizeOf (undefined :: Ptr CChar) + sizeOf (undefined :: Ptr CAstNode) + sizeOf (undefined :: Ptr CAstNode)) incr
                          CGetElement pos index elem -> do
                                                        pokeByteOff ptr 0 (27 :: CInt)
                                                        pokeByteOff ptr (sizeOf (undefined :: Ptr CInt)) pos

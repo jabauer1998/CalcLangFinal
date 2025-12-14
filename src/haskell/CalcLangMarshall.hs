@@ -42,10 +42,6 @@ marshallStorageArray a = case a of
 marshallFuncName :: AstNode -> IO CChar
 marshallFuncName node = case node of
                           IdentAst pos ident -> return (castCharToCChar ident)
-
-marshallIntVal :: AstNode -> IO CString
-marshallIntVal node = case node of
-                        IntNumberAst pos intVal -> (newCString intVal)
                                                 
 
 -- Now we need to marshal Ast Nodes
@@ -247,9 +243,9 @@ marshallAstNode a = case a of
                                                                     ptr <- (mallocBytes (sizeOf (undefined :: CAstNode)))
                                                                     myPos <- marshallSourcePos pos
                                                                     myExpr <- marshallFuncName name
-                                                                    myBegin <- marshallIntVal begin
-                                                                    myEnd <- marshallIntVal end
-                                                                    myIncr <- marshallIntVal incr
+                                                                    myBegin <- marshallAstNode begin
+                                                                    myEnd <- marshallAstNode end
+                                                                    myIncr <- marshallAstNode incr
                                                                     let g = (CCreateGraphCommand myPos myExpr myBegin myEnd myIncr)
                                                                     poke ptr g
                                                                     return ptr
