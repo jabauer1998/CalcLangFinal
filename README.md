@@ -9,7 +9,7 @@ Oroginally it was created as a reply with scala however i switched it over to ha
 --Scala -> it is f(x) = expr
 --Haskell -> it is func f(x) = expr
 
-The reason I did this was because the parser generator said their was an imbiguity which was something I was able to get out when I wrote my own grammer.
+The reason I did this was because the parser generator said their was an ambiguity which was something I was able to get out when I wrote my own grammer.
 
 Speaking of the grammar the grammar of CalcLang is below
 
