@@ -31,7 +31,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/github_username/repo_name">
-    <img src="images/EdeGeneratorTool.png" alt="Logo" width="500" height="500">
+    <img src="images/CalcLangLogo.png" alt="Logo" width="500" height="500">
   </a>
 
 <h3 align="center">CalcLang</h3>
