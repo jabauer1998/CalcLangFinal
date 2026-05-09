@@ -291,8 +291,38 @@ parseDoubleQuote = do
                    start <- getPosition
                    char '"' >> return (DoubleQuote start)
 
+parseGet :: CalcLangLexer Token
+parseGet = do
+           start <- getPosition
+           (parseLexeme (string "get")) >> return (Get start)
+
+parseElem :: CalcLangLexer Token
+parseElem = do
+            start <- getPosition
+            (parseLexeme (string "elem")) >> return (Elem start)
+
+parseLen :: CalcLangLexer Token
+parseLen = do
+           start <- getPosition
+           (parseLexeme (string "len")) >> return (Len start)
+
+parseCos :: CalcLangLexer Token
+parseCos = do
+           start <- getPosition
+           (parseLexeme (string "cos")) >> return (Cos start)
+
+parseTan :: CalcLangLexer Token
+parseTan = do
+           start <- getPosition
+           (parseLexeme (string "tan")) >> return (Tan start)
+
+parseSin :: CalcLangLexer Token
+parseSin = do
+           start <- getPosition
+           (parseLexeme (string "sin")) >> return (Sin start)
+
 parseToken :: CalcLangLexer Token
-parseToken = try parseSingleQuote <|> try parseDoubleQuote <|> try parseSeparator <|> try parseHelp <|> try parseShow <|> try parseHistory <|> try parseVariables <|> try parseFunctions <|> try parseQuit <|> try parseCreate <|> try parseLesson <|> try parsePlan <|> try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent <|> try parseNewLine
+parseToken = try parseCos <|> try parseSin <|> try parseTan <|> try parseSingleQuote <|> try parseDoubleQuote <|> try parseSeparator <|> try parseHelp <|> try parseShow <|> try parseHistory <|> try parseVariables <|> try parseFunctions <|> try parseQuit <|> try parseCreate <|> try parseLesson <|> try parsePlan <|> try parseElse <|> try parseThen <|> try parseIf <|> try parseGtOrEq <|> try parseLtOrEq <|> try parseGT <|> try parseLT <|> try parsePow <|> try parseEq <|> try parseNot <|> try parseDiv <|> try parseTimes <|> try parseMinus <|> try parsePlus <|> try parseLBrack <|> try parseRBrack <|> try parseComma <|> try parseLPar <|> try parseRPar <|> try parseFunc <|> try parseLet <|> try parseDol <|> try parsePerc <|> try parseNum <|> try parsePeriod <|> try parseBool <|> try parseIdent <|> try parseNewLine
 
 parseTokens :: CalcLangLexer [Token]
 parseTokens = spaces *> many parseToken
@@ -393,10 +423,58 @@ parseFunctionCall = do
                     case name of
                           IdentAst _ n -> return (FunctionCall start n l)
                           _ -> return (ErrorNode "Error cant build function call with invalid name")
-                          
+
+parseGetElementOperation :: CalcLangParser AstNode
+parseGetElementOperation = do
+                           start <- getPosition
+                           _ <- parseGet
+                           _ <- parseElem
+                           i <- parseIntNum
+                           _ <- parseFrom
+                           node <- parseExpression
+                           return $ case i of
+                             IntNum i _ -> do
+                                           let index = (read i)
+                                           GetElement start index node
+                             _ -> ErrorNode "Error GetElement expected IntVal as index"
+parseGetLengthOperation :: CalcLangParser AstNode
+parseGetLengthOperation = do
+                          start <- getPosition
+                          _ <- parseGet
+                          _ <- parseLen
+                          _ <- parseFrom
+                          exp <- parseExpression
+                          return (GetLength start exp)
+
+parseTanOperation :: CalcLangParser AstNode
+parseTanOperation = do
+                    start <- getPosition
+                    _ <- parseTan
+                    _ <- parseLPar
+                    node <- parseExpression
+                    _ <- parseRPar
+                    return (TanOperation start node)
+
+parseSinOperation :: CalcLangParser AstNode
+parseSinOperation = do
+                    start <- getPosition
+                    _ <- parseSin
+                    _ <- parseLPar
+                    node <- parseExpression
+                    _ <- parseRPar
+                    return (SinOperation start node)
+
+parseCosOperation :: CalcLangParser AstNode
+parseCosOperation = do
+                    start <- getPosition
+                    _ <- parseCos
+                    _ <- parseLPar
+                    node <- parseExpression
+                    _ <- parseRPar
+                    return (CosOperation start node)
 
 parsePrimaryExpression :: CalcLangParser AstNode
-parsePrimaryExpression = try parseDollarAst <|> try parsePercentAst <|> try parseNumber <|> try parseParenExpression <|> try parseTuple <|> try parseSet <|> try parseBoolean <|> try parseIfExpr <|> try parseFunctionCall <|> try parseIdentifier
+parsePrimaryExpression = try parseSinOperation <|> try parseCosOperation <|> try parseTanOperation <|> try parseGetLengthOperation <|> try parseGetElementOperation <|> try parseDollarAst <|> try parsePercentAst <|> try parseNumber <|> try parseParenExpression <|> try parseTuple <|> try parseSet <|> try parseBoolean <|> try parseIfExpr <|> try parseFunctionCall <|> try parseIdentifier
 
 parseParenExpression :: CalcLangParser AstNode
 parseParenExpression = do

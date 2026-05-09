@@ -29,6 +29,11 @@
 #define IF_EXPR 24
 #define PAREN_EXPR 25
 #define CREATE_GRAPH_COMMAND 26
+#define GET_ELEMENT 27
+#define GET_LENGTH 28
+#define SIN 29
+#define TAN 30
+#define COS 31
 
 struct ANode;
 
@@ -195,10 +200,36 @@ typedef struct {
 typedef struct {
   SourcePos* pos;
   char name;
-  char* begin;
-  char* end;
-  char* incr;
+  struct ANode* begin;
+  struct ANode* end;
+  struct ANode* incr;
 } CreateGraphCommand;
+
+typedef struct {
+  SourcePos* pos;
+  int index;
+  struct ANode* node;;
+} GetElementOperation;
+
+typedef struct {
+  SourcePos* pos;
+  struct ANode* node;
+} GetLengthOperation;
+
+typedef struct {
+  SourcePos* pos;
+  struct ANode* node;
+} SinOperation;
+
+typedef struct {
+  SourcePos* pos;
+  struct ANode* node;
+} TanOperation;
+
+typedef struct {
+  SourcePos* pos;
+  struct ANode* node;
+} CosOperation;
 
 typedef union {
   EqualOperation equalOperation;
@@ -228,6 +259,11 @@ typedef union {
   IfExpr ifStatement;
   ParenExpr par;
   CreateGraphCommand graph;
+  GetElementOperation elem;
+  GetLengthOperation len;
+  SinOperation sin;
+  TanOperation tan;
+  CosOperation cos;
 } AstNodeType;
 
 typedef struct ANode{

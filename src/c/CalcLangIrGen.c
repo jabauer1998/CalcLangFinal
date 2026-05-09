@@ -115,7 +115,7 @@ void drawGraph(LLVMValueRef arena, LLVMValueRef begin, LLVMValueRef end, LLVMVal
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "drawGraph");
   LLVMTypeRef intType = LLVMInt32TypeInContext(ctx);
   //Now define actualFunctionType
-  LLVMTypeRef actualArgTypes[] = {arenaPtrType, intType, intType, intType, funcParamTypePtr};
+  LLVMTypeRef actualArgTypes[] = {arenaPtrType, point, point, point, funcParamTypePtr};
   LLVMTypeRef actualType = LLVMFunctionType(LLVMVoidTypeInContext(ctx), actualArgTypes, 5, 0);
   LLVMValueRef args[] = { arena, begin, end, incr, func};
   LLVMBuildCall2(builder, actualType, myFunc, args, 5, "");
@@ -349,8 +349,8 @@ LLVMValueRef codeGenIntegerValue(IntNumberAst* val, ScopeStack stack, DefList fu
 }
 
 LLVMValueRef codeGenRealValue(RealNumberAst* val, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMValueRef arena, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef floatType = LLVMFloatTypeInContext(ctx);
-  double dVal = atof(val->lexeme);
+  LLVMTypeRef floatType = LLVMDoubleTypeInContext(ctx);
+  long double dVal = strtold(val->lexeme, NULL);
   LLVMValueRef myReal = LLVMConstReal(floatType, dVal);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "realCalcLangValue");
   LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
@@ -467,8 +467,9 @@ LLVMValueRef codeGenIdentifierValue(IdentAst* ident, ScopeStack stack, DefList f
 }
 
 LLVMValueRef codeGenDollarValue(DollarAst* dollar, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMValueRef arena, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef floatType = LLVMFloatTypeInContext(ctx);
-  LLVMValueRef myReal = LLVMConstReal(floatType, atof(dollar->lexeme));
+  LLVMTypeRef floatType = LLVMDoubleTypeInContext(ctx);
+  long double dVal = strtold(dollar->lexeme, NULL);
+  LLVMValueRef myReal = LLVMConstReal(floatType, dVal);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "dollarCalcLangValue");
   LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
   LLVMTypeRef arenaType = LLVMGetTypeByName2(ctx, "struct.LLVMIntArena");
@@ -484,8 +485,9 @@ LLVMValueRef codeGenDollarValue(DollarAst* dollar, ScopeStack stack, DefList fun
 }
 
 LLVMValueRef codeGenPercentValue(PercentAst* percent, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMValueRef arena, LLVMModuleRef mod, LLVMContextRef ctx){
-  LLVMTypeRef floatType = LLVMFloatTypeInContext(ctx);
-  LLVMValueRef myReal = LLVMConstReal(floatType, atof(percent->lexeme));
+  LLVMTypeRef floatType = LLVMDoubleTypeInContext(ctx);
+  long double dVal = strtold(percent->lexeme, NULL);
+  LLVMValueRef myReal = LLVMConstReal(floatType, dVal);
   LLVMValueRef myFunc = LLVMGetNamedFunction(mod, "percentCalcLangValue");
   LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
   LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
@@ -532,6 +534,55 @@ LLVMValueRef codeGenNegateOperation(NegateOperation* negate, ScopeStack stack, D
 LLVMValueRef codeGenNotOperation(NotOperation* not, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMValueRef arena, LLVMModuleRef mod, LLVMContextRef ctx){
   LLVMValueRef ref = codeGenExpression(not->expr, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
   LLVMValueRef func = LLVMGetNamedFunction(mod, "notCalcLangValue");
+  LLVMTypeRef funcType = createFunctionPointerType(ctx, 2, 0);
+  LLVMValueRef args[] = { arena , ref };
+  return LLVMBuildCall2(builder, funcType, func, args, 2, "");
+}
+
+LLVMValueRef codeGenGetElementOperation(GetElementOperation* not, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMValueRef arena, LLVMModuleRef mod, LLVMContextRef ctx){
+  LLVMTypeRef int32Type = LLVMInt32TypeInContext(ctx);
+  LLVMValueRef ref = codeGenExpression(not->node, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
+  LLVMValueRef indexRef = LLVMConstInt(int32Type, not->index, 0);
+  
+  LLVMTypeRef calcLangValueType = LLVMGetTypeByName2(ctx, "struct.CalcLangVal");
+  LLVMTypeRef arenaType = LLVMGetTypeByName2(ctx, "struct.LLVMIntArena");
+  LLVMTypeRef arenaPtr = LLVMPointerType(arenaType, 0);
+  LLVMTypeRef calcLangPtrType = LLVMPointerType(calcLangValueType, 0);
+
+  LLVMTypeRef paramTypes[] = {arenaPtr, int32Type, calcLangPtrType};
+  LLVMTypeRef funcType = LLVMFunctionType(calcLangPtrType, paramTypes, 3, 0);
+  LLVMValueRef func = LLVMGetNamedFunction(mod, "getElementFromCalcLangValue");
+  LLVMValueRef args[] = { arena , indexRef, ref };
+  return LLVMBuildCall2(builder, funcType, func, args, 3, "");
+}
+
+LLVMValueRef codeGenGetLengthOperation(GetLengthOperation* not, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMValueRef arena, LLVMModuleRef mod, LLVMContextRef ctx){
+  LLVMValueRef ref = codeGenExpression(not->node, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
+  LLVMValueRef func = LLVMGetNamedFunction(mod, "getLengthFromCalcLangValue");
+  LLVMTypeRef funcType = createFunctionPointerType(ctx, 2, 0);
+  LLVMValueRef args[] = { arena , ref };
+  return LLVMBuildCall2(builder, funcType, func, args, 2, "");
+}
+
+LLVMValueRef codeGenSinOperation(SinOperation* not, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMValueRef arena, LLVMModuleRef mod, LLVMContextRef ctx){
+  LLVMValueRef ref = codeGenExpression(not->node, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
+  LLVMValueRef func = LLVMGetNamedFunction(mod, "sinCalcLangValue");
+  LLVMTypeRef funcType = createFunctionPointerType(ctx, 2, 0);
+  LLVMValueRef args[] = { arena , ref };
+  return LLVMBuildCall2(builder, funcType, func, args, 2, "");
+}
+
+LLVMValueRef codeGenCosOperation(CosOperation* not, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMValueRef arena, LLVMModuleRef mod, LLVMContextRef ctx){
+  LLVMValueRef ref = codeGenExpression(not->node, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
+  LLVMValueRef func = LLVMGetNamedFunction(mod, "cosCalcLangValue");
+  LLVMTypeRef funcType = createFunctionPointerType(ctx, 2, 0);
+  LLVMValueRef args[] = { arena , ref };
+  return LLVMBuildCall2(builder, funcType, func, args, 2, "");
+}
+
+LLVMValueRef codeGenTanOperation(TanOperation* not, ScopeStack stack, DefList funcDefs, LLVMBuilderRef builder, LLVMValueRef parentFunc, LLVMValueRef arena, LLVMModuleRef mod, LLVMContextRef ctx){
+  LLVMValueRef ref = codeGenExpression(not->node, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
+  LLVMValueRef func = LLVMGetNamedFunction(mod, "tanCalcLangValue");
   LLVMTypeRef funcType = createFunctionPointerType(ctx, 2, 0);
   LLVMValueRef args[] = { arena , ref };
   return LLVMBuildCall2(builder, funcType, func, args, 2, "");
@@ -620,6 +671,11 @@ LLVMValueRef codeGenExpression(AstNode* node, ScopeStack stack, DefList funcDefs
   case NOT_OPERATION: return codeGenNotOperation(&(node->actualNodeData.not), stack, funcDefs,  builder, func, arena, mod, ctx);
   case IF_EXPR: return codeGenIfExpression(&(node->actualNodeData.ifStatement), stack, funcDefs,  builder, func, arena, mod, ctx);
   case PAREN_EXPR: return codeGenExpression(node->actualNodeData.par.expr, stack, funcDefs,  builder, func, arena, mod, ctx);
+  case GET_ELEMENT: return codeGenGetElementOperation(&(node->actualNodeData.elem), stack, funcDefs,  builder, func, arena, mod, ctx);
+  case GET_LENGTH: return codeGenGetLengthOperation(&(node->actualNodeData.len), stack, funcDefs,  builder, func, arena, mod, ctx);
+  case SIN: return codeGenSinOperation(&(node->actualNodeData.sin), stack, funcDefs,  builder, func, arena, mod, ctx);
+  case COS: return codeGenCosOperation(&(node->actualNodeData.cos), stack, funcDefs,  builder, func, arena, mod, ctx);
+  case TAN: return codeGenTanOperation(&(node->actualNodeData.tan), stack, funcDefs,  builder, func, arena, mod, ctx);
   default:
     perror("Invalid Expression type found!!!");
     return NULL;
@@ -810,11 +866,7 @@ void codeGenNode(AstNode* node, ScopeStack stack, DefList funcDefs, LLVMBuilderR
       char fullName[2];
       fullName[0] = name;
       fullName[1] = '\0';
-      printStringRef("Param Name ", builder, mod, ctx);
-      printStringRef(fullName, builder, mod, ctx);
       LLVMValueRef arg1 = LLVMGetParam(func, i);
-      printStringRef(" and value ", builder, mod, ctx);
-      printValueRef(arg1, stack, builder, calcLangPtr, mod, ctx);
       LLVMValueRef ptrToy = LLVMBuildAlloca(builder, point, "");
       LLVMBuildStore(builder, arg1, ptrToy);
       addElemToVarTable(&stack, name, ptrToy);
@@ -825,8 +877,6 @@ void codeGenNode(AstNode* node, ScopeStack stack, DefList funcDefs, LLVMBuilderR
     char funcName[2];
     funcName[0] = myNode->name;
     funcName[1] = '\0';
-    printStringRef("Entering ", builder, mod, ctx);
-    printStringRef(funcName, builder, mod, ctx);
     LLVMValueRef result = codeGenExpression(myNode->expr, stack, funcDefs, builder, func, argArena, mod, ctx);
     LLVMBuildRet(builder, result);
     
@@ -872,11 +922,41 @@ void codeGenNode(AstNode* node, ScopeStack stack, DefList funcDefs, LLVMBuilderR
     }
     LLVMTypeRef int32Type = LLVMInt32TypeInContext(ctx);
 
-    LLVMValueRef begin = LLVMConstInt(int32Type, atoi(myNode->begin), 0);
-    LLVMValueRef end = LLVMConstInt(int32Type, atoi(myNode->end), 0);
-    LLVMValueRef incr = LLVMConstInt(int32Type, atoi(myNode->incr), 0);
+    LLVMValueRef begin = codeGenExpression(myNode->begin, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
+    LLVMValueRef end = codeGenExpression(myNode->end, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
+    LLVMValueRef incr = codeGenExpression(myNode->incr, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
 
     drawGraph(arena, begin, end, incr, func, builder, mod, ctx);
+    resetArena(arena, builder, mod, ctx);
+    break;
+  }
+  case GET_ELEMENT: {
+    LLVMValueRef resPar = codeGenExpression(node, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
+    printValueRef(resPar, stack, builder, calcLangPtr, mod, ctx);
+    resetArena(arena, builder, mod, ctx);
+    break;
+  }
+  case GET_LENGTH: {
+    LLVMValueRef resPar = codeGenExpression(node, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
+    printValueRef(resPar, stack, builder, calcLangPtr, mod, ctx);
+    resetArena(arena, builder, mod, ctx);
+    break;
+  }
+  case SIN: {
+    LLVMValueRef resPar = codeGenExpression(node, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
+    printValueRef(resPar, stack, builder, calcLangPtr, mod, ctx);
+    resetArena(arena, builder, mod, ctx);
+    break;
+  }
+  case COS: {
+    LLVMValueRef resPar = codeGenExpression(node, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
+    printValueRef(resPar, stack, builder, calcLangPtr, mod, ctx);
+    resetArena(arena, builder, mod, ctx);
+    break;
+  }
+  case TAN: {
+    LLVMValueRef resPar = codeGenExpression(node, stack, funcDefs, builder, parentFunc, arena, mod, ctx);
+    printValueRef(resPar, stack, builder, calcLangPtr, mod, ctx);
     resetArena(arena, builder, mod, ctx);
     break;
   }

@@ -42,10 +42,6 @@ marshallStorageArray a = case a of
 marshallFuncName :: AstNode -> IO CChar
 marshallFuncName node = case node of
                           IdentAst pos ident -> return (castCharToCChar ident)
-
-marshallIntVal :: AstNode -> IO CString
-marshallIntVal node = case node of
-                        IntNumberAst pos intVal -> (newCString intVal)
                                                 
 
 -- Now we need to marshal Ast Nodes
@@ -247,13 +243,50 @@ marshallAstNode a = case a of
                                                                     ptr <- (mallocBytes (sizeOf (undefined :: CAstNode)))
                                                                     myPos <- marshallSourcePos pos
                                                                     myExpr <- marshallFuncName name
-                                                                    myBegin <- marshallIntVal begin
-                                                                    myEnd <- marshallIntVal end
-                                                                    myIncr <- marshallIntVal incr
+                                                                    myBegin <- marshallAstNode begin
+                                                                    myEnd <- marshallAstNode end
+                                                                    myIncr <- marshallAstNode incr
                                                                     let g = (CCreateGraphCommand myPos myExpr myBegin myEnd myIncr)
                                                                     poke ptr g
                                                                     return ptr
-                                                     
+                      GetElement pos index elem -> do
+                                                   ptr <- (mallocBytes (sizeOf (undefined :: CAstNode)))
+                                                   myPos <- marshallSourcePos pos
+                                                   let myFinalIndex = (fromIntegral index) :: CInt
+                                                   myElem <- marshallAstNode elem
+                                                   let g = (CGetElement myPos myFinalIndex myElem)
+                                                   poke ptr g
+                                                   return ptr
+                      GetLength pos elem -> do
+                                            ptr <- (mallocBytes (sizeOf (undefined :: CAstNode)))
+                                            myPos <- marshallSourcePos pos
+                                            myElem <- marshallAstNode elem
+                                            let g = (CGetLength myPos myElem)
+                                            poke ptr g
+                                            return ptr
+
+                      SinOperation pos elem -> do
+                                               ptr <- (mallocBytes (sizeOf (undefined :: CAstNode)))
+                                               myPos <- marshallSourcePos pos
+                                               myElem <- marshallAstNode elem
+                                               let g = (CSinOperation myPos myElem)
+                                               poke ptr g
+                                               return ptr
+                      CosOperation pos elem -> do
+                                               ptr <- (mallocBytes (sizeOf (undefined :: CAstNode)))
+                                               myPos <- marshallSourcePos pos
+                                               myElem <- marshallAstNode elem
+                                               let g = (CCosOperation myPos myElem)
+                                               poke ptr g
+                                               return ptr
+                      TanOperation pos elem -> do
+                                               ptr <- (mallocBytes (sizeOf (undefined :: CAstNode)))
+                                               myPos <- marshallSourcePos pos
+                                               myElem <- marshallAstNode elem
+                                               let g = (CTanOperation myPos myElem)
+                                               poke ptr g
+                                               return ptr
+                                            
                        
                                         
                                       

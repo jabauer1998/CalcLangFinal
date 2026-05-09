@@ -5,25 +5,20 @@
 #include "CalcLangCInt.h"
 #include "CalcLangCIntArena.h"
 
-#define WINDOW_WIDTH (long double) 200
-#define WINDOW_HEIGHT (long double) 100
-
 typedef struct {
-  long double x, y;
+  CalcLangValue* x;
+  CalcLangValue* y;
   char display;
 } CalcLangPixel;
 
-long double base = 10;
-
-bool closeTo(long double x, long double y, long double deviation);
-CalcLangPixel** initializeDisplay(int windowWidth, int windowHeight);
-CalcLangPixel** quantifyPlane(long double xSteps, long double ySteps, long double xMin, long double yMax, int windowWidth, int windowHeight);
-char yCompress(long double num, long double pixel, long double range);
-void printPlane(CalcLangPixel** display, int windowHeight, int windowWidth);
-void shadeGraph(CalcLangPixel** display, CalcLangValue*(*eval)(LLVMIntArena*,CalcLangValue*), LLVMIntArena* arena, long double xSteps, long double ySteps, long double leftBound, long double rightBound, int windowHeight, int windowWidth);
-void drawLine(CalcLangPixel** display, CalcLangValue*(*eval)(LLVMIntArena*,CalcLangValue*), LLVMIntArena* arena, long double xSteps, long double ySteps, int windowWidth, int windowHeight);
-void drawPlane(CalcLangPixel** display, long double xSteps, long double ySteps, int windowWidth, int windowHeight);
-bool drawGraph(LLVMIntArena* arena, int begin, int end, int byAmount, CalcLangValue* (*valFunc)(LLVMIntArena*, CalcLangValue*));
+bool closeTo(LLVMIntArena* arena, CalcLangValue* x, CalcLangValue* y, CalcLangValue* deviation);
+CalcLangPixel** initializeDisplay(CalcLangValue* windowWidth, CalcLangValue* windowHeight);
+CalcLangPixel** quantifyPlane(LLVMIntArena* arena, CalcLangValue* xSteps, CalcLangValue* ySteps, CalcLangValue* xMin, CalcLangValue* yMax, CalcLangValue* windowWidth, CalcLangValue* windowHeight);
+char yCompress(LLVMIntArena* arena, CalcLangValue* num, CalcLangValue* pixel, CalcLangValue* range);
+void printPlane(CalcLangPixel** display, CalcLangValue* windowHeight, CalcLangValue* windowWidth);
+void drawLine(CalcLangPixel** display, CalcLangValue*(*eval)(LLVMIntArena*,CalcLangValue*), LLVMIntArena* arena, CalcLangValue* xSteps, CalcLangValue* ySteps, CalcLangValue* windowWidth, CalcLangValue* windowHeight);
+void drawPlane(CalcLangPixel** display, LLVMIntArena* arena,CalcLangValue* xSteps, CalcLangValue* ySteps, CalcLangValue* windowWidth, CalcLangValue* windowHeight);
+bool drawGraph(LLVMIntArena* arena, CalcLangValue* begin, CalcLangValue* end, CalcLangValue* byAmount, CalcLangValue* (*valFunc)(LLVMIntArena*, CalcLangValue*));
 
 
 

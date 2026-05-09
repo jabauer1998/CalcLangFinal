@@ -196,11 +196,43 @@ void createGraphCommandToStr(CreateGraphCommand* graph, int size, char* str){
   strncat(str, "create graph of ", size);
   appendStrChr(graph->name, size, str);
   strncat(str, " from ", size);
-  strncat(str, graph->begin, size);
+  astToStr(graph->begin, size, str);
   strncat(str, " to ", size);
-  strncat(str, graph->end, size);
+  astToStr(graph->end, size, str);
   strncat(str, " by ", size);
-  strncat(str, graph->incr, size);
+  astToStr(graph->incr, size, str);
+}
+
+void getElementOperationToStr(GetElementOperation* op, int size, char* str){
+  strncat(str, "get elem ", size);
+  char myStr[100];
+  sprintf(myStr, "%d", op->index);
+  strncat(str, myStr, size);
+  strncat(str, " from ", size);
+  astToStr(op->node, size, str);
+}
+
+void getLengthOperationToStr(GetLengthOperation* len, int size, char* str){
+  strncat(str, "get len from ", size);
+  astToStr(len->node, size, str);
+}
+
+void sinOperationToStr(SinOperation* sin, int size, char* str){
+  strncat(str, "sin(", size);
+  astToStr(sin->node, size, str);
+  appendStrChr(')', size, str);
+}
+
+void tanOperationToStr(TanOperation* tan, int size, char* str){
+  strncat(str, "tan(", size);
+  astToStr(tan->node, size, str);
+  appendStrChr(')', size, str);
+}
+
+void cosOperationToStr(CosOperation* cos, int size, char* str){
+  strncat(str, "cos(", size);
+  astToStr(cos->node, size, str);
+  appendStrChr(')', size, str);
 }
 
 //Bellow are all the Free tree methods
@@ -372,9 +404,34 @@ void freeParenExpression(ParenExpr* par){
 
 void freeCreateGraphCommand(CreateGraphCommand* graph){
   freePosition(graph->pos);
-  free(graph->begin);
-  free(graph->end);
-  free(graph->incr);
+  freeTree(graph->begin);
+  freeTree(graph->end);
+  freeTree(graph->incr);
+}
+
+void freeGetElementOperation(GetElementOperation* op){
+  freePosition(op->pos);
+  freeTree(op->node);
+}
+
+void freeGetLengthOperation(GetLengthOperation* len){
+  freePosition(len->pos);
+  freeTree(len->node);
+}
+
+void freeSinOperation(SinOperation* op){
+  freePosition(op->pos);
+  freeTree(op->node);
+}
+
+void freeCosOperation(CosOperation* op){
+  freePosition(op->pos);
+  freeTree(op->node);
+}
+
+void freeTanOperation(TanOperation* op){
+  freePosition(op->pos);
+  freeTree(op->node);
 }
 
 void freeTree(AstNode* node){
@@ -459,6 +516,21 @@ void freeTree(AstNode* node){
     break;
   case CREATE_GRAPH_COMMAND:
     freeCreateGraphCommand(&(node->actualNodeData.graph));
+    break;
+  case GET_ELEMENT:
+    freeGetElementOperation(&(node->actualNodeData.elem));
+    break;
+  case GET_LENGTH:
+    freeGetLengthOperation(&(node->actualNodeData.len));
+    break;
+  case SIN:
+    freeSinOperation(&(node->actualNodeData.sin));
+    break;
+  case TAN:
+    freeTanOperation(&(node->actualNodeData.tan));
+    break;
+  case COS:
+    freeCosOperation(&(node->actualNodeData.cos));
     break;
   default:
     fprintf(stderr, "Invalid number %d", node->nodeType);
@@ -553,6 +625,21 @@ void astToStr(AstNode* node, int size, char* str){
     break;
   case CREATE_GRAPH_COMMAND:
     createGraphCommandToStr(&(node->actualNodeData.graph), size, str);
+    break;
+  case GET_ELEMENT:
+    getElementOperationToStr(&(node->actualNodeData.elem), size, str);
+    break;
+  case GET_LENGTH:
+    getLengthOperationToStr(&(node->actualNodeData.len), size, str);
+    break;
+  case SIN:
+    sinOperationToStr(&(node->actualNodeData.sin), size, str);
+    break;
+  case TAN:
+    tanOperationToStr(&(node->actualNodeData.tan), size, str);
+    break;
+  case COS:
+    cosOperationToStr(&(node->actualNodeData.cos), size, str);
     break;
   default:
     fprintf(stderr, "Invalid number %d", node->nodeType);
