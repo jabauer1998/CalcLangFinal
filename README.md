@@ -68,7 +68,6 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -212,17 +211,6 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 
 
-<!-- ROADMAP -->
-## Roadmap
-
-- [ ] Add functionality for Applications
-
-See the [open issues](https://github.com/jabauer1998/EdeGen/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
 <!-- CONTRIBUTING -->
 ## Contributing
 
@@ -269,8 +257,6 @@ Project Link: [https://github.com/jabauer1998/EdeStl](https://github.com/jabauer
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* [DePauw CS Department](https://www.depauw.edu/academics/majors-and-minors/about-computer-science/faculty-and-staff)
-* [PEP 9/Computer Systems By J Stanley Warford](https://computersystemsbook.com/5th-edition/pep9)
 * [Dragon Book](https://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
