@@ -141,10 +141,10 @@ Taken from haskell parser generator
 	Applications -> Applications 'o' Ident             (45)</p>
 
 ### An example of the CalcLang Interpreter Intro
-[![Product Name Screen Shot][product-screenshot3]](images/EdeGenSample3.png)
-
+![FunctionsInterpreter](images/FunctionsInterpreter.png)
+![Help](images/Help.png)
 ### An example of the CalcLang Web Version
-
+![Graph]("images/CalcLangGraph.png")
 
 ### An example of the Help Command
 [![Product Name Screen Shot][product-screenshot4]](images/EdeGenSample4.png)
