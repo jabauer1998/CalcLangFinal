@@ -154,8 +154,10 @@ Taken from haskell parser generator
 ### Built With
 
 * [![Haskell][Haskell.hs]][Haskell-url]
-* [![Caball][Caball.config]][Caball-url]
-* [![Make][makefile]][Make-url]
+* [![C][C.c]][C-url]
+* [Cabal](https://www.haskell.org/cabal) - I would install with GhcUp
+* [Gnu Make](https://www.gnu.org/software/make) - Optional wrapper around Cabal
+* [LLVM](https://llvm.org) - Used for Code Gen
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -289,9 +291,7 @@ Project Link: [https://github.com/jabauer1998/EdeStl](https://github.com/jabauer
 [license-url]: https://github.com/jabauer1998/CalcLangFinal/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/jacobbauer13
-[Java.java]: https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white
-[Java-url]: https://www.oracle.com/java/technologies/downloads/#java26
-[Powershell.ps1]: https://img.shields.io/badge/PowerShell-%235391FE.svg?style=for-the-badge&logo=powershell&logoColor=white
-[Powershell-url]: https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell?view=powershell-7.6
-[Bash.sh]: https://img.shields.io/badge/bash_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white
-[Bash-url]: https://www.gnu.org/software/bash
+[Haskell.hs]: https://img.shields.io/badge/Haskell-5D4F85?style=for-the-badge&logo=haskell&logoColor=white
+[Haskell-url]: https://www.haskell.org/ghcup/install
+[C.c]: https://img.shields.io/badge/c-%2300599C.svg?style=for-the-badge&logo=c&logoColor=white
+[C-url]: https://clang.llvm.org/get_started.html
