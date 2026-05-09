@@ -37,12 +37,11 @@
 <h3 align="center">CalcLang</h3>
   
   <p align="center">
-     Welcome to using CalcLang. CalcLang is a language developed for teachers to teach the concept of functions within a math class.
+  Welcome to using CalcLang. CalcLang is a language developed for teachers to teach the concept of functions within a math class.
   The language can handle basic arithmetic and variable definitions and function definitions.\n"
   The language logs history of previous commands within a session and the user can go back and modify previous commands.
   As a bonus the language can handle recursion with an if else clause to initiate a base expression.
   It can also handle the generation of Sets, and Vectors(Tuples).
-  The language is not Turing complete however.
     <br />
     <a href="https://github.com/jabauer1998/CalcLangFinal"><strong>Explore the docs »</strong></a>
     <br />
@@ -66,7 +65,6 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
@@ -83,7 +81,66 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-### An example of the CalcLang interpreter Intro
+### Haskell
+-- In this version of CalcLang the lexer and the Parser are generated with Parsec Monadic Parser Combinator Library
+
+--The main difference with this version is that defining function syntax is slightly different.
+--Scala -> it is f(x) = expr
+--Haskell -> it is func f(x) = expr
+
+The reason I did this was because the parser generator said their was an ambiguity which was something I was able to get out when I wrote my own grammer.
+
+Speaking of the grammar the grammar of CalcLang is below
+
+Taken from haskell parser generator
+
+  <p>Line -> Ident '=' Expression 'end'                      (1)<br>
+	Line -> Ident '(' Paramaters ')' '=' Expression 'end'   (2)<br>
+	Line -> Expression 'end'                                (3)<br>
+	Paramaters -> Ident                                     (4)<br>
+    Paramaters -> Paramaters ',' Ident                      (5)<br>
+	Expression -> Logical 'for' Logical 'else' Expression   (6)<br>
+	Expression -> Logical                              (7)<br>
+	Logical -> Logical 'and' Relational                (8)<br>
+	Logical -> Logical 'or' Relational                 (9)<br>
+	Logical -> Relational                              (10)<br>
+	Relational -> Expr1 '<' Expr1                      (11)<br>
+	Relational -> Expr1 '>' Expr1                      (12)<br>
+	Relational -> Expr1 '<=' Expr1                     (13)<br>
+	Relational -> Expr1 '>=' Expr1                     (14)<br>
+	Relational -> Expr1 '!=' Expr1                     (15)<br>
+	Relational -> Expr1 '==' Expr1                     (16)<br>
+	Relational -> Expr1                                (17)<br>
+	Expr1 -> Expr1 '+' Term                            (18)<br>
+	Expr1 -> Expr1 '-' Term                            (19)<br>
+	Expr1 -> Term                                      (20)<br>
+	Term -> Term '*' Unary                             (21)<br>
+	Term -> Term '/' Unary                             (22)<br>
+	Term -> Term '.' Unary                             (23)<br>
+	Term -> Unary                                      (24)<br>
+	Unary -> '-' Unary                                 (25)<br>
+	Unary -> 'not' Unary                               (26)<br>
+    Unary -> '+' Unary                                 (27)<br>
+	Unary -> Power                                     (28)<br>
+	Power -> Primary '^' Power                         (29)<br>
+	Power -> Primary                                   (30)<br>
+	Primary -> '(' Expression ')'                      (31)<br>
+	Primary -> '(' Expressions ')'                     (32)<br>
+	Primary -> '(' Applications ')' '(' Expressions ')'   (33)<br>
+	Primary -> '{' Expressions '}'                     (34)<br>
+	Primary -> Ident '(' Expressions ')'               (35)<br>
+	Primary -> Ident                                   (36)<br>
+	Primary -> '$' Number                              (37)<br>
+	Primary -> Number '%'                              (38)<br>
+	Primary -> Number                                  (39)<br>
+	Number -> IntT                                     (40)<br>
+	Number -> RealT                                    (41)<br>
+	Expressions -> Expression                          (42)<br>
+	Expressions -> Expressions ',' Expression          (43)<br>
+	Applications -> Ident                              (44)<br>
+	Applications -> Applications 'o' Ident             (45)</p>
+
+### An example of the CalcLang Interpreter Intro
 [![Product Name Screen Shot][product-screenshot3]](images/EdeGenSample3.png)
 
 ### An example of the CalcLang Web Version
@@ -100,6 +157,7 @@
 
 * [![Haskell][Haskell.hs]][Haskell-url]
 * [![Caball][Caball.config]][Caball-url]
+* [![Make][makefile]][Make-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -110,67 +168,37 @@
 
 1) To get started install git and if you have git clone the repository like so
     ```
-    git clone https://github.com/jabauer1998/EdeGen.git
+    git clone https://github.com/jabauer1998/CalcLang.git
     ```
 
-2) After that change directory into the parent directory called EdeGen.
-3) The user will have to import a github submodule called EdeStl
-   
-   ```
-   git submodule update --init --recursive
-   ```
-5) Once in that directory you can run the command:
+2) After that change directory into the parent directory called CalcLang.
+3) Once in that directory you can run the command:
 
-    For windows users:
+    For linux users:
     ```
-    ./build/WindowsBuild.ps1 build
-    ```
-
-    For mac/linux users:
-    ```
-    ./build/LinuxBuild.sh build
+    make
     ```
 
 6) To run the sample demo run the follwing command:
 
-    Run as standard application:
+    Run as Terminal Application:
     ```
-    ./bin/EdeGen.jar
-    ```
-
-    Run as Java application:
-    ```
-    java -jar ./bin/EdeGen.jar
+    ./bin/ICalcLang
     ```
 
+    Run as Web application:
+    ```
+    ./bin/WCalcLang
+    ```
 ### Prerequisites
+* Can only run on Linux as of now
 
 * Git
-  
-  For Windows: [Git Windows Install](https://git-scm.com/install/windows)
 
-  For Linux: run the follwoing command
+  For Linux: run the following command
   ```
   apt-get install git
   ```
-* [Java Download (Must be 25 or higher)](https://www.oracle.com/java/technologies/downloads/#java25)
-
-  Note: you can install any JDK or JVM it just needs to be java 25 or higher
-* Powershell (Windows Only):
-  ```
-  winget install --id Microsoft.PowerShell.Preview --source winget
-  ```
-  
-
-### Installation
-<p>The package information is available on SourceForge. The steps for installing it are below. Read all steps before clicking on the link for best advice</p>
-
-1. Follow this link: [SourceForge.net](https://sourceforge.net/projects/edegen)
-2. Wait five seconds to install or click install
-3. Note: Install in a directory where it is easily accessable.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- USAGE EXAMPLES -->
@@ -187,7 +215,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Add EdeStl under used Jar inside list so that the user can specify whether it is linked deeply or softly 
+- [ ] Add functionality for Applications
 
 See the [open issues](https://github.com/jabauer1998/EdeGen/issues) for a full list of proposed features (and known issues).
 
@@ -269,67 +297,3 @@ Project Link: [https://github.com/jabauer1998/EdeStl](https://github.com/jabauer
 [Powershell-url]: https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell?view=powershell-7.6
 [Bash.sh]: https://img.shields.io/badge/bash_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white
 [Bash-url]: https://www.gnu.org/software/bash
-
-
-# CalcLang
-CalcLang is an interpreted language designed to be used in a Math class. 
-Oroginally it was created as a reply with scala however i switched it over to haskell for performance reasons.
-
-# Haskell
--- In this version of CalcLang the lexer and the Parser are generated with Parsec Monadic Parser Combinator Library
-
---The main difference with this version is that defining function syntax is slightly different.
---Scala -> it is f(x) = expr
---Haskell -> it is func f(x) = expr
-
-The reason I did this was because the parser generator said their was an ambiguity which was something I was able to get out when I wrote my own grammer.
-
-Speaking of the grammar the grammar of CalcLang is below
-
-Taken from haskell parser generator
-
-  <p>Line -> Ident '=' Expression 'end'                      (1)<br>
-	Line -> Ident '(' Paramaters ')' '=' Expression 'end'   (2)<br>
-	Line -> Expression 'end'                                (3)<br>
-	Paramaters -> Ident                                     (4)<br>
-    Paramaters -> Paramaters ',' Ident                      (5)<br>
-	Expression -> Logical 'for' Logical 'else' Expression   (6)<br>
-	Expression -> Logical                              (7)<br>
-	Logical -> Logical 'and' Relational                (8)<br>
-	Logical -> Logical 'or' Relational                 (9)<br>
-	Logical -> Relational                              (10)<br>
-	Relational -> Expr1 '<' Expr1                      (11)<br>
-	Relational -> Expr1 '>' Expr1                      (12)<br>
-	Relational -> Expr1 '<=' Expr1                     (13)<br>
-	Relational -> Expr1 '>=' Expr1                     (14)<br>
-	Relational -> Expr1 '!=' Expr1                     (15)<br>
-	Relational -> Expr1 '==' Expr1                     (16)<br>
-	Relational -> Expr1                                (17)<br>
-	Expr1 -> Expr1 '+' Term                            (18)<br>
-	Expr1 -> Expr1 '-' Term                            (19)<br>
-	Expr1 -> Term                                      (20)<br>
-	Term -> Term '*' Unary                             (21)<br>
-	Term -> Term '/' Unary                             (22)<br>
-	Term -> Term '.' Unary                             (23)<br>
-	Term -> Unary                                      (24)<br>
-	Unary -> '-' Unary                                 (25)<br>
-	Unary -> 'not' Unary                               (26)<br>
-  Unary -> '+' Unary                                 (27)<br>
-	Unary -> Power                                     (28)<br>
-	Power -> Primary '^' Power                         (29)<br>
-	Power -> Primary                                   (30)<br>
-	Primary -> '(' Expression ')'                      (31)<br>
-	Primary -> '(' Expressions ')'                     (32)<br>
-	Primary -> '(' Applications ')' '(' Expressions ')'   (33)<br>
-	Primary -> '{' Expressions '}'                     (34)<br>
-	Primary -> Ident '(' Expressions ')'               (35)<br>
-	Primary -> Ident                                   (36)<br>
-	Primary -> '$' Number                              (37)<br>
-	Primary -> Number '%'                              (38)<br>
-	Primary -> Number                                  (39)<br>
-	Number -> IntT                                     (40)<br>
-	Number -> RealT                                    (41)<br>
-	Expressions -> Expression                          (42)<br>
-	Expressions -> Expressions ',' Expression          (43)<br>
-	Applications -> Ident                              (44)<br>
-	Applications -> Applications 'o' Ident             (45)</p>
