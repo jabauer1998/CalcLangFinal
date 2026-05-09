@@ -142,14 +142,12 @@ Taken from haskell parser generator
 
 ### An example of the CalcLang Interpreter Intro
 ![FunctionsInterpreter](images/FunctionsInterpreter.png)
-![Help](images/Help.png)
 ### An example of the CalcLang Web Version
-![Graph]("images/CalcLangGraph.png")
-
+![Graph](images/CalcLangGraph.png)
 ### An example of the Help Command
-[![Product Name Screen Shot][product-screenshot4]](images/EdeGenSample4.png)
+![Help](images/Help.png)
 
-<p>The EDE is software that is inspired by the PEP9 virtual computer. PEP9 is an educational tool that allows students to learn the basics of how a computer works without having to dive into any actual hardware. It is a much more cost effective solution for universities to teach undergrad/introductory level assembly/computer systems courses. The clever GUI also allows the students to easily visualize whats going on inside the CPU. It does have its limits. Since PEP 9 is not an actual computer, the assembly syntax is useless in industry. It also offers a very impractical register file. To account for this the EDE is a system where an instructor(or anyone else) can create an emulator with a Hardware Description Language(Verilog). This gui can be utilized to like the pep9 to teach a computer systems course, however with a customized processor. The HDL component of the project can be utilized to teach a computer architecture course without having to buy expensive FPGA's. The EDE can also be used in industry as a high level final step pre-silicon verification tool. Fabless semiconductor companies can use it to verify that there architecture works prior to sending the design off to get manufactered and if it doesn't they can use the gui to give them insight about where the error is occuring.</p>
+<p>Like stated above and like the name suggests CalcLang is a Calculator and Math oriented Language that allows the user to generate math constructs. There are two ways that a student can access CalcLang. They can download the GitRepo and run the Interpreter or the ICalcLang exe. They can also access a Web version by cicking <a href="https://calc-lang-final-JacobBauer5.replit.app">here</a>.</p>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
